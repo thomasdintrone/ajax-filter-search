@@ -62,18 +62,18 @@ if( !class_exists('AFSAdmin') ) :
 		);
 		
 		/* CALLBACK DESCRIPTION FUNCTIONS FOR EACH TAB SECTION */
-		public static function afs_settings_general_section_callback(  ) { 
+		static function afs_settings_general_section_callback(  ) { 
 			echo __( 'Customize your settings below and then copy and paste the shortcode <strong>[ajax_filter_search]</strong> on the page you\'d like the feed to display.', 'wordpress' );
 		}
-		public static function afs_settings_style_options_section_callback(  ) { 
+		static function afs_settings_style_options_section_callback(  ) { 
 			echo __( '', 'wordpress' );
 		}
-		//public static function afs_settings_directions_section_callback(  ) { 
+		//function afs_settings_directions_section_callback(  ) { 
 			//echo __( '', 'wordpress' );
 		//}
 		
 		/* RETRIEVE VALUES */
-		public static function afs_retrieve($val) {
+		static function afs_retrieve($val) {
 			$options 	= get_option( AFS_SETTINGS );
 			$value		= $options[AFS_SUB.$val];
 			return $value;
@@ -82,14 +82,14 @@ if( !class_exists('AFSAdmin') ) :
 		/******************************************
 		* INITIALIZE EVERYTHING
 		******************************************/
-		public static function init() {
+		static function init() {
 			// Admin Settings, Styles & Scripts
 			add_action( 'admin_menu', array(__CLASS__, AFS_SUB.'_add_admin_menu') );
 			add_action( 'admin_init', array(__CLASS__, AFS_SUB.'_settings_init') );
 			add_action( 'admin_enqueue_scripts', array(__CLASS__, 'load_admin_scripts'), 100);
 			
 			// Adds Settings Link to Plugins Page
-			add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_settings_link' ) );
+			add_filter( 'plugin_action_links_'.AFS_PLUGIN_FILE, array(__CLASS__, 'plugin_settings_link') );
 			
 			// Core Styles & Scripts
 			add_action( 'wp_enqueue_scripts', array(__CLASS__, 'load_core_scripts'), 999 );
@@ -100,12 +100,12 @@ if( !class_exists('AFSAdmin') ) :
 		* BUILD ADMIN AREA
 		******************************************/
 		// Set Up Admin Area
-		public static function afs_add_admin_menu(  ) { 	
+		static function afs_add_admin_menu(  ) { 	
 			add_options_page( AFS_PAGE_TITLE, AFS_MENU_TAB_TITLE, AFS_CAPABILITIES, AFS_MENU_SLUG, array(__CLASS__, AFS_CALLBACK) );
 		}
 		
 		// Add Settings Link to Plugins Page
-		public static function plugin_settings_link($links) {
+		static function plugin_settings_link($links) {
 			$url = get_admin_url() . 'options-general.php?page='.AFS_MENU_SLUG;
 			$settings_link = '<a href="'.$url.'">' . __( 'Settings', AFS_MENU_SLUG ) . '</a>';
 			array_unshift( $links, $settings_link );
@@ -113,7 +113,7 @@ if( !class_exists('AFSAdmin') ) :
 		}
 		
 		// Initialize The Tabs
-		public static function init_setting_tabs (  ) {  
+		static function init_setting_tabs (  ) {  
 			
 			$tab_array = self::$tabs;
 			foreach($tab_array as $tab) {
@@ -152,7 +152,7 @@ if( !class_exists('AFSAdmin') ) :
 		}	
 		
 		// Initialize the tabs and all it's data
-		public static function afs_settings_init(  ) { 	
+		static function afs_settings_init(  ) { 	
 			
 			// Grab Tab Information
 			self::init_setting_tabs();		
@@ -162,7 +162,7 @@ if( !class_exists('AFSAdmin') ) :
 		/* REGISTER FORM FIELD FUNCTIONS  */
 		
 		// General
-		public static function afs_general_post_type(  ) { 
+		static function afs_general_post_type(  ) { 
 	
 			$options = get_option( AFS_SETTINGS );
 			
@@ -196,7 +196,7 @@ if( !class_exists('AFSAdmin') ) :
 		<?php
 		}
 		
-		public static function afs_general_post_taxonomy(  ) { $options = get_option( AFS_SETTINGS ); ?>
+		static function afs_general_post_taxonomy(  ) { $options = get_option( AFS_SETTINGS ); ?>
 				
 			<select class="general-post-taxonomy" name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>'>
 				<?php 
@@ -225,7 +225,7 @@ if( !class_exists('AFSAdmin') ) :
 		
 		}
 		
-		public static function afs_general_posts_per_page(  ) {  $options = get_option( AFS_SETTINGS ); 
+		static function afs_general_posts_per_page(  ) {  $options = get_option( AFS_SETTINGS ); 
 			
 			// Set Default:
 			if($options[__FUNCTION__] == '') { $options[__FUNCTION__] = get_option( 'posts_per_page' ); }
@@ -237,7 +237,7 @@ if( !class_exists('AFSAdmin') ) :
 		<?php
 		}
 	
-		public static function afs_general_show_filters(  ) { $options = get_option( AFS_SETTINGS ); 
+		static function afs_general_show_filters(  ) { $options = get_option( AFS_SETTINGS ); 
 			
 			if($options[__FUNCTION__] == '') { $options[__FUNCTION__] = 1; }
 			
@@ -250,7 +250,7 @@ if( !class_exists('AFSAdmin') ) :
 		<?php
 		}
 		
-		public static function afs_general_views(  ) { $options = get_option( AFS_SETTINGS ); 
+		static function afs_general_views(  ) { $options = get_option( AFS_SETTINGS ); 
 			
 			if($options[__FUNCTION__] == '') { $options[__FUNCTION__] = 1; }
 			
@@ -265,7 +265,7 @@ if( !class_exists('AFSAdmin') ) :
 		
 		
 		// Style Options
-		public static function afs_style_options_table_header(  ) { $options = get_option( AFS_SETTINGS );  ?>
+		static function afs_style_options_table_header(  ) { $options = get_option( AFS_SETTINGS );  ?>
 			
 			<input name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' type="text" class="plugin-colorpicker" value="<?php echo $options[__FUNCTION__]; ?>">
             			
@@ -274,7 +274,7 @@ if( !class_exists('AFSAdmin') ) :
 		
 		
 		// Directions
-		public static function afs_directions_content(  ) { ?>
+		static function afs_directions_content(  ) { ?>
 			
 			<style type="text/css">p.submit {display:none;}</style>
 		
@@ -303,7 +303,7 @@ if( !class_exists('AFSAdmin') ) :
 		}	
 		
 		// Image Uploader
-		public static function afs_general_upload_media( ) { $options = get_option( AFS_SETTINGS ); ?>
+		function afs_general_upload_media( ) { $options = get_option( AFS_SETTINGS ); ?>
 			<div>
 				<!--<label for="image_url">Image</label>-->
 				<input type="hidden" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>" id="image_url" class="regular-text" value="<?php echo $options[__FUNCTION__]; ?>">
@@ -348,7 +348,7 @@ if( !class_exists('AFSAdmin') ) :
 		
 		
 		// Display Form HTML
-		public static function afs_options_page(  ) {  ?>
+		static function afs_options_page(  ) {  ?>
 		
 			<div class="wrap">
 				<form id="afs-form" action='options.php' method='post'>
@@ -393,7 +393,7 @@ if( !class_exists('AFSAdmin') ) :
 		/******************************************
 		* REGISTER STYLES & SCRIPTS
 		******************************************/
-		public static function load_core_scripts() {
+		static function load_core_scripts() {
 		
 			global $wp_styles;
 			
@@ -428,7 +428,7 @@ if( !class_exists('AFSAdmin') ) :
 	
 		
 		// Load Admin Scripts
-		public static function load_admin_scripts() {
+		static function load_admin_scripts() {
 			
 			// Color Picker Scripts:
 			wp_enqueue_style('wp-color-picker');

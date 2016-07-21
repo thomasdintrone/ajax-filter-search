@@ -48,6 +48,7 @@ if( !class_exists('AFSSettings') ) :
 			define('AFS_CALLBACK', 'afs_options_page'); // The name of the function that displays the HTML
 			
 			define('AFS_PLUGIN_PATH', plugin_dir_path(__FILE__));
+			define('AFS_PLUGIN_FILE', plugin_basename( __FILE__ ));
    			define('AFS_PLUGIN_URL', plugins_url('', __FILE__));
    			define('AFS_PLUGIN_ADMIN_URL', plugins_url('admin/', __FILE__));
 			
