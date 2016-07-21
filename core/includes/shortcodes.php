@@ -61,7 +61,7 @@ function ajax_filter_search($atts, $content = null) {
 	$text .= '					<div class="afs-Filters col-xs-12">';
 	$text .= '						<div class="row">';
 	$text .= '							<div class="afs-FilterPanel1 col-xs-12 col-sm-12">';
-	$text .= '								<h5>Search Press Releases</h5>';
+	$text .= '								<h5>Search</h5>';
 	$text .= '								<div class="">';
 	$text .= '									<div class="row rowtop">';
 	
@@ -126,7 +126,7 @@ function ajax_filter_search($atts, $content = null) {
     $text .= '       						<div class="row">';
     $text .= '            						<div class="col-sm-12">';
     $text .= '                						<div class="pull-right">';
-    $text .= '                   						<button type="button" id="updateBtn" class="btn btn-primary">Update</button>&nbsp;&nbsp;';
+    $text .= '                   						<button type="button" id="updateBtn" class="btn btn-primary">Update</button>';
 	$text .= '											<button type="button" id="resetBtn" class="btn btn-default reset">Reset</button>';
     $text .= '               						</div>';
     $text .= '               						<div class="clearfix"></div>';
@@ -228,15 +228,16 @@ function afs_feed($atts, $content = null) {
 	Define The Args & Defaults
 	****************************/
 	
+	$offset_pag = $offset;
 	if($filter_type == 'all' ) { $filter_type = ''; }
-	if($offset != 0) {  $offset_val = ($offset - 1) * $posts_per_page; }
+	if($offset != 0) {  $offset = ($offset - 1) * $posts_per_page; }
 	if($posts_per_page == '') { get_option( 'posts_per_page' ); }
 
 	$args = array(
 		'post_type'			=> $post_type,
 		'category_name' 		=> $filter_type,
 		'posts_per_page' 	=> $posts_per_page,
-		'offset'				=> $offset_val,
+		'offset'				=> $offset,
 		'date_query' 		=> array(array()),
 		'orderby' 			=> 'date',
 		'order'   			=> 'DESC',
@@ -283,11 +284,7 @@ function afs_feed($atts, $content = null) {
 			if(AFSAdmin::afs_retrieve('_general_post_taxonomy') != '' && AFSAdmin::afs_retrieve('_general_post_taxonomy') != 'none') {
 				$cats = get_the_terms(get_the_ID(), AFSAdmin::afs_retrieve('_general_post_taxonomy'));
 				foreach( $cats as $cat ) { 
-				if($cat->name == 'Uncategorized') { 
-					$text .= 'Press Release';
-				} else {
 					$text .= $cat->name; 
-					}
 				} 
 			}
 			$text .= '	</h6>';
@@ -326,14 +323,14 @@ function afs_feed($atts, $content = null) {
 			// Pagination
 			$text .= '<div class="row">';
 			$text .= '	<div class="col-xs-12">';
-			$text .= '		Displaying '.$current_post_position.' to <span id="pageLastRecord">'.$posts_per_page.'</span> (of <span id="recordCount">'.$total_count.'</span> releases)';
+			$text .= '		Displaying '.$current_post_position.' to <span id="pageLastRecord">'.$posts_per_page.'</span> (of <span id="recordCount">'.$total_count.'</span>)';
 			$text .= '	</div>';
 			$text .= '	<div class="clearfix"></div>';
 			$text .= '</div>';
 
 			$text .= '<div class="row">';
 			$text .= '	 <div class="col-md-12">';
-			$text .= 		afs_page_navi( array('echo' => false, 'custom_query' => $query, 'offset'=> $offset));
+			$text .= 		afs_page_navi( array('echo' => false, 'custom_query' => $query, 'offset' => $offset_pag));
 			$text .= '	</div>';
 			$text .= '</div>';
 

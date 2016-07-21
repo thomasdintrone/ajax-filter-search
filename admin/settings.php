@@ -83,16 +83,16 @@ if( !class_exists('AFSAdmin') ) :
 		* INITIALIZE EVERYTHING
 		******************************************/
 		public static function init() {
-			// Admin Settings
-			add_action( 'admin_menu', array(get_class($this), AFS_SUB.'_add_admin_menu') );
-			add_action( 'admin_init', array(get_class($this), AFS_SUB.'_settings_init') );
+			// Admin Settings, Styles & Scripts
+			add_action( 'admin_menu', array(__CLASS__, AFS_SUB.'_add_admin_menu') );
+			add_action( 'admin_init', array(__CLASS__, AFS_SUB.'_settings_init') );
+			add_action( 'admin_enqueue_scripts', array(__CLASS__, 'load_admin_scripts'), 100);
 			
 			// Adds Settings Link to Plugins Page
-			add_filter( 'plugin_action_links', array( get_class($this), 'plugin_settings_link' ) );
+			add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_settings_link' ) );
 			
-			// Styles & Scripts
-			add_action( 'wp_enqueue_scripts', array(get_class($this), 'afs_scripts'), 999 );
-			add_action( 'admin_enqueue_scripts', array(get_class($this), 'colpick_and_media_scripts'), 100);
+			// Core Styles & Scripts
+			add_action( 'wp_enqueue_scripts', array(__CLASS__, 'load_core_scripts'), 999 );
 		}
 		
 		
@@ -101,7 +101,7 @@ if( !class_exists('AFSAdmin') ) :
 		******************************************/
 		// Set Up Admin Area
 		public static function afs_add_admin_menu(  ) { 	
-			add_options_page( AFS_PAGE_TITLE, AFS_MENU_TAB_TITLE, AFS_CAPABILITIES, AFS_MENU_SLUG, array(get_class($this), AFS_CALLBACK) );
+			add_options_page( AFS_PAGE_TITLE, AFS_MENU_TAB_TITLE, AFS_CAPABILITIES, AFS_MENU_SLUG, array(__CLASS__, AFS_CALLBACK) );
 		}
 		
 		// Add Settings Link to Plugins Page
@@ -126,7 +126,7 @@ if( !class_exists('AFSAdmin') ) :
 				add_settings_section(
 					$tab_section, 
 					__( $tab['title'], 'wordpress' ), 
-					array(get_class($this), AFS_SETTINGS.'_'.$tab['name'].'_section_callback'), 
+					array(__CLASS__, AFS_SETTINGS.'_'.$tab['name'].'_section_callback'), 
 					$tab_name
 				);
 				
@@ -140,7 +140,7 @@ if( !class_exists('AFSAdmin') ) :
 						add_settings_field( 
 							$field_function, 
 							__( $field['field_description'], 'wordpress' ), 
-							array(get_class($this), $field_function), 
+							array(__CLASS__, $field_function), 
 							$tab_name, 
 							$tab_section 
 						);
@@ -192,35 +192,6 @@ if( !class_exists('AFSAdmin') ) :
 				   
 				<?php } ?>
 			</select>
-			
-			<script type="text/javascript">
-			(function ($) {
-			  $(function () {
-				$('select.general-post-type').on('change', function (e) { 
-					
-					$('#submit').attr('disabled', 'disabled');
-					
-					// Get Post Selected:
-					var optionSelected = $("option:selected", this);
-					var valueSelected = this.value;
-					
-					$('select.general-post-taxonomy').stop().animate({ opacity:0 }, function(){
-						$.ajax({
-							type: 'POST',
-							url : ajaxurl,
-							cache: false,
-							data : 'action=get_selected&option='+valueSelected,
-							complete : function() {  },
-							success: function(data) {
-								$('select.general-post-taxonomy').html(data).stop().animate({ opacity: 1 }, 'fast' );
-								$('#submit').removeAttr('disabled');
-							}
-						});
-					});
-				});
-			  });
-			}(jQuery));
-			</script>
 		
 		<?php
 		}
@@ -231,6 +202,7 @@ if( !class_exists('AFSAdmin') ) :
 				<?php 
 					$cur_post_tax		= $options[__FUNCTION__];
 					$post_type 			= AFSAdmin::afs_retrieve('_general_post_type');
+					if($post_type == '') { $post_type = 'post'; }
 					$taxonomy_objects 	= get_object_taxonomies($post_type, 'objects');
 		
 					if($taxonomy_objects) {
@@ -295,15 +267,7 @@ if( !class_exists('AFSAdmin') ) :
 		// Style Options
 		public static function afs_style_options_table_header(  ) { $options = get_option( AFS_SETTINGS );  ?>
 			
-			<input name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' type="text" class="<?php echo AFS_SUB; ?>-colorpicker" value="<?php echo $options[__FUNCTION__]; ?>">
-			
-			<script type="text/javascript">
-				(function ($) {
-				  $(function () {
-					$('.<?php echo AFS_SUB; ?>-colorpicker').wpColorPicker();
-				  });
-				}(jQuery));
-			</script>
+			<input name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' type="text" class="plugin-colorpicker" value="<?php echo $options[__FUNCTION__]; ?>">
             			
 		<?php
 		} 
@@ -429,7 +393,7 @@ if( !class_exists('AFSAdmin') ) :
 		/******************************************
 		* REGISTER STYLES & SCRIPTS
 		******************************************/
-		public static function afs_scripts() {
+		public static function load_core_scripts() {
 		
 			global $wp_styles;
 			
@@ -463,8 +427,9 @@ if( !class_exists('AFSAdmin') ) :
 		}
 	
 		
-		// Add Color Picker & Media Uploader Scripts
-		public static function colpick_and_media_scripts() {
+		// Load Admin Scripts
+		public static function load_admin_scripts() {
+			
 			// Color Picker Scripts:
 			wp_enqueue_style('wp-color-picker');
 			wp_enqueue_script('iris', admin_url('js/iris.min.js'),array('jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch'), false, 1);
@@ -474,6 +439,10 @@ if( !class_exists('AFSAdmin') ) :
 			
 			// Media Uploader Scripts:
 			wp_enqueue_media();
+			
+			// Plugin Scripts
+			wp_register_script( AFS_SUB.'-admin-script-js', AFS_PLUGIN_URL.'/admin/js/admin.js', array( 'jquery' ), '', true );
+			wp_enqueue_script( AFS_SUB.'-admin-script-js' );
 		}
 		
 	}
