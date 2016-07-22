@@ -37,6 +37,10 @@ if( !class_exists('AFSAdmin') ) :
 											'field_name' 		=> '_views',
 											'field_description' => 'Show optional views. (List View / Grid View)'
 										),
+										array(
+											'field_name' 		=> '_repeatable_meta_box_display',
+											'field_description' => 'test'
+										),
 								   )
 			),
 			/*array(
@@ -93,6 +97,11 @@ if( !class_exists('AFSAdmin') ) :
 			
 			// Core Styles & Scripts
 			add_action( 'wp_enqueue_scripts', array(__CLASS__, 'load_core_scripts'), 999 );
+			
+			
+			
+			add_action('admin_init', array(__CLASS__, AFS_SUB.'_add_meta_boxes'), 1);
+			add_action('save_post', array(__CLASS__, AFS_SUB.'_repeatable_meta_box_save'));
 		}
 		
 		
@@ -284,7 +293,161 @@ if( !class_exists('AFSAdmin') ) :
 		
 		
 		
+		static function afs_get_sample_options() {
+			$theoptions = array (
+				'Option 1' => 'option1',
+				'Option 2' => 'option2',
+				'Option 3' => 'option3',
+				'Option 4' => 'option4',
+			);
+			
+			return $theoptions;
+		}
 		
+		static function afs_add_meta_boxes() {
+			add_meta_box( 'repeatable-fields', 'Repeatable Fields', AFS_SUB.'_general_repeatable_meta_box_display', 'post', 'normal', 'default');
+		}
+		static function afs_general_repeatable_meta_box_display() { $options = get_option( AFS_SETTINGS );
+			
+			$repeatable_fields = $options[__FUNCTION__];
+			$theoptions = self::afs_get_sample_options();
+			wp_nonce_field( AFS_SUB.'_repeatable_meta_box_nonce', AFS_SUB.'_repeatable_meta_box_nonce' );
+			?>
+			<script type="text/javascript">
+			jQuery(document).ready(function( $ ){
+				$( '#add-row' ).on('click', function() {
+					var row = $( '.empty-row.screen-reader-text' ).clone(true);
+					row.removeClass( 'empty-row screen-reader-text' );
+					row.insertBefore( '#repeatable-fieldset-one tbody>tr:last' );
+					return false;
+				});
+			
+				$( '.remove-row' ).on('click', function() {
+					$(this).parents('tr').remove();
+					return false;
+				});
+			});
+			</script>
+		  
+			<table id="repeatable-fieldset-one" width="100%">
+			<thead>
+				<tr>
+					<th width="40%">Name</th>
+					<th width="12%">Select</th>
+					<th width="40%">URL</th>
+					<th width="8%"></th>
+				</tr>
+			</thead>
+			<tbody>
+            
+            
+			<?php print_r($repeatable_fields);
+			
+			if ( $repeatable_fields ) :
+			
+			foreach ( $repeatable_fields as $field ) {
+			?>
+			<tr>
+				<td><input type="text" class="widefat" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>[name]" value="<?php if($field['name'] != '') { echo esc_attr( $field['name'] ); } ?>" /></td>
+			
+				<td>
+					<?php /*<select name="select[]">
+					<?php foreach ( $theoptions as $label => $value ) : ?>
+					<option value="<?php echo $value; ?>"<?php selected( $field['select'], $value ); ?>><?php echo $label; ?></option>
+					<?php endforeach; ?>
+					</select>*/ ?>
+				</td>
+			
+				<td><?php /*<input type="text" class="widefat" name="url[]" value="<?php if ($field['url'] != '') echo esc_attr( $field['url'] ); else echo 'http://'; ?>" />*/ ?></td>
+			
+				<td><a class="button remove-row" href="#">Remove</a></td>
+			</tr>
+			<?php
+			}
+			else :
+			// show a blank one
+			?>
+			<tr>
+				<td><input type="text" class="widefat" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>[name]" /></td>
+			
+				<td>
+					<?php /*<select name="select[]">
+					<?php foreach ( $theoptions as $label => $value ) : ?>
+					<option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+					<?php endforeach; ?>
+					</select>*/ ?>
+				</td>
+			
+				<td><?php /*<input type="text" class="widefat" name="url[]" value="http://" />*/ ?></td>
+			
+				<td><a class="button remove-row" href="#">Remove</a></td>
+			</tr>
+			<?php endif; ?>
+			
+			<!-- empty hidden one for jQuery -->
+			<tr class="empty-row screen-reader-text">
+				<td><input type="text" class="widefat" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>[name]" /></td>
+			
+				<td>
+					<?php /*<select name="select[]">
+					<?php foreach ( $theoptions as $label => $value ) : ?>
+					<option value="<?php echo $value; ?>"><?php echo $label; ?></option>
+					<?php endforeach; ?>
+					</select>*/ ?>
+				</td>
+				
+				<td><?php /*<input type="text" class="widefat" name="url[]" value="http://" />*/ ?></td>
+				  
+				<td><a class="button remove-row" href="#">Remove</a></td>
+			</tr>
+			</tbody>
+			</table>
+			
+			<p><a id="add-row" class="button" href="#">Add another</a></p>
+			<?php
+		}
+		
+		static function afs_repeatable_meta_box_save($post_id) {
+			if ( ! isset( $_POST[AFS_SUB.'_repeatable_meta_box_nonce'] ) ||
+			! wp_verify_nonce( $_POST[AFS_SUB.'_repeatable_meta_box_nonce'], AFS_SUB.'_repeatable_meta_box_nonce' ) )
+				return;
+			
+			if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+				return;
+			
+			if (!current_user_can('edit_post', $post_id))
+				return;
+			
+			$old = get_post_meta($post_id, 'repeatable_fields', true);
+			$new = array();
+			$options =  self::afs_get_sample_options();
+			
+			$names = $_POST['name'];
+			$selects = $_POST['select'];
+			$urls = $_POST['url'];
+			
+			$count = count( $names );
+			
+			for ( $i = 0; $i < $count; $i++ ) {
+				if ( $names[$i] != '' ) :
+					$new[$i]['name'] = stripslashes( strip_tags( $names[$i] ) );
+					
+					if ( in_array( $selects[$i], $options ) )
+						$new[$i]['select'] = $selects[$i];
+					else
+						$new[$i]['select'] = '';
+				
+					if ( $urls[$i] == 'http://' )
+						$new[$i]['url'] = '';
+					else
+						$new[$i]['url'] = stripslashes( $urls[$i] ); // and however you want to sanitize
+				endif;
+			}
+			if ( !empty( $new ) && $new != $old )
+				update_post_meta( $post_id, 'repeatable_fields', $new );
+			elseif ( empty($new) && $old )
+				delete_post_meta( $post_id, 'repeatable_fields', $old );
+		}
 		
 		
 		
@@ -401,10 +564,10 @@ if( !class_exists('AFSAdmin') ) :
 		
 				// Register Files
 				wp_register_style( AFS_SUB.'-fontawesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css', array(), '', 'all' );	
-				wp_register_style( AFS_SUB.'-main', AFS_PLUGIN_URL.'/core/css/main.css', array(), '', 'all' );	
-				wp_register_style( AFS_SUB.'-custom', AFS_PLUGIN_URL.'/core/css/custom.css', array(), '', 'all' );	
+				wp_register_style( AFS_SUB.'-main', AFS_PLUGIN_URL.'/core/css/main.min.css', array(), '', 'all' );	
+				wp_register_style( AFS_SUB.'-custom', AFS_PLUGIN_URL.'/core/css/custom.min.css', array(), '', 'all' );	
 		
-				wp_register_script( AFS_SUB.'-script-js', AFS_PLUGIN_URL.'/core/js/script.js', array( 'jquery' ), '', true );
+				wp_register_script( AFS_SUB.'-script-js', AFS_PLUGIN_URL.'/core/js/script.min.js', array( 'jquery' ), '', true );
 		
 				//if ( is_front_page() && is_home() ) {
 				  // Default homepage
@@ -441,7 +604,7 @@ if( !class_exists('AFSAdmin') ) :
 			wp_enqueue_media();
 			
 			// Plugin Scripts
-			wp_register_script( AFS_SUB.'-admin-script-js', AFS_PLUGIN_URL.'/admin/js/admin.js', array( 'jquery' ), '', true );
+			wp_register_script( AFS_SUB.'-admin-script-js', AFS_PLUGIN_URL.'/admin/js/admin.min.js', array( 'jquery' ), '', true );
 			wp_enqueue_script( AFS_SUB.'-admin-script-js' );
 		}
 		

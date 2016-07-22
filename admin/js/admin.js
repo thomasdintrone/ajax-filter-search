@@ -6,12 +6,12 @@ ADMIN JS
   	$(function () {
 	
 		// Update Post Taxonomy based on Post Type selection:
-		$('select.general-post-type').on('change', function (e) { 
+		$('select.general-post-type').on('change', function () { 
 			
 			$('#submit').attr('disabled', 'disabled');
 			
 			// Get Post Selected:
-			var optionSelected = $("option:selected", this);
+			//var optionSelected = $("option:selected", this);
 			var valueSelected = this.value;
 			
 			$('select.general-post-taxonomy').stop().animate({ opacity:0 }, function(){

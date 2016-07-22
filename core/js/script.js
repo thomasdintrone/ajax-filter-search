@@ -5,7 +5,6 @@
 	INITIALIZE FUNCTION:
 	*****************************************/
 	function init() {
-		"use strict";
 		
 		// Show Summary
 		$("a.showSummary").click(function(n) {
@@ -13,7 +12,7 @@
 			var i = $(this).children(".fa").attr("class"),
 				t = $(this).closest(".afs-PRTools").next();
 			
-			i == "fa fa-minus-square" ? ($(this).children(".fa").attr("class", "fa fa-plus-square"), $(this).parent().removeClass("active"), t.css("display", "none")) : ($(this).children(".fa").attr("class", "fa fa-minus-square"), $(this).parent().addClass("active"), t.css("display", "block"))
+			i === "fa fa-minus-square" ? ($(this).children(".fa").attr("class", "fa fa-plus-square"), $(this).parent().removeClass("active"), t.css("display", "none")) : ($(this).children(".fa").attr("class", "fa fa-minus-square"), $(this).parent().addClass("active"), t.css("display", "block"));
 		});
 		
 		
@@ -23,7 +22,7 @@
 			var t = $(".afs-TableWrapper"),
 				i = $(this).attr("rel");
 		   
-			t.hasClass(i) || ($(".afs-Switch li").removeClass("active"), $(this).parent().addClass("active"), t.removeAttr("class"), t.addClass("afs-TableWrapper " + i))
+			t.hasClass(i) || ($(".afs-Switch li").removeClass("active"), $(this).parent().addClass("active"), t.removeAttr("class"), t.addClass("afs-TableWrapper " + i));
 		});
 		
 		
@@ -36,10 +35,10 @@
 		}), 
 		$("#newsForm input[name='filterBy']").keydown(function(n) {
 			var t = n.keyCode || n.which;
-			t == 13 && submitForm()
+			t === 13 && submitForm();
 		}), 
 		$("#updateBtn, .filterBy").click(function() {
-			submitForm()
+			submitForm();
 			return false;
 		}), 
 		$("#resetBtn").click(function() {
@@ -47,7 +46,7 @@
 			$("#newsForm")[0].reset(), 
 			$("input[placeholder='Email']").val(t), 
 			$("select[name='category']").val($("input[name='filingType']").val()), 
-			submitForm()
+			submitForm();
 			return false;
 		});
 		
@@ -76,9 +75,7 @@
 	/*****************************************
 	PROCESS FORM DATA:
 	*****************************************/
-	var submitForm = function(n) {
-		"use strict";
-		
+	var submitForm = function(n) {		
 		 // Get the info
 		var t;
 		t = "filingType=" + encodeURIComponent(
