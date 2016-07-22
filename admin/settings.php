@@ -37,10 +37,10 @@ if( !class_exists('AFSAdmin') ) :
 											'field_name' 		=> '_views',
 											'field_description' => 'Show optional views. (List View / Grid View)'
 										),
-										array(
+										/*array(
 											'field_name' 		=> '_repeatable_meta_box_display',
 											'field_description' => 'test'
-										),
+										),*/
 								   )
 			),
 			/*array(
@@ -99,9 +99,6 @@ if( !class_exists('AFSAdmin') ) :
 			add_action( 'wp_enqueue_scripts', array(__CLASS__, 'load_core_scripts'), 999 );
 			
 			
-			
-			add_action('admin_init', array(__CLASS__, AFS_SUB.'_add_meta_boxes'), 1);
-			add_action('save_post', array(__CLASS__, AFS_SUB.'_repeatable_meta_box_save'));
 		}
 		
 		
