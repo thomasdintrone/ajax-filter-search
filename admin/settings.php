@@ -13,29 +13,36 @@ if( !class_exists('AFSAdmin') ) :
 		static $tabs = array(
 		
 			// General Tab Info:
+			
+			
 			array(
 				'name' 			=> 'general',
 				'title' 			=> 'Below are the general options for the Filter Display:',
 				'fields'			=> array(
 										array(
 											'field_name' 		=> '_post_type',
-											'field_description' => 'Select a post type to pull the feed from. (default is "post")'
+											'field_description' => 'Select a post type to pull the feed from. (default is "post")',
+											'default'			=> 'post'
 										),
 										array(
 											'field_name' 		=> '_post_taxonomy',
-											'field_description' => 'Select a post taxonomy for the tabbed filters. (default is "post")'
+											'field_description' => 'Select a post taxonomy for the tabbed filters. (default is "post")',
+											'default'			=> 'category'
 										),
 										array(
 											'field_name' 		=> '_posts_per_page',
-											'field_description' => 'How many posts to display per page.'
+											'field_description' => 'How many posts to display per page.',
+											'default'			=> 10
 										),
 										array(
 											'field_name' 		=> '_show_filters',
-											'field_description' => 'Display tabbed filters.'
+											'field_description' => 'Display tabbed filters.',
+											'default'			=> 1
 										),
 										array(
 											'field_name' 		=> '_views',
-											'field_description' => 'Show optional views. (List View / Grid View)'
+											'field_description' => 'Show optional views. (List View / Grid View)',
+											'default'			=> 1
 										),
 										/*array(
 											'field_name' 		=> '_repeatable_meta_box_display',
@@ -78,10 +85,39 @@ if( !class_exists('AFSAdmin') ) :
 		
 		/* RETRIEVE VALUES */
 		static function afs_retrieve($val) {
-			$options 	= get_option( AFS_SETTINGS );
-			$value		= $options[AFS_SUB.$val];
+			$value 	= self::afs_get_option(AFS_SUB.$val);
 			return $value;
 		}
+		
+		/* SET DEFAULTS */
+		static function afs_get_option( $option_name='' ){
+			
+			// Array of defaults: option => default value 
+			$defaults = array();
+			
+			$tab_array = self::$tabs;
+			foreach($tab_array as $tab) { 
+				$fields =  $tab['fields'];
+				if($fields) {
+					foreach($fields as $field) { 
+						$field_function = AFS_SUB.'_'.$tab['name'].$field['field_name'];
+						$field_default	= $field['default'];
+						$defaults[$field_function] = $field_default;
+					} 
+				}
+			}
+						
+			$options = get_option(AFS_SETTINGS,$defaults);
+			
+			//Parse defaults again - see comments
+			$options = wp_parse_args( $options, $defaults );
+			
+			if( !isset($options[$option_name]) )
+			   return false;
+			
+			return $options[$option_name];
+	
+		 }
 		
 		/******************************************
 		* INITIALIZE EVERYTHING
@@ -155,6 +191,9 @@ if( !class_exists('AFSAdmin') ) :
 				
 			}
 			
+			// Set Default Variables
+			self::afs_get_option();
+			
 		}	
 		
 		// Initialize the tabs and all it's data
@@ -169,9 +208,7 @@ if( !class_exists('AFSAdmin') ) :
 		
 		// General
 		static function afs_general_post_type(  ) { 
-	
-			$options = get_option( AFS_SETTINGS );
-			
+				
 			// Select a Post Type
 			$args = array(
 			   'public'   => true,
@@ -183,18 +220,13 @@ if( !class_exists('AFSAdmin') ) :
 			$post_types = get_post_types( $args, $output, $operator ); 
 			
 			?>
-			<?php 
-				if($options[__FUNCTION__] == '') { 
-					$options[__FUNCTION__] = 'post'; 
-				} 
-			?>
 			<select class="general-post-type" name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>'>
 				
-				<!--<option value='0' <?php selected( $options[__FUNCTION__], 0 ); ?>>--</option>-->
+				<!--<option value='0' <?php selected( self::afs_get_option( __FUNCTION__ ), 0 ); ?>>--</option>-->
 				
 				<?php foreach ( $post_types  as $post_type ) { ?>
 					
-					<option value='<?php echo $post_type->name ?>' <?php selected( $options[__FUNCTION__], $post_type->name ); ?>><?php echo $post_type->name; ?></option>
+					<option value='<?php echo $post_type->name ?>' <?php selected( self::afs_get_option( __FUNCTION__ ), $post_type->name ); ?>><?php echo $post_type->name; ?></option>
 				   
 				<?php } ?>
 			</select>
@@ -202,13 +234,14 @@ if( !class_exists('AFSAdmin') ) :
 		<?php
 		}
 		
-		static function afs_general_post_taxonomy(  ) { $options = get_option( AFS_SETTINGS ); ?>
+		static function afs_general_post_taxonomy(  ) { ?>
 				
 			<select class="general-post-taxonomy" name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>'>
 				<?php 
-					$cur_post_tax		= $options[__FUNCTION__];
-					$post_type 			= AFSAdmin::afs_retrieve('_general_post_type');
-					if($post_type == '') { $post_type = 'post'; }
+					$cur_post_tax		= self::afs_get_option( __FUNCTION__ );
+					//$post_type 			= AFSAdmin::afs_retrieve('_general_post_type');
+					$post_type 			= self::afs_get_option( 'afs_general_post_type' );
+					//if($post_type == '') { $post_type = 'post'; }
 					$taxonomy_objects 	= get_object_taxonomies($post_type, 'objects');
 		
 					if($taxonomy_objects) {
@@ -231,49 +264,35 @@ if( !class_exists('AFSAdmin') ) :
 		
 		}
 		
-		static function afs_general_posts_per_page(  ) {  $options = get_option( AFS_SETTINGS ); 
-			
-			// Set Default:
-			if($options[__FUNCTION__] == '') { $options[__FUNCTION__] = get_option( 'posts_per_page' ); }
-			//get_option( AFS_SETTINGS.'['.__FUNCTION__.']', get_option( 'posts_per_page' ) );
-			
-			?>
+		static function afs_general_posts_per_page(  ) { ?>
 		
-			<input type='text' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' value='<?php echo $options[__FUNCTION__]; ?>'>
+			<input type='text' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' value='<?php echo self::afs_get_option( __FUNCTION__ ); ?>'>
 		<?php
 		}
 	
-		static function afs_general_show_filters(  ) { $options = get_option( AFS_SETTINGS ); 
-			
-			if($options[__FUNCTION__] == '') { $options[__FUNCTION__] = 1; }
-			
-			?>
+		static function afs_general_show_filters(  ) { ?>
 			
 			Yes
-			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( $options[__FUNCTION__], 1 ); ?> value='1'>
+			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( self::afs_get_option( __FUNCTION__ ), 1 ); ?> value='1'>
 			&nbsp; No
-			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( $options[__FUNCTION__], 0 ); ?> value='0'>
+			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( self::afs_get_option( __FUNCTION__ ), 0 ); ?> value='0'>
 		<?php
 		}
 		
-		static function afs_general_views(  ) { $options = get_option( AFS_SETTINGS ); 
-			
-			if($options[__FUNCTION__] == '') { $options[__FUNCTION__] = 1; }
-			
-			?>
+		static function afs_general_views(  ) { ?>
 			
 			Yes
-			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( $options[__FUNCTION__], 1 ); ?> value='1'>
+			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( self::afs_get_option( __FUNCTION__ ), 1 ); ?> value='1'>
 			&nbsp; No
-			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( $options[__FUNCTION__], 0 ); ?> value='0'>
+			<input type='radio' name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' <?php checked( self::afs_get_option( __FUNCTION__ ), 0 ); ?> value='0'>
 		<?php
 		}
 		
 		
 		// Style Options
-		static function afs_style_options_table_header(  ) { $options = get_option( AFS_SETTINGS );  ?>
+		static function afs_style_options_table_header(  ) { ?>
 			
-			<input name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' type="text" class="plugin-colorpicker" value="<?php echo $options[__FUNCTION__]; ?>">
+			<input name='<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>' type="text" class="plugin-colorpicker" value="<?php echo self::afs_get_option( __FUNCTION__ ); ?>">
             			
 		<?php
 		} 
@@ -285,168 +304,7 @@ if( !class_exists('AFSAdmin') ) :
 			<style type="text/css">p.submit {display:none;}</style>
 		
 		<?php	
-		} 
-		
-		
-		
-		
-		static function afs_get_sample_options() {
-			$theoptions = array (
-				'Option 1' => 'option1',
-				'Option 2' => 'option2',
-				'Option 3' => 'option3',
-				'Option 4' => 'option4',
-			);
-			
-			return $theoptions;
-		}
-		
-		static function afs_add_meta_boxes() {
-			add_meta_box( 'repeatable-fields', 'Repeatable Fields', AFS_SUB.'_general_repeatable_meta_box_display', 'post', 'normal', 'default');
-		}
-		static function afs_general_repeatable_meta_box_display() { $options = get_option( AFS_SETTINGS );
-			
-			$repeatable_fields = $options[__FUNCTION__];
-			$theoptions = self::afs_get_sample_options();
-			wp_nonce_field( AFS_SUB.'_repeatable_meta_box_nonce', AFS_SUB.'_repeatable_meta_box_nonce' );
-			?>
-			<script type="text/javascript">
-			jQuery(document).ready(function( $ ){
-				$( '#add-row' ).on('click', function() {
-					var row = $( '.empty-row.screen-reader-text' ).clone(true);
-					row.removeClass( 'empty-row screen-reader-text' );
-					row.insertBefore( '#repeatable-fieldset-one tbody>tr:last' );
-					return false;
-				});
-			
-				$( '.remove-row' ).on('click', function() {
-					$(this).parents('tr').remove();
-					return false;
-				});
-			});
-			</script>
-		  
-			<table id="repeatable-fieldset-one" width="100%">
-			<thead>
-				<tr>
-					<th width="40%">Name</th>
-					<th width="12%">Select</th>
-					<th width="40%">URL</th>
-					<th width="8%"></th>
-				</tr>
-			</thead>
-			<tbody>
-            
-            
-			<?php print_r($repeatable_fields);
-			
-			if ( $repeatable_fields ) :
-			
-			foreach ( $repeatable_fields as $field ) {
-			?>
-			<tr>
-				<td><input type="text" class="widefat" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>[name]" value="<?php if($field['name'] != '') { echo esc_attr( $field['name'] ); } ?>" /></td>
-			
-				<td>
-					<?php /*<select name="select[]">
-					<?php foreach ( $theoptions as $label => $value ) : ?>
-					<option value="<?php echo $value; ?>"<?php selected( $field['select'], $value ); ?>><?php echo $label; ?></option>
-					<?php endforeach; ?>
-					</select>*/ ?>
-				</td>
-			
-				<td><?php /*<input type="text" class="widefat" name="url[]" value="<?php if ($field['url'] != '') echo esc_attr( $field['url'] ); else echo 'http://'; ?>" />*/ ?></td>
-			
-				<td><a class="button remove-row" href="#">Remove</a></td>
-			</tr>
-			<?php
-			}
-			else :
-			// show a blank one
-			?>
-			<tr>
-				<td><input type="text" class="widefat" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>[name]" /></td>
-			
-				<td>
-					<?php /*<select name="select[]">
-					<?php foreach ( $theoptions as $label => $value ) : ?>
-					<option value="<?php echo $value; ?>"><?php echo $label; ?></option>
-					<?php endforeach; ?>
-					</select>*/ ?>
-				</td>
-			
-				<td><?php /*<input type="text" class="widefat" name="url[]" value="http://" />*/ ?></td>
-			
-				<td><a class="button remove-row" href="#">Remove</a></td>
-			</tr>
-			<?php endif; ?>
-			
-			<!-- empty hidden one for jQuery -->
-			<tr class="empty-row screen-reader-text">
-				<td><input type="text" class="widefat" name="<?php echo AFS_SETTINGS.'['.__FUNCTION__.']';?>[name]" /></td>
-			
-				<td>
-					<?php /*<select name="select[]">
-					<?php foreach ( $theoptions as $label => $value ) : ?>
-					<option value="<?php echo $value; ?>"><?php echo $label; ?></option>
-					<?php endforeach; ?>
-					</select>*/ ?>
-				</td>
-				
-				<td><?php /*<input type="text" class="widefat" name="url[]" value="http://" />*/ ?></td>
-				  
-				<td><a class="button remove-row" href="#">Remove</a></td>
-			</tr>
-			</tbody>
-			</table>
-			
-			<p><a id="add-row" class="button" href="#">Add another</a></p>
-			<?php
-		}
-		
-		static function afs_repeatable_meta_box_save($post_id) {
-			if ( ! isset( $_POST[AFS_SUB.'_repeatable_meta_box_nonce'] ) ||
-			! wp_verify_nonce( $_POST[AFS_SUB.'_repeatable_meta_box_nonce'], AFS_SUB.'_repeatable_meta_box_nonce' ) )
-				return;
-			
-			if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
-				return;
-			
-			if (!current_user_can('edit_post', $post_id))
-				return;
-			
-			$old = get_post_meta($post_id, 'repeatable_fields', true);
-			$new = array();
-			$options =  self::afs_get_sample_options();
-			
-			$names = $_POST['name'];
-			$selects = $_POST['select'];
-			$urls = $_POST['url'];
-			
-			$count = count( $names );
-			
-			for ( $i = 0; $i < $count; $i++ ) {
-				if ( $names[$i] != '' ) :
-					$new[$i]['name'] = stripslashes( strip_tags( $names[$i] ) );
-					
-					if ( in_array( $selects[$i], $options ) )
-						$new[$i]['select'] = $selects[$i];
-					else
-						$new[$i]['select'] = '';
-				
-					if ( $urls[$i] == 'http://' )
-						$new[$i]['url'] = '';
-					else
-						$new[$i]['url'] = stripslashes( $urls[$i] ); // and however you want to sanitize
-				endif;
-			}
-			if ( !empty( $new ) && $new != $old )
-				update_post_meta( $post_id, 'repeatable_fields', $new );
-			elseif ( empty($new) && $old )
-				delete_post_meta( $post_id, 'repeatable_fields', $old );
-		}
-		
-		
+		} 		
 		
 		/* Other example Form Fields:
 		
