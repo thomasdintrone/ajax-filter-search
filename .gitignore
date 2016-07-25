@@ -15,6 +15,8 @@ wp-content/plugins/hello.php
 /readme.html
 /sitemap.xml
 /sitemap.xml.gz
-/config.codekit
-/.codekit-cache/
+config.codekit
+.codekit-cache/
 
+
+*.codekit
