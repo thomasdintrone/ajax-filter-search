@@ -268,10 +268,12 @@ function afs_feed($atts, $content = null) {
 		$current_post_position = $offset + 1;
 
 		if($posts_per_page > $total_count) { $posts_per_page = $total_count; }
-
+		
+		$n = 1;
+		$mar = 'margin-left:0;';
 		while ( $query->have_posts() ) { $query->the_post();
-
-			$text .= '<div id="post-'.get_the_ID().'" class="'.join( '  ', get_post_class( 'afs-Loadingdata afs-HasGA afs-TableRowItem gridPR'.$i )).'" role="article" itemscope itemtype="http://schema.org/BlogPosting">';
+			
+			$text .= '<div id="post-'.get_the_ID().'" class="'.join( '  ', get_post_class( 'afs-Loadingdata afs-HasGA afs-TableRowItem gridPR'.$i )).'" role="article" itemscope itemtype="http://schema.org/BlogPosting" style="'.$mar.'">';
             $text .= '<div class="prDateCol col-sm-2">';
             $text .= '	<div class="visible-xs afs-Divider"></div>';
             $text .= ' 	<div class="afs-PRDate">'.get_the_time('n/d/Y').'</div>';
@@ -324,8 +326,13 @@ function afs_feed($atts, $content = null) {
             $text .= '</div>';
             $text .= '<div class="clearfix"></div>';
         	$text .= '</div>';
-
-			$i++; } 
+			
+			if($n % 3 == 0) { $text .= '<div class="clearfix"></div>'; }
+			if($n % 3 == 0) { $mar = 'margin-left:0;';} else { $mar = ''; }
+			
+			$i++; 
+			$n++;
+		} 
 
 			// Pagination
 			$text .= '<div class="row">';
