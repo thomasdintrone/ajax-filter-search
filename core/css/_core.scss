@@ -1872,10 +1872,10 @@
     content: ""
 }
 #afs-wrapper {
-    color: #333;
+    /*color: #333;
     font-family: "arial", sans-serif;
     font-weight: 400;
-    font-size: 12px;
+    font-size: 12px;*/
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased
 }
@@ -1891,8 +1891,8 @@
 #afs-wrapper .h4,
 #afs-wrapper .h5,
 #afs-wrapper .h6 {
-    font-family: inherit;
-    font-weight: 500;
+   /* font-family: inherit;
+    font-weight: 500;*/
     line-height: 1.3;
     color: inherit
 }
@@ -3219,7 +3219,7 @@
     display: block;
     padding: 5px 15px;
     color: #333;
-    font-family: Arial, Helvetica, sans-serif;
+    /*font-family: Arial, Helvetica, sans-serif;*/
     text-decoration: none;
     border-left: solid 3px #428bca;
     background-color: #f3f3f3
