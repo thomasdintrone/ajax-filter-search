@@ -143,7 +143,7 @@ line-height: normal;
 padding-top: 8px;
 }
 /*===============================
-Style for : irwToolKit  and Search Section
+Style for :  Search Section
 =================================*/
 .afs-ToolKit {
 margin-top: 15px;
@@ -201,87 +201,11 @@ color: #4b4b4b;
 margin-bottom: 15px;
 }
 }
-/*********
-IR MENU STYLYING
-/*********/
-.navbar.navbar-default {
-/*margin: 0 3%;*/
-}
-.navbar.navbar-default .dropdown:hover .dropdown-menu {
-display: block;
-left: 0;
-margin-top: 0;
-padding: 0;
-}
-#ir-menu li
-{
-list-style-type:none
-}
-#ir-menu li a
-{
-font-size:15px;
-font-family: "proxima-nova", sans-serif;
-font-weight: 700;
-color:#2f3c4a;
-text-transform: uppercase;
-border-bottom:3px solid transparent;
-padding-right: 15px;
-padding-left: 15px;
-line-height:30px;
-}
-#ir-menu li a:hover,#ir-menu li a.active
-{
-color:#f1b45c;
-border-bottom:3px solid #f1b45c
-}
-.navbar #ir-menu .dropdown-menu > li > a {
-background-color: #2f3c4a;
-border-bottom: 1px solid #293542;
-color: #a9b2bd;
-padding: 10px 15px;
-font-size:14px;
-line-height:20px;
-white-space: normal;
-}
-.navbar #ir-menu .dropdown-menu
-{
-min-width:100%;
-}
-.navbar #ir-menu .dropdown-menu > li > a:hover, .navbar #ir-menu .dropdown-menu > li > a:focus {
-background-color: #384552 !important;
-color: white;
-outline: medium none;
-text-decoration: none;
-}
-.NoPadding
-{
-padding:0
-}
 .afs-ToolKit img {
 vertical-align: middle;
 width: inherit;
 }
 
-@media only screen and (max-width: 767px)
-{
-.navbar.navbar-default .navbar-toggle .icon-bar
-{
-width: 20px;
-height: 1px;
-border-radius: 0;
-background-color: rgba(0, 0, 0, 1);
-}
-#ir-menu li a
-{
-color:white
-}
-.navbar #ir-menu .dropdown-menu > li > a:hover, .navbar #ir-menu .dropdown-menu > li > a:focus {
-background-color: #384552 !important;
-color: white;
-outline: medium none;
-text-decoration: none;
-}
-}
 #afs-wrapper .afs-Description
 {
 margin-left:60px;
@@ -309,10 +233,6 @@ margin-bottom:30px;
 font-family: "proxima-nova", sans-serif;
 font-weight: 700;
 text-align:left;
-
-}
-#news ul
-{
 
 }
 #afs-wrapper #corporateform #news p a
@@ -345,10 +265,6 @@ font-weight: 700;
 text-align:left;
 
 }
-#news ul
-{
-
-}
 #afs-wrapper #corporateform #presentations p a
 {
 color:#fff;
@@ -363,13 +279,13 @@ font-family: "proxima-nova", sans-serif;
 font-style:italic;
 font-weight:100;
 }
-.bg-cover {
+#afs-wrapper .bg-cover {
 background-size: cover;
 background-repeat: no-repeat;
 background-position: center center;
 padding:118px 0;
 }
-.bg-center {
+#afs-wrapper .bg-center {
 background-position: center center;
 }
 #afs-wrapper #corporateform h3
@@ -399,7 +315,7 @@ text-align:center;
 {
 text-decoration:underline;
 }
-#webcast
+#afs-wrapper #webcast
 {
 position: absolute;
 width: 100%;
@@ -410,32 +326,32 @@ height: 500px;
 }
 @media only screen and (max-width: 767px)
 {
-#webcast
+#afs-wrapper #webcast
 {
 top: 15%;
 }
 
-#webcast ul,#news ul,#afs-wrapper #corporateform #presentations ul
+#afs-wrapper #webcast ul,#afs-wrapper #corporateform #presentations ul
 {
 margin-left:0;
 padding-left:0;
 }
 }
-#webcast h1 a
+#afs-wrapper #webcast h1 a
 {
 color:white;
 text-decoration:none;
 font-family: "proxima-nova", sans-serif;
 
 }
-#webcast .input-group
+#afs-wrapper #webcast .input-group
 {
 background-color:#f1b45c;
 border-radius: 4px;
 color:white;
 font-family: "proxima-nova", sans-serif;
 }
-#webcast .input-group .input-group-addon
+#afs-wrapper #webcast .input-group .input-group-addon
 {
 background-color:#2f3c4a;
 border-color:#2f3c4a;
@@ -444,7 +360,7 @@ padding:10px;
 font-size:30px;
 border-radius: 4px 0px 0px 4px;
 }
-#webcast .input-group span
+#afs-wrapper #webcast .input-group span
 {
 padding:10px;
 line-height:50px;
@@ -490,16 +406,16 @@ background-color: #f1b45c;
 font-size: 25px;
 font-weight: bold;
 }
-.sitefooter {
+#afs-wrapper .sitefooter {
 position: relative;
 }
-.content {
+#afs-wrapper .content {
 padding: 5%;
 background-color: #f8f8f8;
 margin: 0;
 position: relative;
 }
-h1.page-title {
+#afs-wrapper h1.page-title {
 font-size: 48px;
 margin-bottom:20px;
 line-height: 50px;
@@ -533,3 +449,5 @@ height: auto;
 max-width: 100%;
 width: auto;
 }
+
+#afs-wrapper .pagination a { box-shadow:none !Important; }  

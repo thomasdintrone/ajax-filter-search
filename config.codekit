@@ -24,7 +24,7 @@
 		},
 	"\/admin\/js\/admin.min.js": {
 		"fileType": 64,
-		"ignore": 1,
+		"ignore": 0,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/admin\/js\/admin.min.js",
 		"outputAbbreviatedPath": "\/admin\/js\/admin.min.min.js",
@@ -51,24 +51,15 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
-	"\/core\/css\/custom.min.css": {
-		"fileType": 16,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/core\/css\/custom.min.css",
-		"outputAbbreviatedPath": "No Output Path",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0
-		},
-	"\/core\/css\/custom.scss": {
+	"\/core\/css\/_core.scss": {
 		"createSourceMap": 0,
 		"debugStyle": 0,
 		"decimalPrecision": 10,
 		"fileType": 4,
-		"ignore": 0,
+		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/core\/css\/custom.scss",
-		"outputAbbreviatedPath": "\/core\/css\/custom.min.css",
+		"inputAbbreviatedPath": "\/core\/css\/_core.scss",
+		"outputAbbreviatedPath": "\/core\/css\/_core.min.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 3,
@@ -76,24 +67,56 @@
 		"shouldRunBless": 0,
 		"useLibsass": 0
 		},
-	"\/core\/css\/main.min.css": {
+	"\/core\/css\/_custom.scss": {
+		"createSourceMap": 0,
+		"debugStyle": 0,
+		"decimalPrecision": 10,
+		"fileType": 4,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/core\/css\/_custom.scss",
+		"outputAbbreviatedPath": "\/core\/css\/_custom.min.css",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 3,
+		"shouldRunAutoprefixer": 0,
+		"shouldRunBless": 0,
+		"useLibsass": 0
+		},
+	"\/core\/css\/_fonts.scss": {
+		"createSourceMap": 0,
+		"debugStyle": 0,
+		"decimalPrecision": 10,
+		"fileType": 4,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/core\/css\/_fonts.scss",
+		"outputAbbreviatedPath": "\/core\/css\/_fonts.min.css",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 3,
+		"shouldRunAutoprefixer": 0,
+		"shouldRunBless": 0,
+		"useLibsass": 0
+		},
+	"\/core\/css\/style.min.css": {
 		"fileType": 16,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/core\/css\/main.min.css",
+		"inputAbbreviatedPath": "\/core\/css\/style.min.css",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
-	"\/core\/css\/main.scss": {
+	"\/core\/css\/style.scss": {
 		"createSourceMap": 0,
 		"debugStyle": 0,
 		"decimalPrecision": 10,
 		"fileType": 4,
 		"ignore": 0,
 		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/core\/css\/main.scss",
-		"outputAbbreviatedPath": "\/core\/css\/main.min.css",
+		"inputAbbreviatedPath": "\/core\/css\/style.scss",
+		"outputAbbreviatedPath": "\/core\/css\/style.min.css",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 3,
@@ -141,7 +164,7 @@
 		},
 	"\/core\/js\/script.min.js": {
 		"fileType": 64,
-		"ignore": 1,
+		"ignore": 0,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/core\/js\/script.min.js",
 		"outputAbbreviatedPath": "\/core\/js\/script.min.min.js",
@@ -183,7 +206,7 @@
 	},
 "hooks": [
 	],
-"lastSavedByUser": "Thomas Dintrone",
+"lastSavedByUser": "Tom Dintrone",
 "manualImportLinks": {
 	},
 "projectAttributes": {
@@ -807,7 +830,7 @@
 	"stylusAutoOutputPathRelativePath": "..\/css",
 	"stylusAutoOutputPathReplace1": "stylus",
 	"stylusAutoOutputPathReplace2": "css",
-	"stylusAutoOutputPathStyle": 2,
+	"stylusAutoOutputPathStyle": 0,
 	"stylusCreateSourceMap": 0,
 	"stylusDebugStyle": 0,
 	"stylusImportCSS": 0,

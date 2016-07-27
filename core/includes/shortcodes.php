@@ -263,9 +263,9 @@ function afs_feed($atts, $content = null) {
 		//$posts_pp  				= get_option( 'posts_per_page' );
 		$posts_pp  				= $posts_per_page;
 		$posts_per_page 		= $current_page_number * $posts_pp;
-		//$current_post_position 	= $wp_query->current_post + 2;
 
-		$current_post_position = ($posts_per_page - $posts_pp) + 1;
+		//$current_post_position = ($posts_per_page - $posts_pp) + 1;
+		$current_post_position = $offset + 1;
 
 		if($posts_per_page > $total_count) { $posts_per_page = $total_count; }
 
@@ -283,9 +283,16 @@ function afs_feed($atts, $content = null) {
 			
 			if(AFSAdmin::afs_retrieve('_general_post_taxonomy') != '' && AFSAdmin::afs_retrieve('_general_post_taxonomy') != 'none') {
 				$cats = get_the_terms(get_the_ID(), AFSAdmin::afs_retrieve('_general_post_taxonomy'));
-				foreach( $cats as $cat ) { 
-					$text .= $cat->name; 
-				} 
+				$cat_count = count($cats);
+				$i = 1;
+				if($cats) { // meow
+					foreach( $cats as $cat ) {
+						$comma = ', '; 
+						if($cat_count == $i) { $comma = ''; } 
+						$text .= $cat->name.$comma; 
+						$i++;
+					} 
+				}
 			}
 			$text .= '	</h6>';
 

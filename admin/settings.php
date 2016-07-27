@@ -419,8 +419,7 @@ if( !class_exists('AFSAdmin') ) :
 		
 				// Register Files
 				wp_register_style( AFS_SUB.'-fontawesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css', array(), '', 'all' );	
-				wp_register_style( AFS_SUB.'-main', AFS_PLUGIN_URL.'/core/css/main.min.css', array(), '', 'all' );	
-				wp_register_style( AFS_SUB.'-custom', AFS_PLUGIN_URL.'/core/css/custom.min.css', array(), '', 'all' );	
+				wp_register_style( AFS_SUB.'-styles', AFS_PLUGIN_URL.'/core/css/style.min.css', array(), '', 'all' );	
 		
 				wp_register_script( AFS_SUB.'-script-js', AFS_PLUGIN_URL.'/core/js/script.min.js', array( 'jquery' ), '', true );
 		
@@ -435,8 +434,7 @@ if( !class_exists('AFSAdmin') ) :
 					wp_enqueue_script( AFS_SUB.'-script-js' );
 		
 					wp_enqueue_style( AFS_SUB.'-fontawesome' );
-					wp_enqueue_style( AFS_SUB.'-main' );
-					wp_enqueue_style( AFS_SUB.'-custom' );
+					wp_enqueue_style( AFS_SUB.'-styles' );
 		
 				//} else {
 				  //everything else
