@@ -3,7 +3,7 @@ Contributors: longislandfreelancewebdesigner
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34C7NUYWTVYFA
 Tags: ajax search, ajax filter, search posts, search using ajax, filter posts by year, filter posts by month, filter posts by date, pagination using ajax, display posts in table format, custom post type search
 Requires at least: 3.6
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Tested up to: 4.5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -102,6 +102,9 @@ How to install Ajax Filter Search.
 
 
 == Changelog ==
+
+= 1.0.2 =
+* Update to test Version #
 
 = 1.0.1 =
 * CSS Edits, A Few Bug Fixes, Added Screenshots, Robots text edits, Compiled SCSS files
