@@ -23,6 +23,7 @@
 				i = $(this).attr("rel");
 		   
 			t.hasClass(i) || ($(".afs-Switch li").removeClass("active"), $(this).parent().addClass("active"), t.removeAttr("class"), t.addClass("afs-TableWrapper " + i));
+			
 		});
 		
 		

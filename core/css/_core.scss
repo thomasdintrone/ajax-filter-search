@@ -5182,6 +5182,7 @@ body.showscroll {
     background-color: #428bca;
     color: #fff
 }
+#afs-wrapper .gridPR .afs-TableRowItem .afs-PRSummary.afs-Hidden { display: none!important }
 #afs-wrapper .gridPR .afs-TableRowItem:hover .afs-PRSummary.afs-Hidden {
     display: block!important
 }

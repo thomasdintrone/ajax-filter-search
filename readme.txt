@@ -4,15 +4,16 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: ajax search, ajax filter, search posts, search using ajax, filter posts by year, filter posts by month, filter posts by date, pagination using ajax, display posts in table format, custom post type search
 Requires at least: 3.6
 Tested up to: 4.5.3
-Stable tag: 3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Displays posts or custom post types in a friendly, filterable format using ajax.
+Displays posts or custom post types in a friendly, filterable format using ajax so there's no page reload!
 
 == Description ==
 
-Ajax Filter Search is a small but powerful plugin that displays your post or custom post type in a listed format with pagination, all using ajax so there's no page reload!
+Ajax Filter Search is a small but powerful plugin that displays your post or custom post type in a tabled format with pagination, all using ajax so there's no page reload! 
+
+A user can filter your posts by search keyword, month, year, and category to get the exact content they're looking for. This is a great tool for anyone looking to show a reel of Press Releases, Blog Posts, Upcoming Events, whatever you can think of!
 
 
 = Features =
@@ -33,20 +34,14 @@ Ajax Filter Search is a small but powerful plugin that displays your post or cus
 * Firefox (Mac, PC)
 * Chrome (Mac, PC, iOS, Android)
 * Safari (Mac, iOS)
-* IE8+
-* Android (Native)
-* BB10 (Native)
+* IE10+
 
 ***
 
-= Website =
-http://streetcarpro.com/
 
-***
+= Please Rate Ajax Filter Search! =
 
-= Please Rate Ajax Load More! =
-
-Your ratings make a big difference! If you like and use Ajax Load More, please consider taking the time to [rate my plugin](http://wordpress.org/support/view/plugin-reviews/ajax-load-more). Your ratings and reviews will help this plugin grow and provide the motivation needed to keep pushing it forward.
+Your ratings make a big difference! If you like and use Ajax Filter Search, please consider taking the time to [rate my plugin](http://wordpress.org/support/view/plugin-reviews/ajax-filter-search). Your ratings and reviews will help this plugin grow and provide the motivation needed to keep pushing it forward.
 
 
 
@@ -97,10 +92,18 @@ How to install Ajax Filter Search.
 
 == Screenshots ==
 
-1. Settings screen
+1. Overview of AFS in action. Here you see search filters, the post reel, pagination capabilities and dual reel views (List & Grid)
+2. See how a user can instantly improve their search experience by filtering out the most relevant content for them.
+3. "Summary" buttons pull the excerpt from the post so they can view a teaser of the content for that particular post
+4. Grid View
+5. Settings panel where you can choose a post type (including custom post types) and an optional taxonomy among other options. New features coming soon!
+6. Optional Filter Tabs at the top of the reel to filter results by category.
 
 
 == Changelog ==
+
+= 1.0.1 =
+* CSS Edits, Bug Fixes, Added Screenshots, Robots text edits, Compiled SCSS files
 
 = 1.0.0 =
 * Ajax Filter Search
