@@ -118,6 +118,25 @@ if (!function_exists('get_the_selected_excerpt')) {
 
 
 /*******************************************************************
+* RETURN TEMPLATE
+********************************************************************/
+if (!function_exists('return_template')) {
+	function return_template($template='default.php'){
+		ob_start();
+		if (file_exists(STYLESHEETPATH.'/afs-template/'.$template)) {
+			// yep, load the page template
+			include( STYLESHEETPATH.'/afs-template/'.$template );
+		} else {
+			// nope, load the set default
+			include( WP_PLUGIN_DIR.'/'.AFS_MENU_SLUG.'/afs-template/'.$template );
+			
+		}
+		return ob_get_clean();
+	}
+}
+
+
+/*******************************************************************
 * AJAX FUN STUFF
 ********************************************************************/
 if (!function_exists('myplugin_ajaxurl')) {

@@ -274,56 +274,9 @@ function afs_feed($atts, $content = null) {
 		while ( $query->have_posts() ) { $query->the_post();
 			
 			$text .= '<div id="post-'.get_the_ID().'" class="'.join( '  ', get_post_class( 'afs-Loadingdata afs-HasGA afs-TableRowItem gridPR'.$i )).'" role="article" itemscope itemtype="http://schema.org/BlogPosting" style="'.$mar.'">';
-            $text .= '<div class="prDateCol col-sm-2">';
-            $text .= '	<div class="visible-xs afs-Divider"></div>';
-            $text .= ' 	<div class="afs-PRDate">'.get_the_time('n/d/Y').'</div>';
-       		$text .= '	<div class="afs-PRTimezone"><span class="afs-PRTime">'.get_the_time('g:i a').'</span><span class="afs-timezone">&nbsp;'.get_the_time('T').'</span></div>';
-            $text .= '</div>';
-
-            $text .= '<div class="col-sm-10">';
-            $text .= '   <h6>';
+            
+			$text .= return_template();
 			
-			if(AFSAdmin::afs_retrieve('_general_post_taxonomy') != '' && AFSAdmin::afs_retrieve('_general_post_taxonomy') != 'none') {
-				$cats = get_the_terms(get_the_ID(), AFSAdmin::afs_retrieve('_general_post_taxonomy'));
-				$cat_count = count($cats);
-				$i = 1;
-				if($cats) { // meow
-					foreach( $cats as $cat ) {
-						$comma = ', '; 
-						if($cat_count == $i) { $comma = ''; } 
-						$text .= $cat->name.$comma; 
-						$i++;
-					} 
-				}
-			}
-			$text .= '	</h6>';
-
-            $text .= '   <h4><a href="'.get_the_permalink().'" class="afs-GaLabel afs-EventTracking afs-GaHasFile" data-GaFID="'.get_the_ID().'">'.get_the_title().'</a></h4>';
-            $text .= '    <div class="prDateRow">';
-            $text .= '        <div class="afs-PRDate">'.get_the_time('n/d/Y').'</div>';
-            $text .= '    </div>';
-            $text .= '    <div class="afs-PRTools">';
-            $text .= '        <ul>';
-            $text .= '      		<li class="hideFromGrid last"><a class="showSummary" href="#"><span class="fa fa-plus-square"></span>&nbsp;Summary</a></li>';
-            $text .= '       </ul>';
-            $text .= '       <div class="clearfix"></div>';
-            $text .= '   </div>';
-
-            $text .= '    <div class="afs-PRSummary afs-Hidden">';
-			$text .= '		<p>'.get_the_selected_excerpt(200).'...</p>';
-            $text .= '        <a href="'.get_the_permalink().'" class="afs-EventTracking afs-GaHasTitle" data-GaTitle="HTM"><span class="fa fa-chevron-right"></span>&nbsp;Continue Reading</a>';
-            $text .= '    </div>';
-
-       		$text .= '   <div class="afs-PRRelated afs-PendingHide">';
-         	$text .= '       <ul>';
-         	$text .= '           <li class="first"><strong>Related Material:&nbsp;</strong></li>';
-           	$text .= '           <li><a href="#"><span class="fa fa-microphone"></span>&nbsp;Webcast</a></li>';
-            $text .= '           <li class="last"><a href="#"><span class="fa fa-download"></span>&nbsp;Download - XLS - 3.5MB</a></li>';
-            $text .= '      </ul>';
-
-            $text .= '      <div class="clearfix"></div>';
-            $text .= '   </div>';
-            $text .= '</div>';
             $text .= '<div class="clearfix"></div>';
         	$text .= '</div>';
 			
