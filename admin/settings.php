@@ -255,7 +255,7 @@ if( !class_exists('AFSAdmin') ) :
 							}
 						}	
 					} else {
-						echo '<option value="none" '.$sel.'>None</option>';
+						echo '<option value="none" selected="selected">None</option>';
 					}
 				?>
 			</select>

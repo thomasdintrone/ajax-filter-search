@@ -5,7 +5,28 @@
 // [ajax_filter_search]
 function ajax_filter_search($atts, $content = null) {
     extract(shortcode_atts(array(
+		'post_type'			  	=> '',
+		'selected_taxonomies'	=> '',
+		'posts_per_page'	 	=> '',
+		'filter_type'			=> '',
+		'filter_by' 				=> '',
+		'filter_months' 			=> '',
+		'filter_years' 			=> '',
+		'filter_withPDF' 		=> '',
+		'offset' 				=> '',
     ), $atts));
+	
+	// Build String to attach to [afs_feed] to allow for custom building
+	$afs_args = '';
+	if($post_type == '') { } else { $afs_args .=' post_type="'.$post_type.'" '; }
+	if($selected_taxonomies == '') { } else { $afs_args .=' selected_taxonomies='.$selected_taxonomies.'" '; }
+	if($posts_per_page == '') { } else { $afs_args .=' posts_per_page="'.$posts_per_page.'" '; }
+	if($filter_type == '') { } else { $afs_args .=' filter_type="'.$filter_type.'" '; }
+	if($filter_by == '') { } else { $afs_args .=' filter_by="'.$filter_by.'" '; }
+	if($filter_months == '') { } else { $afs_args .=' filter_months="'.$filter_months.'" '; }
+	if($filter_years == '') { } else { $afs_args .=' filter_years="'.$filter_years.'" '; }
+	if($filter_withPDF == '') { } else { $afs_args .=' filter_withPDF="'.$filter_withPDF.'" '; }
+	if($offset == '') { } else { $afs_args .=' offset="'.$offset.'" '; }
 	
 	$text = '';
 	$i = 1;
@@ -25,34 +46,42 @@ function ajax_filter_search($atts, $content = null) {
 	Top Tabs
 	****************************/
 	if(AFSAdmin::afs_retrieve('_general_show_filters') == 1) { 
+	$taxonomy = AFSAdmin::afs_retrieve('_general_post_taxonomy');
+		if($taxonomy == 'none' || $taxonomy == '') {
+		} else {
                 
-	$text .= '					<div class="afs-Tabs col-xs-12">';
-	$text .= '						<ul class="hidden-xs afs-CommonTabs">';
-	$text .= '							<li class="active"><a rel="all" href="#">All</a></li>';
-				
-										$taxonomy = AFSAdmin::afs_retrieve('_general_post_taxonomy');
-										$terms = get_terms($taxonomy, $args = array('orderby'=>'id')	);
-										foreach($terms as $term) {
-											if($term->name == 'Uncategorized') { continue; }
-											$text .= '<li><a rel="'.$term->slug.'" href="#">'.$term->name.'</a></li>';
-										}
-				
-	$text .= '						</ul>';
-	
-	$text .= '						<input type="hidden" name="filingType" />';
-	
-	$text .= '						<div class="form-group visible-xs" style="margin-left: -15px;">';
-	
-	$text .= '							<label for="category"><strong>Display:&nbsp;</strong></label>';
-	$text .= '							<select name="category">';
-	$text .= '								<option value="all">All Releases</option>';
-											foreach($terms as $term) {
-												if($term->name == 'Uncategorized') { continue; }
-												$text .= '<option value="'.$term->slug.'">'.$term->name.'</option>';
-											}
-	$text .= '							</select>';
-	$text .= '						</div>';
-	$text .= '					</div>';
+			$text .= '					<div class="afs-Tabs col-xs-12">';
+			$text .= '						<ul class="hidden-xs afs-CommonTabs">';
+			$text .= '							<li class="active"><a rel="all" href="#">All</a></li>';
+						
+												$terms = get_terms($taxonomy, $args = array('orderby'=>'id')	);
+												if($terms) {
+													foreach($terms as $term) {
+														if($term->name == 'Uncategorized') { continue; }
+														$text .= '<li><a rel="'.$term->slug.'" href="#">'.$term->name.'</a></li>';
+													}
+												}
+			$text .= '						</ul>';
+			
+			$text .= '						<input type="hidden" name="filingType" />';
+			
+			$text .= '						<div class="form-group visible-xs" style="margin-left: -15px;">';
+			
+			$text .= '							<label for="category"><strong>Display:&nbsp;</strong></label>';
+			$text .= '							<select name="category">';
+			$text .= '								<option value="all">All</option>';
+													$terms = get_terms($taxonomy, $args = array('orderby'=>'id')	);
+													if($terms) {
+													
+														foreach($terms as $term) {
+															if($term->name == 'Uncategorized') { continue; }
+															$text .= '<option value="'.$term->slug.'">'.$term->name.'</option>';
+														}
+													}
+			$text .= '							</select>';
+			$text .= '						</div>';
+			$text .= '					</div>';
+		}
  	} 
 	
 	/****************************
@@ -175,7 +204,7 @@ function ajax_filter_search($atts, $content = null) {
 	Get The Feed
 	****************************/
 	$text .= '									<div id="newsPanelResults" class="jscroll-inner">';
-	$text .= '										[afs_feed]'; // <-- the shortcode
+	$text .= '										[afs_feed '.$afs_args.']'; // <-- the shortcode
 	$text .= '										<div class="clearfix"></div>';
 	$text .= '									</div>';
 	$text .= '									<div class="clearfix"></div>';
@@ -228,6 +257,7 @@ function afs_feed($atts, $content = null) {
 	Define The Args & Defaults
 	****************************/
 	
+	$post_tax = AFSAdmin::afs_retrieve('_general_post_taxonomy');
 	$offset_pag = $offset;
 	if($filter_type == 'all' ) { $filter_type = ''; }
 	if($offset != 0) {  $offset = ($offset - 1) * $posts_per_page; }
@@ -235,10 +265,11 @@ function afs_feed($atts, $content = null) {
 
 	$args = array(
 		'post_type'			=> $post_type,
-		'category_name' 		=> $filter_type,
+		//'category_name' 		=> $filter_type,
 		'posts_per_page' 	=> $posts_per_page,
 		'offset'				=> $offset,
 		'date_query' 		=> array(array()),
+		//'tax_query' 			=> array(array()),
 		'orderby' 			=> 'date',
 		'order'   			=> 'DESC',
 	);
@@ -246,6 +277,18 @@ function afs_feed($atts, $content = null) {
 	if($filter_by !== '') { $args['s'] = $filter_by; }
 	if($filter_years !== '') { $args['date_query'][]['year'] = $filter_years; }
 	if($filter_months !== '') { $args['date_query'][]['month'] = $filter_months; }
+	if($post_tax == 'category') {
+		$args['category_name'] = $filter_type;
+		
+		//if($filter_type !== '') { 
+			//$args['tax_query'][]['taxonomy'] = $filter_type; 
+			//$args['tax_query'][]['field'] = $filter_type; 
+			//$args['tax_query'][]['terms'][] = terms here; 
+		//}
+	} elseif($post_tax == 'post_tag') {
+		$args['tag'] = $filter_type;
+	}
+	
 
 	$query = new WP_Query($args);
 

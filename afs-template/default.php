@@ -28,14 +28,20 @@
       		<div class="afs-PRDate"><?php echo get_the_time('n/d/Y'); ?></div>
       	</div>
    		<div class="afs-PRTools">
+        	<?php 
+				$summary = get_the_selected_excerpt(200); 
+				if(get_the_selected_excerpt(200) == '') {
+				} else {
+			?>
      		<ul>
     			<li class="hideFromGrid last"><a class="showSummary" href="#"><span class="fa fa-plus-square"></span>&nbsp;Summary</a></li>
  			</ul>
+            <?php } ?>
   			<div class="clearfix"></div>
     	</div>
 
  		<div class="afs-PRSummary afs-Hidden">
-			<p><?php echo get_the_selected_excerpt(200); ?>...</p>
+			<p><?php echo $summary; ?>...</p>
    				<a href="<?php echo get_the_permalink(); ?>" class="afs-EventTracking afs-GaHasTitle" data-GaTitle="HTM"><span class="fa fa-chevron-right"></span>&nbsp;Continue Reading</a>
       	</div>
     	
