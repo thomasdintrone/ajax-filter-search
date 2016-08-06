@@ -3,7 +3,7 @@ Contributors: longislandfreelancewebdesigner
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34C7NUYWTVYFA
 Tags: ajax search, ajax filter, search posts, search using ajax, filter posts by year, filter posts by month, filter posts by date, pagination using ajax, display posts in table format, custom post type search
 Requires at least: 3.6
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 Tested up to: 4.5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,13 +19,13 @@ A user can filter your posts by search keyword, month, year, and category to get
 
 = Features =
 * **Setting Panel** - Customize your version of Ajax Filter Search by updating various plugin settings (see screenshots).
-
+* **Customizeable Shortcode** - Beginning the process of allow overriding of the default values in the general settings with custom shortcode attributes. In the future, this will give you the ability to have multiple shortcodes throughout the site. For now, You can add a "filter_by" attribute to show selected categories/taxonomies to the default query.
 
 ***
 
 = Example Shortcode =
 
-    [ajax_filter_search]
+    [ajax_filter_search filter_by="category-slug-1,category-slug2"]
 
 ***
    
@@ -54,6 +54,12 @@ Your ratings make a big difference! If you like and use Ajax Filter Search, plea
 1. Copy the shortcode [ajax_filter_search]
 2. Add the shortcode to your page, by adding it through the content editor or placing it directly within one of your template files.
 3. Load a page with your shortcode in place and watch Ajax Filter Search fetch your posts. 
+
+= Is it possible to only display post from 1 or 2 categories? =
+
+Yes! Simply add the "filter_by" attribute to the shortcode and enter the *category slug* of the selected category/taxonomy you'd like to display. For multiple categories, separate each with a comma (,).
+
+Make sure you have the correct slug for the correct post type & taxonomy you selected..
 
 = Is the ajax functionality secure? =
 
@@ -102,6 +108,13 @@ How to install Ajax Filter Search.
 
 
 == Changelog ==
+
+= 1.0.3 =
+* Function / Structure Improvements
+* Bug fixes to address Page loop error.
+* Added a template capability to the loop to allow for customization in the future.
+* Added "filter_by" attritbute to the shortcode to allow for selected categories in the loop
+* Began ground work for color selection options in settings page
 
 = 1.0.2 =
 * Update to test Version #

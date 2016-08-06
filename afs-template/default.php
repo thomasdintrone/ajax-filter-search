@@ -1,3 +1,11 @@
+<?php 	
+if(FILTER_TYPE == '') { 
+	// do nothing
+} else { 
+	$filter_type_array = explode(',',FILTER_TYPE);
+	$filter_type_count = count($filter_type_array);
+}
+?>
 <div class="prDateCol col-sm-2">
 	<div class="visible-xs afs-Divider"></div>
 		<div class="afs-PRDate"><?php echo get_the_time('n/d/Y'); ?></div>
@@ -10,13 +18,23 @@
 			if(AFSAdmin::afs_retrieve('_general_post_taxonomy') != '' && AFSAdmin::afs_retrieve('_general_post_taxonomy') != 'none') {
 				$cats = get_the_terms(get_the_ID(), AFSAdmin::afs_retrieve('_general_post_taxonomy'));
 				$cat_count = count($cats);
+				
 				$i = 1;
 				if($cats) { // meow
 					foreach( $cats as $cat ) {
-						$comma = ', '; 
-						if($cat_count == $i) { $comma = ''; } 
-						echo $cat->name.$comma; 
-						$i++;
+						if(isset($filter_type_array)) {
+							if(in_array($cat->slug,$filter_type_array)) {
+								$comma = ', '; 
+								if($cat_count == $i) { $comma = ''; } 
+								echo $cat->name.$comma; 
+								$i++;
+							}
+						} else {
+							$comma = ', '; 
+							if($cat_count == $i) { $comma = ''; } 
+							echo $cat->name.$comma; 
+							$i++;
+						}
 					} 
 				}
 			}

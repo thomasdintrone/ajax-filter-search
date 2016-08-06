@@ -50,7 +50,7 @@ if( !class_exists('AFSAdmin') ) :
 										),*/
 								   )
 			),
-			array(
+			/*array(
 				'name' 			=> 'style_options',
 				'title' 			=> 'Style the Filter Display according to your brand:',
 				'fields'			=> array(
@@ -61,7 +61,7 @@ if( !class_exists('AFSAdmin') ) :
 										),
 								   )
 			),
-			/*array(
+			array(
 				'name' 			=> 'directions',
 				'title' 			=> '',
 				'fields'			=> array(

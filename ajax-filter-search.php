@@ -1,18 +1,18 @@
 <?php 
 /**
  * @package ajax-filter-search
- * @version 1.0.2
+ * @version 1.0.3
  */
 /*
 
 Plugin Name: Ajax Filter Search
-Plugin URI: http://curran-connors.com
+Plugin URI: http://streetcarpro.com
 Description: Displays posts or custom post types in a friendly, filterable format using ajax.
 Text Domain: ajax-filter-search
 Author: Thomas Dintrone
 Twitter: @streetcarpro
 Author URI: http://streetcarpro.com
-Version: 1.0.2
+Version: 1.0.3
 License: GPL
 Copyright: Drive Media, Inc.
 
@@ -21,7 +21,7 @@ Copyright: Drive Media, Inc.
 /*******************************************************************
 * DEFINE CONSTANTS
 ********************************************************************/
-define('AFS_VERSION', '1.0.2');
+define('AFS_VERSION', '1.0.3');
 define('AFS_RELEASE', 'July 20, 2016');
 define('AFS_URL', 'http://streetcarpro.com');
 
