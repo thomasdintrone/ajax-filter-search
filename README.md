@@ -1,88 +1,44 @@
-=== Ajax Filter Search ===
-Displays posts or custom post types in a friendly, filterable format using ajax so there's no page reload!
+# Ajax Filter Search
 
-== Description ==
+WordPress plugin: a filterable, searchable, paginated list of posts or custom post types, updated with ajax. Published on WordPress.org as [ajax-filter-search](https://wordpress.org/plugins/ajax-filter-search/).
 
-Ajax Filter Search is a small but powerful plugin that displays your post or custom post type in a tabled format with pagination, all using ajax so there's no page reload! 
+**GitHub is the source of truth for development. WordPress.org SVN is a release target only.** See the user-facing docs in [readme.txt](readme.txt).
 
-A user can filter your posts by search keyword, month, year, and category to get the exact content they're looking for. This is a great tool for anyone looking to show a reel of Press Releases, Blog Posts, Upcoming Events, whatever you can think of!
+## Layout
 
+| Path | What |
+|---|---|
+| `ajax-filter-search.php` | Bootstrap and constants |
+| `includes/` | Settings, renderer (HTML and queries), REST endpoint, shortcode/block/assets |
+| `afs-template/default.php` | Per-item template; themes override it at `your-theme/afs-template/default.php` |
+| `blocks/feed/` | Gutenberg block (no build step; `editor.js` uses the `wp.*` globals) |
+| `public/` | Front-end CSS and JS (no dependencies) |
+| `admin/js/` | Settings-screen script |
+| `.wordpress-org/` | Store assets (banner, screenshots). Synced to SVN `/assets`, never shipped in the zip |
+| `bin/` | Dev scripts (seed content, smoke test, zip build) |
 
-= Features =
-* **Setting Panel** - Customize your version of Ajax Filter Search by updating various plugin settings (see screenshots).
-* **Customizeable Shortcode** - Beginning the process of allow overriding of the default values in the general settings with custom shortcode attributes. In the future, this will give you the ability to have multiple shortcodes throughout the site. For now, You can add a "filter_by" attribute to show selected categories/taxonomies to the default query.
+## Development
 
-***
+Requires Docker, Node and Composer.
 
-= Example Shortcode =
+```bash
+composer install
+npx @wordpress/env start          # http://localhost:8890  (admin / password)
+npx @wordpress/env run cli wp eval-file wp-content/plugins/ajax-filter-search/bin/seed-test-content.php
+bin/smoke-test.sh                 # HTTP checks against the seeded site
+composer lint                     # WordPress coding standards + PHP 7.4 compatibility
+```
 
-    [ajax_filter_search filter_by="category-slug-1,category-slug2"]
+To test another PHP/WordPress version, add a git-ignored `.wp-env.override.json`, for example `{ "phpVersion": "7.4", "core": "WordPress/WordPress#6.0" }`.
 
-***
-   
+## Release
 
-= Tested Browsers =
+1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and `Stable tag` / changelog in `readme.txt`; update `Tested up to`.
+2. `bin/build-zip.sh` builds `build/ajax-filter-search-<version>.zip` from `.distignore`.
+3. Copy the built tree into SVN `trunk/`, `svn add`/`svn rm` as needed, and sync `.wordpress-org/` into SVN `assets/`.
+4. `svn cp trunk tags/<version>`, then `svn ci`.
+5. Tag the same commit in git: `git tag -a v<version> && git push --tags`.
 
-* Firefox (Mac, PC)
-* Chrome (Mac, PC, iOS, Android)
-* Safari (Mac, iOS)
-* IE10+
+## License
 
-***
-
-
-= Please Rate Ajax Filter Search! =
-
-Your ratings make a big difference! If you like and use Ajax Filter Search, please consider taking the time to [rate my plugin](http://wordpress.org/support/view/plugin-reviews/ajax-filter-search). Your ratings and reviews will help this plugin grow and provide the motivation needed to keep pushing it forward.
-
-
-
-== Frequently Asked Questions ==
-
-
-= What are the steps to getting Ajax Filter Search to display on my website =
-
-1. Copy the shortcode [ajax_filter_search]
-2. Add the shortcode to your page, by adding it through the content editor or placing it directly within one of your template files.
-3. Load a page with your shortcode in place and watch Ajax Filter Search fetch your posts. 
-
-= Is it possible to only display post from 1 or 2 categories? =
-
-Yes! Simply add the "filter_by" attribute to the shortcode and enter the *category slug* of the selected category/taxonomy you'd like to display. For multiple categories, separate each with a comma (,).
-
-Make sure you have the correct slug for the correct post type & taxonomy you selected..
-
-= Is the ajax functionality secure? =
-
-Yes, Ajax Filter Search uses admin-ajax and nonces in order to protect URLs and forms from being misused.
-
-= Can I make modifications to the plugin code? =
-
-Yep, but just know that any edits may affect future versions.
-
-
-== Installation ==
-
-How to install Ajax Filter Search.
-
-= Using The WordPress Dashboard =
-
-1. Navigate to the 'Add New' in the plugins dashboard
-2. Search for 'Ajax Filter Search'
-3. Click 'Install Now'
-4. Activate the plugin on the Plugin dashboard
-
-= Uploading in WordPress Dashboard =
-
-1. Navigate to the 'Add New' in the plugins dashboard
-2. Navigate to the 'Upload' area
-3. Select `ajax-filter-search.zip` from your computer
-4. Click 'Install Now'
-5. Activate the plugin in the Plugin dashboard
-
-= Using FTP =
-
-1. Download `ajax-filter-search.zip`
-2. Extract the `ajax-filter-search` directory to your computer
-3. Upload the `ajax-filter-search` directory to the `/wp-content/plugins/` directory
-4. Activate the plugin in the Plugin dashboard
+GPL v2 or later.
