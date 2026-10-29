@@ -151,6 +151,14 @@ if (!function_exists('myplugin_ajaxurl')) {
 	}
 }
 
+if (!function_exists('afs_post_value')) {
+	// A submitted value as a plain string: missing or array-typed input becomes ''.
+	function afs_post_value($key) {
+		if (!isset($_POST[$key]) || !is_scalar($_POST[$key])) { return ''; }
+		return trim(wp_unslash((string) $_POST[$key]));
+	}
+}
+
 if (!function_exists('my_action_callback')) {
 	// Ajax call to sort PRs
 	function my_action_callback() {  
@@ -160,20 +168,21 @@ if (!function_exists('my_action_callback')) {
 		$posts_per_page	= max(1, absint(AFSAdmin::afs_retrieve('_general_posts_per_page')));
 		
 		$filter_type = '';
-		if (isset($_POST['filingType'])) {
-			$slugs = array_filter(array_map('sanitize_title', array_slice(explode(',', wp_unslash($_POST['filingType'])), 0, 50)));
+		$filing_type = afs_post_value('filingType');
+		if ($filing_type !== '') {
+			$slugs = array_filter(array_map('sanitize_title', array_slice(explode(',', $filing_type), 0, 50)));
 			$filter_type = implode(',', $slugs);
 		}
 		
-		$filter_by = isset($_POST['filterBy']) ? mb_substr(sanitize_text_field(wp_unslash($_POST['filterBy'])), 0, 200) : '';
+		$filter_by = mb_substr(sanitize_text_field(afs_post_value('filterBy')), 0, 200);
 		
-		$filter_months = isset($_POST['filterMonths']) ? absint($_POST['filterMonths']) : 0;
+		$filter_months = absint(afs_post_value('filterMonths'));
 		if ($filter_months < 1 || $filter_months > 12) { $filter_months = ''; }
 		
-		$filter_years = isset($_POST['filterYears']) ? absint($_POST['filterYears']) : 0;
+		$filter_years = absint(afs_post_value('filterYears'));
 		if ($filter_years < 1000 || $filter_years > 9999) { $filter_years = ''; }
 		
-		$offset = isset($_POST['page']) ? absint($_POST['page']) : 0;
+		$offset = absint(afs_post_value('page'));
 		
 		// Call the feed directly instead of building and running a shortcode from user input.
 		echo afs_feed(array(
@@ -205,7 +214,7 @@ if (!function_exists('get_selected_taxonomy')) {
 	
 		// Get the values:
 		$cur_post_tax	= AFSAdmin::afs_retrieve('_general_post_taxonomy');
-		$post_type 		= isset($_POST['option']) ? sanitize_key(wp_unslash($_POST['option'])) : '';
+		$post_type 		= sanitize_key(afs_post_value('option'));
 		
 		$taxonomy_objects = post_type_exists($post_type) ? get_object_taxonomies($post_type, 'objects') : array();
 		
