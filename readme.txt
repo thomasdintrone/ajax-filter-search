@@ -110,10 +110,11 @@ How to install Ajax Filter Search.
 == Changelog ==
 
 = 1.0.4 =
-* Security: The ajax handler no longer builds a shortcode from submitted form values, which allowed visitors to run arbitrary shortcodes. All submitted values are now validated.
-* Security: Draft and scheduled posts are no longer returned by the ajax handler.
-* Security: The settings-screen taxonomy lookup is now limited to administrators and its output is escaped.
-* No changes to markup, styling, shortcodes or settings.
+* Security: Hardened the ajax request handler. All submitted values are now validated.
+* Security: Draft, scheduled and pending posts are no longer included in ajax results.
+* Security: The settings-screen taxonomy lookup is now limited to administrators.
+* Fix: Filtering no longer causes a fatal error on PHP 8.
+* Tested up to WordPress 7.1. No changes to markup, styling, shortcodes or settings.
 
 = 1.0.3 =
 * Function / Structure Improvements
