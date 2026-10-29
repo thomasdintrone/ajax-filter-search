@@ -199,7 +199,7 @@ if (!function_exists('my_action_callback')) {
 	
 	}
 	
-add_action('wp_ajax_my_action', 'my_action_callback');
+	add_action('wp_ajax_my_action', 'my_action_callback');
 	add_action('wp_ajax_nopriv_my_action', 'my_action_callback');
 }
 
