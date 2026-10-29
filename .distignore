@@ -1,0 +1,26 @@
+# Files that stay in GitHub and must never ship to WordPress.org
+.git
+.github
+.gitignore
+.distignore
+.editorconfig
+.wordpress-org
+.wp-env.json
+.wp-env.override.json
+.phpcs-cache
+phpcs.xml.dist
+composer.json
+composer.lock
+package.json
+package-lock.json
+README.md
+docs
+bin
+tests
+node_modules
+vendor
+build
+_notes
+*.scss
+*.map
+*.zip
