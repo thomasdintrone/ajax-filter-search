@@ -155,24 +155,42 @@ if (!function_exists('my_action_callback')) {
 	// Ajax call to sort PRs
 	function my_action_callback() {  
 	
-		// Get the values:
+		// Get the values (every value is validated; nothing is ever pasted into a shortcode string):
 		$post_type		= AFSAdmin::afs_retrieve('_general_post_type');
-		$posts_per_page	= AFSAdmin::afs_retrieve('_general_posts_per_page');
-		$filter_type 	= $_POST['filingType'];
-		$filter_by 		= $_POST['filterBy'];
-		$filter_months 	= $_POST['filterMonths'];
-		$filter_years 	= $_POST['filterYears'];
-		$filter_withPDF = $_POST['withPDF'];
-	
-		$offset  		= $_POST['page'];
+		$posts_per_page	= max(1, absint(AFSAdmin::afs_retrieve('_general_posts_per_page')));
 		
-		echo do_shortcode('[afs_feed post_type="'.$post_type.'" posts_per_page="'.$posts_per_page.'" offset="'.$offset.'" filter_type="'.$filter_type.'" filter_by="'.$filter_by.'" filter_months="'.$filter_months.'" filter_years="'.$filter_years.'" filter_withPDF="'.$filter_withPDF.'"]');
+		$filter_type = '';
+		if (isset($_POST['filingType'])) {
+			$slugs = array_filter(array_map('sanitize_title', explode(',', wp_unslash($_POST['filingType']))));
+			$filter_type = implode(',', $slugs);
+		}
+		
+		$filter_by = isset($_POST['filterBy']) ? sanitize_text_field(wp_unslash($_POST['filterBy'])) : '';
+		
+		$filter_months = isset($_POST['filterMonths']) ? absint($_POST['filterMonths']) : 0;
+		if ($filter_months < 1 || $filter_months > 12) { $filter_months = ''; }
+		
+		$filter_years = isset($_POST['filterYears']) ? absint($_POST['filterYears']) : 0;
+		if ($filter_years < 1000 || $filter_years > 9999) { $filter_years = ''; }
+		
+		$offset = isset($_POST['page']) ? absint($_POST['page']) : 0;
+		
+		// Call the feed directly instead of building and running a shortcode from user input.
+		echo afs_feed(array(
+			'post_type'			=> $post_type,
+			'posts_per_page'	=> $posts_per_page,
+			'offset'			=> $offset,
+			'filter_type'		=> $filter_type,
+			'filter_by'			=> $filter_by,
+			'filter_months'		=> $filter_months,
+			'filter_years'		=> $filter_years,
+		));
 	
 		exit;
 	
 	}
 	
-	add_action('wp_ajax_my_action', 'my_action_callback');
+add_action('wp_ajax_my_action', 'my_action_callback');
 	add_action('wp_ajax_nopriv_my_action', 'my_action_callback');
 }
 
@@ -180,14 +198,16 @@ if (!function_exists('my_action_callback')) {
 * AJAX IN ADMIN
 ********************************************************************/
 if (!function_exists('get_selected_taxonomy')) {
-	// Ajax call to get taxnomy values
+	// Ajax call to get taxnomy values (settings screen only: logged-in administrators)
 	function get_selected_taxonomy() {  
+	
+		if (!current_user_can(AFS_CAPABILITIES)) { wp_die('', '', array('response' => 403)); }
 	
 		// Get the values:
 		$cur_post_tax	= AFSAdmin::afs_retrieve('_general_post_taxonomy');
-		$post_type 		= $_POST['option'];
+		$post_type 		= isset($_POST['option']) ? sanitize_key(wp_unslash($_POST['option'])) : '';
 		
-		$taxonomy_objects = get_object_taxonomies($post_type, 'objects');
+		$taxonomy_objects = post_type_exists($post_type) ? get_object_taxonomies($post_type, 'objects') : array();
 		
 		if($taxonomy_objects) {
 			foreach($taxonomy_objects as $tax) {
@@ -196,11 +216,11 @@ if (!function_exists('get_selected_taxonomy')) {
 					continue;
 				} else {
 					if($tax->name == $cur_post_tax) { $sel = 'selected="selected"'; }
-					echo '<option value="'.$tax->name.'" '.$sel.'>'.$tax->label.'</option>';
+					echo '<option value="'.esc_attr($tax->name).'" '.$sel.'>'.esc_html($tax->label).'</option>';
 				}
 			}	
 		} else {
-			echo '<option value="none" '.$sel.'>None</option>';
+			echo '<option value="none">None</option>';
 		}
 	
 		exit;
@@ -208,7 +228,6 @@ if (!function_exists('get_selected_taxonomy')) {
 	}
 	
 	add_action('wp_ajax_get_selected', 'get_selected_taxonomy');
-	add_action('wp_ajax_nopriv_get_selected', 'get_selected_taxonomy');
 }
 
 /*add_action( 'admin_footer', 'my_action_javascript' ); // Write our JS below here

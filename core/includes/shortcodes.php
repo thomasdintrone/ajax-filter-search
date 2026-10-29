@@ -289,6 +289,7 @@ function afs_feed($atts, $content = null) {
 
 	$args = array(
 		'post_type'			=> $post_type,
+		'post_status'		=> 'publish', // admin-ajax runs with is_admin() true, which would otherwise add drafts/scheduled posts
 		'posts_per_page' 	=> $posts_per_page,
 		'offset'				=> $offset,
 		'date_query' 		=> array(array()),

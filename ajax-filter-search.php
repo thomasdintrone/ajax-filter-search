@@ -1,7 +1,7 @@
 <?php 
 /**
  * @package ajax-filter-search
- * @version 1.0.3
+ * @version 1.0.4
  */
 /*
 
@@ -12,7 +12,7 @@ Text Domain: ajax-filter-search
 Author: Thomas Dintrone
 Twitter: @streetcarpro
 Author URI: http://streetcarpro.com
-Version: 1.0.3
+Version: 1.0.4
 License: GPL
 Copyright: Drive Media, Inc.
 
@@ -21,7 +21,7 @@ Copyright: Drive Media, Inc.
 /*******************************************************************
 * DEFINE CONSTANTS
 ********************************************************************/
-define('AFS_VERSION', '1.0.3');
+define('AFS_VERSION', '1.0.4');
 define('AFS_RELEASE', 'July 20, 2016');
 define('AFS_URL', 'http://streetcarpro.com');
 

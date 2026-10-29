@@ -3,8 +3,8 @@ Contributors: longislandfreelancewebdesigner
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34C7NUYWTVYFA
 Tags: ajax search, ajax filter, search posts, search using ajax, filter posts by year, filter posts by month, filter posts by date, pagination using ajax, display posts in table format, custom post type search
 Requires at least: 3.6
-Stable tag: 1.0.3
-Tested up to: 4.5.3
+Stable tag: 1.0.4
+Tested up to: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,12 @@ How to install Ajax Filter Search.
 
 == Changelog ==
 
+= 1.0.4 =
+* Security: The ajax handler no longer builds a shortcode from submitted form values, which allowed visitors to run arbitrary shortcodes. All submitted values are now validated.
+* Security: Draft and scheduled posts are no longer returned by the ajax handler.
+* Security: The settings-screen taxonomy lookup is now limited to administrators and its output is escaped.
+* No changes to markup, styling, shortcodes or settings.
+
 = 1.0.3 =
 * Function / Structure Improvements
 * Bug fixes to address Page loop error.
@@ -127,6 +133,8 @@ How to install Ajax Filter Search.
 
 == Upgrade Notice ==
 
-* None 
+= 1.0.4 =
+Security update. Recommended for all users.
+
 
 
