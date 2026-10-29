@@ -161,11 +161,11 @@ if (!function_exists('my_action_callback')) {
 		
 		$filter_type = '';
 		if (isset($_POST['filingType'])) {
-			$slugs = array_filter(array_map('sanitize_title', explode(',', wp_unslash($_POST['filingType']))));
+			$slugs = array_filter(array_map('sanitize_title', array_slice(explode(',', wp_unslash($_POST['filingType'])), 0, 50)));
 			$filter_type = implode(',', $slugs);
 		}
 		
-		$filter_by = isset($_POST['filterBy']) ? sanitize_text_field(wp_unslash($_POST['filterBy'])) : '';
+		$filter_by = isset($_POST['filterBy']) ? mb_substr(sanitize_text_field(wp_unslash($_POST['filterBy'])), 0, 200) : '';
 		
 		$filter_months = isset($_POST['filterMonths']) ? absint($_POST['filterMonths']) : 0;
 		if ($filter_months < 1 || $filter_months > 12) { $filter_months = ''; }

@@ -289,7 +289,9 @@ function afs_feed($atts, $content = null) {
 
 	$args = array(
 		'post_type'			=> $post_type,
-		'post_status'		=> 'publish', // admin-ajax runs with is_admin() true, which would otherwise add drafts/scheduled posts
+		// admin-ajax runs with is_admin() true, which would otherwise add drafts/scheduled/pending posts.
+		// Same statuses as a normal front-end query: WP_Query still limits 'private' to users allowed to read it.
+		'post_status'		=> is_user_logged_in() ? array('publish', 'private') : 'publish',
 		'posts_per_page' 	=> $posts_per_page,
 		'offset'				=> $offset,
 		'date_query' 		=> array(array()),
