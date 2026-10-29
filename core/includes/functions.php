@@ -182,7 +182,7 @@ if (!function_exists('my_action_callback')) {
 		$filter_years = absint(afs_post_value('filterYears'));
 		if ($filter_years < 1000 || $filter_years > 9999) { $filter_years = ''; }
 		
-		$offset = absint(afs_post_value('page'));
+		$offset = min(100000, absint(afs_post_value('page'))); // cap: a huge page number would overflow the SQL LIMIT
 		
 		// Call the feed directly instead of building and running a shortcode from user input.
 		echo afs_feed(array(
