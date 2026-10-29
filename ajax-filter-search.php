@@ -12,6 +12,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       ajax-filter-search
  * Domain Path:       /languages
+ * Copyright:         Drive Media, Inc.
  *
  * @package ajax-filter-search
  */

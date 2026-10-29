@@ -135,6 +135,18 @@
 				return;
 			}
 
+			// 1.x template overrides use <a class="showSummary"> and a .afs-Hidden panel.
+			var legacy = event.target.closest( 'a.showSummary' );
+			if ( legacy ) {
+				event.preventDefault();
+				var tools = legacy.closest( '.afs-PRTools' );
+				var legacyPanel = tools ? tools.nextElementSibling : null;
+				if ( legacyPanel ) {
+					legacyPanel.style.display = legacyPanel.style.display === 'block' ? 'none' : 'block';
+				}
+				return;
+			}
+
 			var toggle = event.target.closest( '.afs-summary-toggle' );
 			if ( toggle ) {
 				var panel = self.root.querySelector( '#' + toggle.getAttribute( 'aria-controls' ) );

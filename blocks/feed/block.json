@@ -26,5 +26,6 @@
 		"html": false,
 		"align": [ "wide", "full" ]
 	},
-	"editorScript": "file:./editor.js"
+	"editorScript": "file:./editor.js",
+	"style": "afs-styles"
 }

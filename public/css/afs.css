@@ -28,6 +28,11 @@
 	display: none !important;
 }
 
+/* Legacy (1.x) template overrides hide their summary panel with this class. */
+.afs .afs-Hidden {
+	display: none;
+}
+
 /* Visually hidden, still announced. */
 .afs-sr-only {
 	position: absolute;

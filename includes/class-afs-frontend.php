@@ -14,10 +14,11 @@ class AFS_Frontend {
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register' ) );
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_assets' ) );
 	}
 
 	public static function register() {
+		// Registered on init so the block (editor preview and front end) can reference the stylesheet handle.
+		self::register_assets();
 		add_shortcode( 'ajax_filter_search', array( __CLASS__, 'shortcode' ) );
 		// Kept for 1.x pages that used the inner shortcode directly.
 		add_shortcode( 'afs_feed', array( __CLASS__, 'feed_shortcode' ) );
