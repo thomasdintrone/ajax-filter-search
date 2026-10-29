@@ -1,0 +1,339 @@
+# Copyright (C) 2026 Thomas Dintrone
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Ajax Filter Search 2.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ajax-filter-search\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-29T20:38:31+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.7.1\n"
+"X-Domain: ajax-filter-search\n"
+
+#. Plugin Name of the plugin
+msgid "Ajax Filter Search"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://streetcarpro.com"
+msgstr ""
+
+#. Description of the plugin
+msgid "Displays posts or custom post types in a friendly, filterable format using ajax."
+msgstr ""
+
+#. Author of the plugin
+msgid "Thomas Dintrone"
+msgstr ""
+
+#: afs-template/default.php:51
+msgid "Summary"
+msgstr ""
+
+#: afs-template/default.php:55
+msgid "Continue Reading"
+msgstr ""
+
+#: includes/class-afs-frontend.php:59
+msgid "Sorry, the results could not be loaded. Please try again."
+msgstr ""
+
+#: includes/class-afs-renderer.php:332
+msgid "Filter posts"
+msgstr ""
+
+#: includes/class-afs-renderer.php:347
+msgid "Categories"
+msgstr ""
+
+#: includes/class-afs-renderer.php:352
+msgid "All"
+msgstr ""
+
+#: includes/class-afs-renderer.php:386
+msgid "Search"
+msgstr ""
+
+#: includes/class-afs-renderer.php:393
+msgid "Month"
+msgstr ""
+
+#: includes/class-afs-renderer.php:395
+msgid "All Months"
+msgstr ""
+
+#: includes/class-afs-renderer.php:408
+msgid "Year"
+msgstr ""
+
+#: includes/class-afs-renderer.php:410
+msgid "All Years"
+msgstr ""
+
+#: includes/class-afs-renderer.php:421
+msgid "Update"
+msgstr ""
+
+#: includes/class-afs-renderer.php:422
+msgid "Reset"
+msgstr ""
+
+#: includes/class-afs-renderer.php:427
+msgid "Layout"
+msgstr ""
+
+#: includes/class-afs-renderer.php:428
+msgid "List View"
+msgstr ""
+
+#: includes/class-afs-renderer.php:429
+msgid "Grid View"
+msgstr ""
+
+#: includes/class-afs-renderer.php:474
+msgid "Date"
+msgstr ""
+
+#: includes/class-afs-renderer.php:474
+msgid "Headline"
+msgstr ""
+
+#. translators: 1: first result number, 2: last result number, 3: total results.
+#: includes/class-afs-renderer.php:495
+msgid "Displaying %1$s to %2$s (of %3$s)"
+msgstr ""
+
+#: includes/class-afs-renderer.php:503
+msgid "No results found."
+msgstr ""
+
+#: includes/class-afs-renderer.php:524
+msgid "Pagination"
+msgstr ""
+
+#: includes/class-afs-renderer.php:539
+msgid "Previous page"
+msgstr ""
+
+#: includes/class-afs-renderer.php:545
+msgid "Next page"
+msgstr ""
+
+#: includes/class-afs-settings.php:31
+#: blocks/feed/editor.js:77
+msgid "Post type"
+msgstr ""
+
+#: includes/class-afs-settings.php:32
+msgid "Select a post type to pull the feed from."
+msgstr ""
+
+#: includes/class-afs-settings.php:38
+msgid "Taxonomy"
+msgstr ""
+
+#: includes/class-afs-settings.php:39
+msgid "Select a taxonomy for the tabbed filters."
+msgstr ""
+
+#: includes/class-afs-settings.php:45
+#: blocks/feed/editor.js:101
+msgid "Posts per page"
+msgstr ""
+
+#: includes/class-afs-settings.php:46
+msgid "How many posts to display per page (1 to 100)."
+msgstr ""
+
+#: includes/class-afs-settings.php:52
+#: blocks/feed/editor.js:152
+msgid "Category tabs"
+msgstr ""
+
+#: includes/class-afs-settings.php:53
+msgid "Display tabbed filters."
+msgstr ""
+
+#: includes/class-afs-settings.php:59
+#: blocks/feed/editor.js:160
+msgid "Layout switcher"
+msgstr ""
+
+#: includes/class-afs-settings.php:60
+msgid "Show the List View / Grid View switcher."
+msgstr ""
+
+#: includes/class-afs-settings.php:66
+msgid "Default layout"
+msgstr ""
+
+#: includes/class-afs-settings.php:67
+msgid "The layout used when a page first loads."
+msgstr ""
+
+#: includes/class-afs-settings.php:73
+msgid "Accent color"
+msgstr ""
+
+#: includes/class-afs-settings.php:74
+msgid "Used for links, the active tab and the active page."
+msgstr ""
+
+#: includes/class-afs-settings.php:127
+msgid "Settings"
+msgstr ""
+
+#: includes/class-afs-settings.php:144
+msgid "General"
+msgstr ""
+
+#: includes/class-afs-settings.php:150
+msgid "Appearance"
+msgstr ""
+
+#: includes/class-afs-settings.php:175
+msgid "Customize your settings below, then add the shortcode <code>[ajax_filter_search]</code> (or the \"Ajax Filter Search\" block) to the page where you want the feed to appear."
+msgstr ""
+
+#: includes/class-afs-settings.php:267
+#: includes/class-afs-settings.php:355
+#: blocks/feed/editor.js:55
+msgid "None"
+msgstr ""
+
+#: includes/class-afs-settings.php:285
+msgid "Yes"
+msgstr ""
+
+#: includes/class-afs-settings.php:286
+msgid "No"
+msgstr ""
+
+#: includes/class-afs-settings.php:292
+#: blocks/feed/editor.js:144
+msgid "List"
+msgstr ""
+
+#: includes/class-afs-settings.php:293
+#: blocks/feed/editor.js:145
+msgid "Grid"
+msgstr ""
+
+#: includes/class-afs-settings.php:324
+msgid "Save Settings"
+msgstr ""
+
+#: blocks/feed/editor.js:21
+msgid "Use plugin setting"
+msgstr ""
+
+#: blocks/feed/editor.js:25
+msgid "Show"
+msgstr ""
+
+#: blocks/feed/editor.js:26
+msgid "Hide"
+msgstr ""
+
+#: blocks/feed/editor.js:75
+msgid "Content"
+msgstr ""
+
+#: blocks/feed/editor.js:85
+msgid "Taxonomy for tabs"
+msgstr ""
+
+#: blocks/feed/editor.js:93
+msgid "Limit to term slugs"
+msgstr ""
+
+#: blocks/feed/editor.js:94
+msgid "Comma separated, for example news,press. Leave empty for all."
+msgstr ""
+
+#: blocks/feed/editor.js:102
+msgid "0 uses the plugin setting."
+msgstr ""
+
+#: blocks/feed/editor.js:111
+msgid "Order by"
+msgstr ""
+
+#: blocks/feed/editor.js:115
+msgid "Date published"
+msgstr ""
+
+#: blocks/feed/editor.js:116
+msgid "Title"
+msgstr ""
+
+#: blocks/feed/editor.js:117
+msgid "Date modified"
+msgstr ""
+
+#: blocks/feed/editor.js:124
+msgid "Order"
+msgstr ""
+
+#: blocks/feed/editor.js:128
+msgid "Newest / Z to A first"
+msgstr ""
+
+#: blocks/feed/editor.js:129
+msgid "Oldest / A to Z first"
+msgstr ""
+
+#: blocks/feed/editor.js:138
+msgid "Display"
+msgstr ""
+
+#: blocks/feed/editor.js:140
+msgid "Starting layout"
+msgstr ""
+
+#: blocks/feed/editor.js:168
+msgid "Search box"
+msgstr ""
+
+#: blocks/feed/editor.js:175
+msgid "Month filter"
+msgstr ""
+
+#: blocks/feed/editor.js:182
+msgid "Year filter"
+msgstr ""
+
+#: blocks/feed/block.json
+msgctxt "block title"
+msgid "Ajax Filter Search"
+msgstr ""
+
+#: blocks/feed/block.json
+msgctxt "block description"
+msgid "A filterable, searchable, paginated list of posts or custom post types, updated with ajax."
+msgstr ""
+
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "filter"
+msgstr ""
+
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "search"
+msgstr ""
+
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "posts"
+msgstr ""
+
+#: blocks/feed/block.json
+msgctxt "block keyword"
+msgid "ajax"
+msgstr ""

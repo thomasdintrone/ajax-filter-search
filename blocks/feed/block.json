@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "ajax-filter-search/feed",
+	"title": "Ajax Filter Search",
+	"category": "widgets",
+	"icon": "filter",
+	"description": "A filterable, searchable, paginated list of posts or custom post types, updated with ajax.",
+	"keywords": [ "filter", "search", "posts", "ajax" ],
+	"textdomain": "ajax-filter-search",
+	"attributes": {
+		"postType": { "type": "string", "default": "" },
+		"taxonomy": { "type": "string", "default": "" },
+		"terms": { "type": "string", "default": "" },
+		"perPage": { "type": "number", "default": 0 },
+		"layout": { "type": "string", "default": "" },
+		"orderby": { "type": "string", "default": "" },
+		"order": { "type": "string", "default": "" },
+		"showTabs": { "type": "string", "default": "" },
+		"showViews": { "type": "string", "default": "" },
+		"showSearch": { "type": "boolean", "default": true },
+		"showMonths": { "type": "boolean", "default": true },
+		"showYears": { "type": "boolean", "default": true }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	},
+	"editorScript": "file:./editor.js"
+}
