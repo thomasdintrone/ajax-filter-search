@@ -57,7 +57,7 @@ class AFS_Renderer {
 				break;
 			}
 		}
-		$terms = array_values( array_unique( array_filter( array_map( 'sanitize_title', $terms ) ) ) );
+		$terms = array_values( array_unique( array_filter( array_map( 'sanitize_title', array_slice( $terms, 0, 50 ) ) ) ) );
 		$terms = array_values( array_diff( $terms, array( 'all' ) ) );
 		if ( '' === $taxonomy ) {
 			$terms = array();
@@ -125,7 +125,7 @@ class AFS_Renderer {
 			'term'   => $term,
 			'month'  => isset( $raw['month'] ) ? self::clean_month( $raw['month'] ) : $config['month'],
 			'year'   => isset( $raw['year'] ) ? self::clean_year( $raw['year'] ) : $config['year'],
-			'paged'  => isset( $raw['paged'] ) ? max( 1, absint( $raw['paged'] ) ) : $config['page'],
+			'paged'  => isset( $raw['paged'] ) ? min( 100000, max( 1, absint( $raw['paged'] ) ) ) : $config['page'],
 			'layout' => in_array( $layout, array( 'list', 'grid' ), true ) ? $layout : $config['layout'],
 		);
 	}
@@ -316,9 +316,11 @@ class AFS_Renderer {
 	 */
 	public static function render_widget( $config, $state, $syncs_url = false ) {
 		++self::$instances;
-		$n    = self::$instances;
-		$id   = 1 === $n ? 'afs-wrapper' : 'afs-wrapper-' . $n;
-		$base = self::current_url();
+		$n  = self::$instances;
+		$id = 1 === $n ? 'afs-wrapper' : 'afs-wrapper-' . $n;
+		// 1.x element IDs, only on the first feed (IDs must be unique). Part of the compatibility layer.
+		$legacy = 1 === $n && AFS_Compat::enabled();
+		$base   = self::current_url();
 
 		$client = array(
 			'post_type'      => $config['post_type'],
@@ -342,7 +344,7 @@ class AFS_Renderer {
 		?>
 		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?>" data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
 			<h2 class="afs-sr-only"><?php echo esc_html( self::label( __( 'Filterable posts', 'ajax-filter-search' ), $n ) ); ?></h2>
-			<form class="afs-form" method="get" action="<?php echo esc_url( $base ); ?>" role="search" aria-label="<?php echo esc_attr( self::label( __( 'Filter posts', 'ajax-filter-search' ), $n ) ); ?>">
+			<form<?php echo $legacy ? ' id="newsForm"' : ''; ?> class="afs-form" method="get" action="<?php echo esc_url( $base ); ?>" role="search" aria-label="<?php echo esc_attr( self::label( __( 'Filter posts', 'ajax-filter-search' ), $n ) ); ?>">
 				<?php
 				// Plain-permalink sites keep their page id in the query string.
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -431,20 +433,20 @@ class AFS_Renderer {
 					<?php endif; ?>
 
 					<div class="afs-actions">
-						<button type="submit" class="afs-btn afs-btn-primary afs-update"><?php esc_html_e( 'Update', 'ajax-filter-search' ); ?></button>
-						<button type="button" class="afs-btn afs-reset"><?php esc_html_e( 'Reset', 'ajax-filter-search' ); ?></button>
+						<button type="submit"<?php echo $legacy ? ' id="updateBtn"' : ''; ?> class="afs-btn afs-btn-primary afs-update"><?php esc_html_e( 'Update', 'ajax-filter-search' ); ?></button>
+						<button type="button"<?php echo $legacy ? ' id="resetBtn"' : ''; ?> class="afs-btn afs-reset"><?php esc_html_e( 'Reset', 'ajax-filter-search' ); ?></button>
 					</div>
 				</div>
 
 				<?php if ( $config['show_views'] ) : ?>
-					<div class="afs-Switch" role="group" aria-label="<?php echo esc_attr( self::label( __( 'Layout', 'ajax-filter-search' ), $n ) ); ?>">
+					<div<?php echo $legacy ? ' id="newsViewOptionsPanel"' : ''; ?> class="afs-Switch" role="group" aria-label="<?php echo esc_attr( self::label( __( 'Layout', 'ajax-filter-search' ), $n ) ); ?>">
 						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="list" aria-pressed="<?php echo 'list' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'List View', 'ajax-filter-search' ); ?></button>
 						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="grid" aria-pressed="<?php echo 'grid' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'Grid View', 'ajax-filter-search' ); ?></button>
 					</div>
 				<?php endif; ?>
 			</form>
 
-			<div class="afs-results" aria-live="polite" aria-busy="false">
+			<div<?php echo $legacy ? ' id="newsPanelResults"' : ''; ?> class="afs-results" aria-live="polite" aria-busy="false">
 				<?php echo self::render_results( $config, $state, $base, $n )['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped in render_results(). ?>
 			</div>
 		</div>
@@ -492,7 +494,7 @@ class AFS_Renderer {
 				$query->the_post();
 				printf(
 					'<article class="%1$s" itemscope itemtype="https://schema.org/BlogPosting">%2$s</article>',
-					esc_attr( implode( ' ', get_post_class( 'afs-TableRowItem afs-item gridPR' . $i ) ) ),
+					esc_attr( implode( ' ', array_diff( get_post_class( 'afs-TableRowItem afs-item gridPR' . $i ), array( 'hentry' ) ) ) ), // 'hentry' makes many themes style each result as a full post.
 					return_template( 'default.php', $config['terms'], $config['taxonomy'] ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Template output is trusted theme/plugin markup.
 				);
 				++$i;

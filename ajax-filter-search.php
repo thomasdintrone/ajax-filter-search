@@ -39,7 +39,9 @@ require_once AFS_PLUGIN_PATH . 'includes/class-afs-settings.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-renderer.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-rest.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-frontend.php';
+require_once AFS_PLUGIN_PATH . 'includes/compat.php';
 
 AFSAdmin::init();
 AFS_Frontend::init();
 AFS_REST::init();
+AFS_Compat::init();

@@ -50,6 +50,13 @@
 		<exclude-pattern>*.asset.php</exclude-pattern>
 	</rule>
 
+	<!-- includes/compat.php deliberately keeps 1.x names and declarations in one file. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="Generic.Files.OneObjectStructurePerFile.MultipleFound"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+
 	<!-- 1.x public names kept on purpose for theme template overrides. -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
 		<exclude-pattern>includes/functions.php</exclude-pattern>

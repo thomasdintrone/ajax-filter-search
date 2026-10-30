@@ -6,7 +6,7 @@ fail=0
 check() { # name, expected, actual
 	if [ "$2" == "$3" ]; then echo "ok    $1"; else echo "FAIL  $1 (expected '$2', got '$3')"; fail=1; fi
 }
-articles() { curl -s "$1" | grep -o '<article' | wc -l | tr -d ' '; }
+articles() { curl -s "$1" | grep -o '<article class="[^"]*afs-item' | wc -l | tr -d ' '; }
 
 check "single page renders 10 items"        10 "$(articles "$B/afs-single/")"
 check "legacy filter_by limits tabs (All + 2)"  3 "$(curl -s "$B/afs-legacy/" | grep -o 'data-afs-term=' | wc -l | tr -d ' ')"

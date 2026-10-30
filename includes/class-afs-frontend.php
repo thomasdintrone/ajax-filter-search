@@ -53,7 +53,7 @@ class AFS_Frontend {
 
 		wp_add_inline_script(
 			'afs-script',
-			'window.afsSettings = ' . wp_json_encode(
+			AFS_Compat::legacy_globals_js() . 'window.afsSettings = ' . wp_json_encode(
 				array(
 					'restUrl' => esc_url_raw( rest_url( AFS_REST::NAMESPACE_ . '/results' ) ),
 					'i18n'    => array(

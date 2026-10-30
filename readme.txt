@@ -66,7 +66,11 @@ Yes. Add the `terms` attribute with the term *slugs* you want, separated by comm
 
 = Is the ajax functionality secure? =
 
-The filters call a read-only REST endpoint (`/wp-json/afs/v1/results`) that only ever returns published content of public post types. All incoming values are validated and sanitized on the server, and the endpoint cannot change anything on your site, so no nonce is needed. Since version 2.0.0 the old `admin-ajax` actions are gone.
+The filters call a read-only REST endpoint (`/wp-json/afs/v1/results`) that only ever returns published content of public post types. All incoming values are validated and sanitized on the server, and the endpoint cannot change anything on your site, so no nonce is needed.
+
+= I'm upgrading from 1.x. What changes? =
+
+Version 2.0.0 is a major update. Please back up your site and try it on a staging copy first. The feed has new markup and a small new stylesheet, so custom CSS written for the old Bootstrap-based markup needs updating, and the Font Awesome icon font is no longer loaded. Theme template overrides keep working. A compatibility layer keeps the 1.x functions, constants, the first feed's element IDs, the old script handles and the old ajax action working for now; it is deprecated and can be switched off with `add_filter( 'afs_enable_legacy_compat', '__return_false' );`. The `filter_by` attribute now limits a feed to category slugs, as the 1.x readme described; use `search` for a starting keyword. A short migration guide is in the plugin's GitHub repository (docs/MIGRATION-1.x-to-2.0.md).
 
 = Can I change how each result looks? =
 
@@ -110,12 +114,13 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Screenshots ==
 
-1. Overview of Ajax Filter Search in action: search filters, the post reel, pagination and the list / grid views.
-2. A visitor can instantly narrow results by keyword, month and year.
-3. "Summary" buttons reveal a teaser of each post.
-4. Grid view.
-5. Settings panel where you choose a post type (including custom post types), a taxonomy and other options.
-6. Optional category tabs at the top of the reel.
+1. The default feed: category tabs, search, month and year filters, list view.
+2. Filtered results, with the filters kept in the address bar so the view can be shared.
+3. Grid layout.
+4. Two feeds with different settings on one page.
+5. The settings screen.
+6. The "Ajax Filter Search" block in the editor, with a live preview and controls.
+7. The feed on a phone.
 
 == Changelog ==
 
@@ -126,14 +131,21 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * New: Shortcode attributes `terms`, `layout`, `orderby`, `order`, `search`, `show_tabs`, `show_views`, `show_search`, `show_months`, `show_years`. `filter_by` now does what the old documentation said (limit to category slugs).
 * New: Accent color setting and `--afs-*` CSS variables.
 * New: Settings for the default layout; `afs_query_args` and `afs_template_file` filters.
-* Security: Replaced the unauthenticated admin-ajax handler, which built shortcodes from raw POST data, with a validated read-only REST endpoint. All output is escaped and all settings are validated on save.
+* Security: Replaced the old admin-ajax handler with a validated read-only REST endpoint, escaped all output, and validate all settings on save. Includes every fix from 1.0.4.
 * Improved: Front end rewritten in plain JavaScript (jQuery no longer required) with a small, scoped stylesheet. Assets load only on pages that use the plugin.
 * Improved: Accessibility - labeled fields, ARIA states, keyboard friendly controls, announced updates.
 * Improved: Fully translatable; dates and month names follow the site language and settings.
 * Improved: Works with PHP 7.4 to 8.4 and WordPress 6.0 to 7.1; removed all PHP warnings from earlier versions (for example when two feeds shared a page).
 * Improved: Child themes are checked for template overrides; the settings page and its scripts only load on the plugin's own screen.
+* Added: A deprecated compatibility layer for 1.x code: the 1.x functions, classes and constants, the old ajax action (now served by the same validated code), the first feed's 1.x element IDs, the old script and style handles, and the `ajaxurl` / `scriptpath` globals on feed pages. Switch it off with the `afs_enable_legacy_compat` filter.
 * Removed: The Font Awesome CDN, the bundled Bootstrap-derived CSS, SCSS sources and development junk from the plugin package.
 * Added: `uninstall.php` removes the plugin's setting on deletion.
+
+= 1.0.4 =
+* Security: Hardened the ajax request handler. All submitted values are now validated.
+* Security: Draft, scheduled and pending posts are no longer included in ajax results.
+* Security: The settings-screen taxonomy lookup is now limited to administrators.
+* Fix: Filtering no longer causes a fatal error on PHP 8.
 
 = 1.0.3 =
 * Function / Structure Improvements
@@ -154,4 +166,7 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 == Upgrade Notice ==
 
 = 2.0.0 =
-Major update: new block, multiple feeds, REST-based ajax, accessibility and security improvements. The Bootstrap-derived styles and Font Awesome are gone; if you styled the old markup, please check your pages. Theme template overrides written for 1.x keep working.
+Major update. Back up your site and test on a staging copy first. The new markup and styles replace the old Bootstrap-based ones, so custom CSS, JavaScript and code that calls the legacy AJAX action may need adjusting. 1.x template overrides keep working.
+
+= 1.0.4 =
+Security update. Recommended for all users.

@@ -59,6 +59,7 @@ class AFS_REST {
 					'afs_page'       => array(
 						'type'    => 'integer',
 						'minimum' => 1,
+						'maximum' => 100000,
 					),
 					'instance'       => array(
 						'type'    => 'integer',
