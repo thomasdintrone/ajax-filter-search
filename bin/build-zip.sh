@@ -10,7 +10,12 @@ out="build/${slug}"
 
 rm -rf build
 mkdir -p "$out"
-rsync -a --exclude-from=.distignore --exclude='/build' ./ "$out/"
+# Start from tracked files only (git archive), so untracked local material (for example docs-private/)
+# can never end up in the package, then drop everything listed in .distignore.
+stage="$(mktemp -d)"
+trap 'rm -rf "$stage"' EXIT
+git archive HEAD | tar -x -C "$stage"
+rsync -a --exclude-from=.distignore "$stage/" "$out/"
 ( cd build && zip -qr "${slug}-${version}.zip" "${slug}" )
 
 echo "Built build/${slug}-${version}.zip"
