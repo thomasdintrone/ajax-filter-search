@@ -25,7 +25,10 @@
 | Ajax transport | `admin-ajax.php?action=my_action` | `/wp-json/afs/v1/results` (REST) | If a security or caching plugin blocks REST for visitors, allow `/wp-json/afs/v1/`. Custom code calling `my_action` still works via the compatibility layer, but move to REST |
 | JavaScript | jQuery | Plain JavaScript | Custom scripts that hooked the old DOM need updating |
 | Template overrides | Old markup | Still used as-is; they keep their old markup, so they lose icons | Optionally rebase on the new `afs-template/default.php` (adds `$afs_terms`, `$afs_taxonomy`) |
-| Unpublished posts | Feed excluded drafts on page load | Feed only ever lists published posts, including for administrators (1.0.4 shows private posts to users allowed to read them) | None |
+| Private posts | Shown in the feed to users allowed to read them (administrators, in 1.0.4) | **Never shown, for anyone, including administrators.** The feed lists published posts only, so page output and the REST endpoint are the same for every visitor and safe to cache | If you relied on administrators seeing private posts in a feed, view them in the post list or on the post itself. This is a deliberate 2.0 choice to avoid per-user output and caching problems |
+| Drafts, pending and scheduled posts | Not listed on page load; 1.0.3 leaked them through ajax (fixed in 1.0.4) | Never listed | None |
+
+> **Private posts:** from 2.0.0 the feed is public-only. Private posts no longer appear in any feed, even for logged-in administrators.
 
 ## New things you can use
 Gutenberg block ("Ajax Filter Search"), `terms`, `layout`, `orderby`, `order`, `search`, `show_tabs`, `show_views`, `show_search`, `show_months`, `show_years` shortcode attributes, shareable filter URLs, an accent color setting, and the `afs_query_args` and `afs_template_file` filters.
