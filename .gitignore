@@ -1,32 +1,22 @@
-*.log
-wp-config.php
-wp-content/advanced-cache.php
-wp-content/backup-db/
-wp-content/backups/
-wp-content/blogs.dir/
-wp-content/cache/
-wp-content/upgrade/
-wp-content/uploads/
-wp-content/wp-cache-config.php
-wp-content/plugins/hello.php
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
 
-/.htaccess
-/license.txt
-/readme.html
-/sitemap.xml
-/sitemap.xml.gz
-config.codekit
+# Legacy tooling (Dreamweaver, CodeKit, Sass)
+_notes/
+*.codekit
 .codekit-cache/
+.sass-cache/
 
+# Dev dependencies and local artifacts
+node_modules/
+vendor/
+build/
+*.log
+.phpcs-cache
+.phpunit.result.cache
+.wp-env.override.json
 
-*.codekit
-
-*.codekit
-
-admin/_notes/dwsync.xml
-
-admin/_notes/dwsync.xml
-
-admin/_notes/dwsync.xml
-
-admin/js/_notes/dwsync.xml
+# Private notes (security assessments, runbooks); never tracked or shipped
+docs-private/

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<ruleset name="Ajax Filter Search">
+	<description>WordPress coding standards for Ajax Filter Search.</description>
+
+	<file>.</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/build/*</exclude-pattern>
+	<exclude-pattern>*/bin/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="ps"/>
+
+	<rule ref="WordPress"/>
+	<rule ref="WordPress-Extra"/>
+
+	<config name="testVersion" value="7.4-"/>
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="minimum_wp_version" value="6.0"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="ajax-filter-search"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="afs"/>
+				<element value="AFS"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Docblock style is not enforced; escaping, i18n and security sniffs are. -->
+	<rule ref="Squiz.Commenting.FunctionComment.Missing"><severity>0</severity></rule>
+	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag"><severity>0</severity></rule>
+	<rule ref="Squiz.Commenting.ClassComment.Missing"><severity>0</severity></rule>
+	<rule ref="Generic.Commenting.DocComment.MissingShort"><severity>0</severity></rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed"><severity>0</severity></rule>
+	<rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames"><severity>0</severity></rule>
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>*.asset.php</exclude-pattern>
+	</rule>
+	<rule ref="Squiz.Commenting.FileComment.WrongStyle">
+		<exclude-pattern>*.asset.php</exclude-pattern>
+	</rule>
+
+	<!-- includes/compat.php deliberately keeps 1.x names and declarations in one file. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="Universal.Files.SeparateFunctionsFromOO.Mixed"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="Generic.Files.OneObjectStructurePerFile.MultipleFound"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"><exclude-pattern>includes/compat.php</exclude-pattern></rule>
+
+	<!-- 1.x public names kept on purpose for theme template overrides. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
+		<exclude-pattern>includes/functions.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound">
+		<exclude-pattern>includes/class-afs-renderer.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>includes/class-afs-settings.php</exclude-pattern>
+	</rule>
+</ruleset>
