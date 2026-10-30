@@ -17,3 +17,6 @@ build/
 .phpcs-cache
 .phpunit.result.cache
 .wp-env.override.json
+
+# Private notes (security assessments, runbooks); never tracked or shipped
+docs-private/
