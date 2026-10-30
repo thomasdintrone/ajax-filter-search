@@ -8,7 +8,7 @@ GitHub is the source of truth for development. WordPress.org SVN is a release ta
 | Production version | **2.0.0** (WordPress.org SVN revision r3775464, published 2026-10-30) |
 | Previous releases | 1.0.4 security release (r3774078); 1.0.3 original |
 | Supported | WordPress 6.0 and up (tested to 7.1.4), PHP 7.4 and up (tested on 7.4 and 8.4) |
-| Git release commits | 2.0.0 = `36c8469`; 1.0.4 = `d39cb21`; 1.0.3 = `a510c2b` (tag `v1.0.3`). Tags `v1.0.4` and `v2.0.0` and the `master` update are prepared but pending approval |
+| Git release commits | 2.0.0 = `36c8469` (tag `v2.0.0`); 1.0.4 = `d39cb21` (tag `v1.0.4`); 1.0.3 = `a510c2b` (tag `v1.0.3`). `master` contains all three (merge commit `40e44bd`) and equals the 2.0.0 source |
 | Source layout | see `README.md` |
 
 ## Build and package
