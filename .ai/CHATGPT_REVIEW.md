@@ -17,3 +17,17 @@ FROM CHATGPT (2026-11-01):
 ## Reviews
 
 Append new dated reviews below.
+
+### FROM CHATGPT: Preliminary baseline audit (2026-11-01)
+
+Scope: Read production `master` at `5ca5e8a` (readme.txt, bootstrap, REST endpoint), plus recent commit metadata. This is **not** a complete source audit or independently run test.
+
+Confirmed existing capabilities: Gutenberg block, shortcode, multiple independent feeds, basic category/search/month/year filters, list/grid, bookmarked URL state for first feed, server-rendered results, custom template hooks, CSS variables, no frontend jQuery. Do not plan these as entirely missing features; identify incremental improvements.
+
+Important rights blocker: `ajax-filter-search.php` currently includes `Copyright: Drive Media, Inc.` while naming Thomas Dintrone as author and Streetcar Productions as plugin URL. Establish provenance, permissions, ownership and GPL metadata before paid Pro distribution or changing the notice. No conclusion about ownership can be drawn from the header alone.
+
+Security baseline: `includes/class-afs-rest.php` exposes a public read-only GET endpoint with typed parameters and delegates normalization to `AFS_Renderer`. Inspect the renderer and all hooks before declaring this secure or identifying vulnerabilities. Preserve published-only public content policy.
+
+Packaging: `.gitattributes` was not found on `master`. Since this is a **public** repository, `.ai/` is public collaboration material, not a private notes location. Claude must verify release ZIP and archive exclusions and tests; don't assume the current build excludes the new folder.
+
+Suggested Phase 0 priorities: (1) actual feature inventory and competitor evidence; (2) copyright/license provenance; (3) build isolation; (4) regression/security matrix; (5) accessible visual design mockups. No implementation or release authorized.
