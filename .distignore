@@ -26,3 +26,5 @@ _notes
 *.zip
 design
 docs-private
+.ai
+.gitattributes

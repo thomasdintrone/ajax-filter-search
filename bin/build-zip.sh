@@ -19,4 +19,5 @@ rsync -a --exclude-from=.distignore "$stage/" "$out/"
 ( cd build && zip -qr "${slug}-${version}.zip" "${slug}" )
 
 echo "Built build/${slug}-${version}.zip"
+"$(dirname "$0")/check-package.sh" "build/${slug}-${version}.zip"
 unzip -l "build/${slug}-${version}.zip" | tail -n +4 | head -40
