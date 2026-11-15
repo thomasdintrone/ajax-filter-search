@@ -19,8 +19,9 @@ items() { grep -o '<article class="[^"]*afs-item' | wc -l | tr -d ' '; }
 # The 2.0.0 response keys only; newer versions add keys (for example meta) and must not fail this comparison.
 rest_core() { python3 -c 'import sys,json; d=json.load(sys.stdin); print(json.dumps({k: d[k] for k in ("html","found","pages")}))' | norm; }
 rest_items() { python3 -c 'import sys,json; print(json.load(sys.stdin)["html"])' | items; }
+# Asset URLs carry the plugin version (?ver=), which changes on every release by design.
 # The inline script that carries the UI strings may gain keys in newer versions (for example a retry label); that is additive.
-norm() { sed -E 's/window\.afsSettings = \{[^;]*\};/window.afsSettings = {...};/g; s/afs-summary-[0-9]+/afs-summary-N/g; s/Post excerpt [0-9]+/Post excerpt N/g' | tr -s '\n\t ' ' ' | sed 's/> </></g'; }
+norm() { sed -E 's/ver=[0-9][0-9.]*/ver=V/g; s/window\.afsSettings = \{[^;]*\};/window.afsSettings = {...};/g; s/afs-summary-[0-9]+/afs-summary-N/g; s/Post excerpt [0-9]+/Post excerpt N/g' | tr -s '\n\t ' ' ' | sed 's/> </></g'; }
 
 bin/build-zip.sh >/dev/null
 zip="$(ls build/ajax-filter-search-*.zip | head -1)"
