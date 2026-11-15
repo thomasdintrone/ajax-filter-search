@@ -66,6 +66,8 @@ class AFS_REST {
 			'order'          => $text,
 			'afs_s'          => $text,
 			'afs_term'       => $text,
+			'afs_sort'       => $text,
+			'show_chips'     => $text,
 			'afs_month'      => array(
 				'type'    => 'integer',
 				'minimum' => 0,
@@ -103,6 +105,7 @@ class AFS_REST {
 				'posts_per_page' => $request->get_param( 'posts_per_page' ),
 				'orderby'        => $request->get_param( 'orderby' ),
 				'order'          => $request->get_param( 'order' ),
+				'show_chips'     => $request->get_param( 'show_chips' ),
 			)
 		);
 
@@ -113,6 +116,7 @@ class AFS_REST {
 				'month' => $request->get_param( 'afs_month' ),
 				'year'  => $request->get_param( 'afs_year' ),
 				'paged' => $request->get_param( 'afs_page' ),
+				'sort'  => $request->get_param( 'afs_sort' ),
 			),
 			$config
 		);
@@ -167,6 +171,7 @@ class AFS_REST {
 						'term'  => $state['term'],
 						'month' => $state['month'],
 						'year'  => $state['year'],
+						'sort'  => $state['sort'],
 					),
 				),
 			);

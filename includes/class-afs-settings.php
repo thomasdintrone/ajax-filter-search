@@ -67,6 +67,20 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'help'    => __( 'The layout used when a page first loads.', 'ajax-filter-search' ),
 					'default' => 'list',
 				),
+				'afs_general_show_sort'        => array(
+					'section' => self::SECTION_GENERAL,
+					'type'    => 'yesno',
+					'label'   => __( 'Sort control', 'ajax-filter-search' ),
+					'help'    => __( 'Let visitors sort by newest, oldest, A to Z, recently updated or most commented. Each feed can override this.', 'ajax-filter-search' ),
+					'default' => 0,
+				),
+				'afs_general_show_chips'       => array(
+					'section' => self::SECTION_GENERAL,
+					'type'    => 'yesno',
+					'label'   => __( 'Active filter chips', 'ajax-filter-search' ),
+					'help'    => __( 'Show the active filters as removable chips with a Clear all link, and offer a way out when nothing matches. Each feed can override this.', 'ajax-filter-search' ),
+					'default' => 0,
+				),
 				'afs_general_noindex_filtered' => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'yesno',
@@ -210,7 +224,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 			$per_page                          = isset( $input['afs_general_posts_per_page'] ) ? absint( $input['afs_general_posts_per_page'] ) : 10;
 			$out['afs_general_posts_per_page'] = min( 100, max( 1, $per_page ) );
 
-			foreach ( array( 'afs_general_show_filters', 'afs_general_views', 'afs_general_noindex_filtered' ) as $key ) {
+			foreach ( array( 'afs_general_show_filters', 'afs_general_views', 'afs_general_noindex_filtered', 'afs_general_show_sort', 'afs_general_show_chips' ) as $key ) {
 				$out[ $key ] = ( isset( $input[ $key ] ) && '0' !== (string) $input[ $key ] ) ? 1 : 0;
 			}
 

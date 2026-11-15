@@ -31,6 +31,11 @@ class AFS_Query {
 			'ignore_sticky_posts' => true,
 		);
 
+		// A visitor's sort choice (opt-in control) overrides the feed's own order.
+		if ( ! empty( $state['sort'] ) && isset( AFS_Renderer::SORTS[ $state['sort'] ] ) ) {
+			list( $args['orderby'], $args['order'] ) = AFS_Renderer::SORTS[ $state['sort'] ];
+		}
+
 		if ( '' !== $state['s'] ) {
 			$args['s'] = $state['s'];
 		}
