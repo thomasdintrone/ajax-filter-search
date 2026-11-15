@@ -101,7 +101,7 @@ class AFS_Frontend {
 				array(
 					'restUrl' => esc_url_raw( rest_url( AFS_REST::NAMESPACE_ . '/results' ) ),
 					'i18n'    => array(
-						'error' => __( 'Sorry, the results could not be loaded.', 'ajax-filter-search' ),
+						'error' => __( 'Sorry, the results could not be loaded. Please try again.', 'ajax-filter-search' ),
 						'retry' => __( 'Try again', 'ajax-filter-search' ),
 					),
 				)
