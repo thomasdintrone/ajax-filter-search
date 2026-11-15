@@ -1,6 +1,6 @@
 # Release 2.1.0: checklist
 
-Status: **prepared, not published.** Nothing has been tagged, and nothing has been sent to WordPress.org. The steps below are for the person who owns the WordPress.org account to run; publishing is a manual, approved step (see `MAINTAINING.md`).
+Status: **published** to WordPress.org as SVN r3803994 (trunk, `tags/2.1.0` and the nine screenshots in `assets/`); Git tag `v2.1.0`. The steps below are kept as the record and as the template for the next release. The steps below are for the person who owns the WordPress.org account to run; publishing is a manual, approved step (see `MAINTAINING.md`).
 
 Package: `build/ajax-filter-search-2.1.0.zip` (built by `bin/build-zip.sh` from the tracked files and `.distignore`; 24 files; the allowlist check passed).
 
@@ -90,7 +90,7 @@ svn up && svn log -v -l 1                    # one revision: trunk changes and t
 svn diff ^/ajax-filter-search/trunk ^/ajax-filter-search/tags/2.1.0   # empty
 ```
 
-WordPress.org holds a new release for about six hours before offering it to sites. Then verify the live update with `docs-private/verify/verify-live-update.sh` (the plugins API reports 2.1.0, the downloaded zip matches the package, and a site on 2.0.0 is offered the update). Also check that the listing shows all nine screenshots in order.
+WordPress.org holds a new release for about six hours before offering it to sites. Then verify the live update with `bin/verify-live-release.sh 2.1.0 2.0.0` (the plugins API reports 2.1.0, the downloaded zip matches the package, and a site on 2.0.0 is offered the update). Also check that the listing shows all nine screenshots in order.
 
 ## After publishing
 
