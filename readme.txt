@@ -5,7 +5,7 @@ Tags: ajax filter, search posts, custom post type, pagination, shortcode
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,8 @@ A visitor can filter your posts by search keyword, month, year and category to g
 * **Multiple feeds per page** - Every feed has its own post type, categories, layout and filters.
 * **Shareable links** - The first feed on a page keeps its filters and page number in the address bar, so a filtered view can be bookmarked or shared, and the back button works. It also works with JavaScript turned off.
 * **Fast, light front end** - Plain JavaScript (no jQuery), a small stylesheet, and assets that load only on pages that contain a feed. No external fonts or icon libraries.
+* **Sort and filter chips (optional)** - Let visitors sort by newest, oldest, A to Z, recently updated or most commented, and show the active filters as removable chips with a Clear all link. Both are off until you turn them on.
+* **RSS feed for any view** - Every filter state has its own RSS 2.0 feed at `/wp-json/afs/v1/feed`, built from the same query as the results and listing published posts only.
 * **Accessible** - Labeled form fields, keyboard friendly tabs and buttons, live-region updates and a current-page indicator.
 * **Easy to theme** - Set your accent color in Settings, or override any `--afs-*` CSS variable. Developers can override the item template and use filters.
 * **Settings panel** - Choose the default post type, taxonomy, posts per page, layout and more under Settings > Ajax Filter Search.
@@ -47,6 +49,7 @@ All attributes are optional. Anything you leave out uses the setting from Settin
 * `orderby` - `date`, `title` or `modified`. `order` - `DESC` or `ASC`.
 * `search` - a keyword to start with. `filter_years` / `filter_months` - start on a year (for example 2025) or month (1 to 12).
 * `show_tabs`, `show_views`, `show_search`, `show_months`, `show_years` - `true` or `false`.
+* `show_sort`, `show_chips` - `true` or `false`. The sort control and the active filter chips are off unless you turn them on here, in the block, or under Settings.
 
 = Please Rate Ajax Filter Search! =
 
@@ -63,6 +66,18 @@ Your ratings make a big difference! If you like and use Ajax Filter Search, plea
 = Is it possible to only display posts from 1 or 2 categories? =
 
 Yes. Add the `terms` attribute with the term *slugs* you want, separated by commas, for example `[ajax_filter_search terms="news,events"]`. Make sure the slugs belong to the taxonomy selected for that post type. (If you used `filter_by` with an older version, it still works.)
+
+= Can visitors sort the results or see which filters are active? =
+
+Yes, both are optional. Add `show_sort="true"` for a sort control and `show_chips="true"` for removable filter chips with a Clear all link (they also offer a way out when nothing matches). You can also use the matching block controls, or turn them on for every feed under Settings > Ajax Filter Search. They are off by default, so existing feeds look exactly as before.
+
+= Is there an RSS feed for a filtered view? =
+
+Yes. `/wp-json/afs/v1/feed` accepts the same parameters as the results endpoint (for example `afs_term=news&afs_year=2025`) and returns RSS 2.0 with published posts only. Developers can build the address with `afs_feed_url()` or remove the feed with `add_filter( 'afs_enable_feed', '__return_false' );`.
+
+= Will search engines index every filtered view? =
+
+No. A page that shows a feed and is opened with a filter, search or page number in the address is marked noindex, follow, so only the main page is indexed. You can turn this off under Settings > Ajax Filter Search or with the `afs_noindex_filtered_states` filter.
 
 = Is the ajax functionality secure? =
 
@@ -124,6 +139,19 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Changelog ==
 
+= 2.1.0 =
+* New: Optional sort control (newest, oldest, A to Z, recently updated, most commented). Turn it on with `show_sort="true"`, the block control or Settings.
+* New: Optional active filter chips with Clear all, and a "Clear all filters" link when nothing matches (`show_chips="true"`, the block control or Settings).
+* New: RSS 2.0 feed for any filter state at `/wp-json/afs/v1/feed`. It uses the same query as the results and lists published posts only.
+* New: The results endpoint returns a `meta` block and, for logged-out visitors, sends cache validators so a repeat request is answered with an empty 304.
+* New: Filtered views of a feed page are marked noindex, follow so only the main page is indexed (setting, on by default).
+* New: A dismissible notice for administrators when the theme has template overrides or styles written for 1.x, with a link to the migration guide.
+* New: Extension points for add-ons: registries, the `afs_register` action, `afs_rest_response`, `afs_cache_version`, `afs_feed_url()` and JavaScript hooks and events (`afs:loaded`, `afs:results`, `afs:error`).
+* Improved: The Update button is hidden when JavaScript is active. It stays for visitors without JavaScript.
+* Improved: If an update request fails, the first feed on a page falls back to a normal page load and any other feed shows a Try again button.
+* Improved: The category tab list is cached.
+* Security: Only published content can be listed, even if a site's `afs_query_args` filter tries to widen the post status.
+
 = 2.0.0 =
 * New: Gutenberg block with editor controls and live preview.
 * New: Multiple feeds on one page, each with its own settings.
@@ -164,6 +192,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Ajax Filter Search
 
 == Upgrade Notice ==
+
+= 2.1.0 =
+Adds optional sort, filter chips and an RSS feed (all off by default), cache validators for the results endpoint and noindex for filtered views. Existing feeds render as before. A site filter can no longer widen the post status beyond published. Recommended.
 
 = 2.0.0 =
 Major update. Back up your site and test on a staging copy first. The new markup and styles replace the old Bootstrap-based ones, so custom CSS, JavaScript and code that calls the legacy AJAX action may need adjusting. 1.x template overrides keep working.

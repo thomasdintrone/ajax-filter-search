@@ -2,32 +2,37 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ajax Filter Search 2.0.0\n"
+"Project-Id-Version: Ajax Filter Search 2.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ajax-filter-search\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-29T20:38:31+00:00\n"
+"POT-Creation-Date: 2026-11-15T22:03:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.7.1\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: ajax-filter-search\n"
 
 #. Plugin Name of the plugin
+#: ajax-filter-search.php
+#: includes/class-afs-migration.php:73
 msgid "Ajax Filter Search"
 msgstr ""
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
+#: ajax-filter-search.php
 msgid "https://streetcarpro.com"
 msgstr ""
 
 #. Description of the plugin
+#: ajax-filter-search.php
 msgid "Displays posts or custom post types in a friendly, filterable format using ajax."
 msgstr ""
 
 #. Author of the plugin
+#: ajax-filter-search.php
 msgid "Thomas Dintrone"
 msgstr ""
 
@@ -39,88 +44,169 @@ msgstr ""
 msgid "Continue Reading"
 msgstr ""
 
-#: includes/class-afs-frontend.php:59
+#: includes/class-afs-frontend.php:104
 msgid "Sorry, the results could not be loaded. Please try again."
 msgstr ""
 
-#: includes/class-afs-renderer.php:332
+#: includes/class-afs-frontend.php:105
+msgid "Try again"
+msgstr ""
+
+#. translators: %s: comma separated file paths.
+#: includes/class-afs-migration.php:78
+#, php-format
+msgid "Your theme overrides the result template (%s). It keeps working."
+msgstr ""
+
+#. translators: %s: comma separated file paths.
+#: includes/class-afs-migration.php:87
+#, php-format
+msgid "Your theme stylesheet (%s) styles element ids from version 1.x."
+msgstr ""
+
+#: includes/class-afs-migration.php:92
+msgid "Read the migration guide"
+msgstr ""
+
+#: includes/class-afs-migration.php:93
+msgid "Dismiss"
+msgstr ""
+
+#: includes/class-afs-renderer.php:329
+msgid "Filterable posts"
+msgstr ""
+
+#: includes/class-afs-renderer.php:330
 msgid "Filter posts"
 msgstr ""
 
-#: includes/class-afs-renderer.php:347
+#: includes/class-afs-renderer.php:345
 msgid "Categories"
 msgstr ""
 
-#: includes/class-afs-renderer.php:352
+#: includes/class-afs-renderer.php:350
 msgid "All"
 msgstr ""
 
-#: includes/class-afs-renderer.php:386
+#: includes/class-afs-renderer.php:384
 msgid "Search"
 msgstr ""
 
-#: includes/class-afs-renderer.php:393
+#: includes/class-afs-renderer.php:391
 msgid "Month"
 msgstr ""
 
-#: includes/class-afs-renderer.php:395
+#: includes/class-afs-renderer.php:393
 msgid "All Months"
 msgstr ""
 
-#: includes/class-afs-renderer.php:408
+#: includes/class-afs-renderer.php:406
 msgid "Year"
 msgstr ""
 
-#: includes/class-afs-renderer.php:410
+#: includes/class-afs-renderer.php:408
 msgid "All Years"
 msgstr ""
 
-#: includes/class-afs-renderer.php:421
+#: includes/class-afs-renderer.php:420
+msgid "Sort by"
+msgstr ""
+
+#: includes/class-afs-renderer.php:426
 msgid "Update"
 msgstr ""
 
-#: includes/class-afs-renderer.php:422
+#: includes/class-afs-renderer.php:427
 msgid "Reset"
 msgstr ""
 
-#: includes/class-afs-renderer.php:427
+#: includes/class-afs-renderer.php:432
 msgid "Layout"
 msgstr ""
 
-#: includes/class-afs-renderer.php:428
+#: includes/class-afs-renderer.php:433
 msgid "List View"
 msgstr ""
 
-#: includes/class-afs-renderer.php:429
+#: includes/class-afs-renderer.php:434
 msgid "Grid View"
 msgstr ""
 
-#: includes/class-afs-renderer.php:474
+#: includes/class-afs-renderer.php:481
 msgid "Date"
 msgstr ""
 
-#: includes/class-afs-renderer.php:474
+#: includes/class-afs-renderer.php:481
 msgid "Headline"
 msgstr ""
 
 #. translators: 1: first result number, 2: last result number, 3: total results.
-#: includes/class-afs-renderer.php:495
+#: includes/class-afs-renderer.php:502
+#, php-format
 msgid "Displaying %1$s to %2$s (of %3$s)"
 msgstr ""
 
-#: includes/class-afs-renderer.php:503
+#: includes/class-afs-renderer.php:510
 msgid "No results found."
 msgstr ""
 
-#: includes/class-afs-renderer.php:524
+#: includes/class-afs-renderer.php:515
+msgid "Clear all filters"
+msgstr ""
+
+#: includes/class-afs-renderer.php:530
+msgid "Newest"
+msgstr ""
+
+#: includes/class-afs-renderer.php:531
+msgid "Oldest"
+msgstr ""
+
+#: includes/class-afs-renderer.php:532
+msgid "A to Z"
+msgstr ""
+
+#: includes/class-afs-renderer.php:533
+msgid "Recently updated"
+msgstr ""
+
+#: includes/class-afs-renderer.php:534
+msgid "Most commented"
+msgstr ""
+
+#: includes/class-afs-renderer.php:554
+msgid "Default order"
+msgstr ""
+
+#. translators: %s: the visitor's search text.
+#: includes/class-afs-renderer.php:590
+#, php-format
+msgid "Search: %s"
+msgstr ""
+
+#: includes/class-afs-renderer.php:609
+msgid "Active filters"
+msgstr ""
+
+#. translators: %s: the filter, for example "Category: News".
+#: includes/class-afs-renderer.php:625
+#, php-format
+msgid "Remove filter: %s"
+msgstr ""
+
+#: includes/class-afs-renderer.php:632
+msgid "Clear all"
+msgstr ""
+
+#: includes/class-afs-renderer.php:648
 msgid "Pagination"
 msgstr ""
 
-#: includes/class-afs-renderer.php:539
+#: includes/class-afs-renderer.php:663
 msgid "Previous page"
 msgstr ""
 
-#: includes/class-afs-renderer.php:545
+#: includes/class-afs-renderer.php:669
 msgid "Next page"
 msgstr ""
 
@@ -177,54 +263,80 @@ msgid "The layout used when a page first loads."
 msgstr ""
 
 #: includes/class-afs-settings.php:73
-msgid "Accent color"
+#: blocks/feed/editor.js:168
+msgid "Sort control"
 msgstr ""
 
 #: includes/class-afs-settings.php:74
+msgid "Let visitors sort by newest, oldest, A to Z, recently updated or most commented. Each feed can override this."
+msgstr ""
+
+#: includes/class-afs-settings.php:80
+#: blocks/feed/editor.js:176
+msgid "Active filter chips"
+msgstr ""
+
+#: includes/class-afs-settings.php:81
+msgid "Show the active filters as removable chips with a Clear all link, and offer a way out when nothing matches. Each feed can override this."
+msgstr ""
+
+#: includes/class-afs-settings.php:87
+msgid "Hide filtered views from search engines"
+msgstr ""
+
+#: includes/class-afs-settings.php:88
+msgid "Adds noindex to a page when it is shown with a filter, search or page number in the address, so only the main page is indexed."
+msgstr ""
+
+#: includes/class-afs-settings.php:94
+msgid "Accent color"
+msgstr ""
+
+#: includes/class-afs-settings.php:95
 msgid "Used for links, the active tab and the active page."
 msgstr ""
 
-#: includes/class-afs-settings.php:127
+#: includes/class-afs-settings.php:148
 msgid "Settings"
 msgstr ""
 
-#: includes/class-afs-settings.php:144
+#: includes/class-afs-settings.php:165
 msgid "General"
 msgstr ""
 
-#: includes/class-afs-settings.php:150
+#: includes/class-afs-settings.php:171
 msgid "Appearance"
 msgstr ""
 
-#: includes/class-afs-settings.php:175
+#: includes/class-afs-settings.php:196
 msgid "Customize your settings below, then add the shortcode <code>[ajax_filter_search]</code> (or the \"Ajax Filter Search\" block) to the page where you want the feed to appear."
 msgstr ""
 
-#: includes/class-afs-settings.php:267
-#: includes/class-afs-settings.php:355
+#: includes/class-afs-settings.php:288
+#: includes/class-afs-settings.php:376
 #: blocks/feed/editor.js:55
 msgid "None"
 msgstr ""
 
-#: includes/class-afs-settings.php:285
+#: includes/class-afs-settings.php:306
 msgid "Yes"
 msgstr ""
 
-#: includes/class-afs-settings.php:286
+#: includes/class-afs-settings.php:307
 msgid "No"
 msgstr ""
 
-#: includes/class-afs-settings.php:292
+#: includes/class-afs-settings.php:313
 #: blocks/feed/editor.js:144
 msgid "List"
 msgstr ""
 
-#: includes/class-afs-settings.php:293
+#: includes/class-afs-settings.php:314
 #: blocks/feed/editor.js:145
 msgid "Grid"
 msgstr ""
 
-#: includes/class-afs-settings.php:324
+#: includes/class-afs-settings.php:345
 msgid "Save Settings"
 msgstr ""
 
@@ -296,15 +408,15 @@ msgstr ""
 msgid "Starting layout"
 msgstr ""
 
-#: blocks/feed/editor.js:168
+#: blocks/feed/editor.js:184
 msgid "Search box"
 msgstr ""
 
-#: blocks/feed/editor.js:175
+#: blocks/feed/editor.js:191
 msgid "Month filter"
 msgstr ""
 
-#: blocks/feed/editor.js:182
+#: blocks/feed/editor.js:198
 msgid "Year filter"
 msgstr ""
 
