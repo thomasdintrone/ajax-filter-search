@@ -306,7 +306,7 @@ class AFS_Renderer {
 					// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					if ( isset( $_GET[ $keep ] ) ) {
 						// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-						printf( '<input type="hidden" name="%s" value="%s">', esc_attr( $keep ), esc_attr( absint( wp_unslash( $_GET[ $keep ] ) ) ) );
+						printf( '<input type="hidden" name="%s" value="%d">', esc_attr( $keep ), absint( wp_unslash( $_GET[ $keep ] ) ) );
 					}
 				}
 				?>

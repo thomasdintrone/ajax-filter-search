@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Coding standards
+    name: Coding standards and static analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +24,8 @@ jobs:
           tools: composer
       - run: composer install --no-interaction --prefer-dist
       - run: vendor/bin/phpcs -q
+      - name: Static analysis (PHPStan level 5)
+        run: composer analyse
 
   guards:
     name: Hard-rule guards
@@ -49,7 +51,10 @@ jobs:
           - { label: 'WP 6.0 / PHP 7.4 (current floor)', image: 'wordpress:6.0-php7.4-apache' }
           - { label: 'WP 6.5 / PHP 8.2',                 image: 'wordpress:6.5-php8.2-apache' }
           - { label: 'WP 6.8 / PHP 8.2',                 image: 'wordpress:6.8-php8.2-apache' }
+          - { label: 'WP 6.8 / PHP 8.1',                 image: 'wordpress:6.8-php8.1-apache' }
+          - { label: 'WP 6.5 / PHP 8.3',                 image: 'wordpress:6.5-php8.3-apache' }
           - { label: 'WP latest / PHP 8.4',              image: 'wordpress:php8.4-apache' }
+          - { label: 'WP latest / PHP 8.4 / multisite',  image: 'wordpress:php8.4-apache', multisite: '1' }
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -65,6 +70,22 @@ jobs:
       - run: bin/test.sh
         env:
           WP_IMAGE: ${{ matrix.image }}
+          AFS_MULTISITE: ${{ matrix.multisite }}
+
+  test-beta:
+    name: PHPUnit (WordPress beta, allowed to fail)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+      - run: composer install --no-interaction --prefer-dist
+      - run: bin/test.sh
+        env:
+          WP_IMAGE: wordpress:beta-php8.4-apache
 
   snapshots-frozen:
     name: 2.0.0 snapshots match the release tag

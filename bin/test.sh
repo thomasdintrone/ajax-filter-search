@@ -51,5 +51,5 @@ echo "Testing $plugin_dir on WordPress $core_version ($WP_IMAGE), series ${AFS_S
 docker run --rm --network "$net" \
 	-v "$repo":/repo -v "$plugin_dir":/plugin:ro -v "$repo/$lib":/wp-tests:ro \
 	-e WP_TESTS_DIR=/wp-tests -e AFS_TEST_PLUGIN_DIR=/plugin -e WP_TESTS_DB_HOST="$db" \
-	-e UPDATE_SNAPSHOTS="${UPDATE_SNAPSHOTS:-}" -e AFS_SNAPSHOT_SERIES="${AFS_SNAPSHOT_SERIES:-2.0.0}" \
+	-e AFS_MULTISITE="${AFS_MULTISITE:-}" -e UPDATE_SNAPSHOTS="${UPDATE_SNAPSHOTS:-}" -e AFS_SNAPSHOT_SERIES="${AFS_SNAPSHOT_SERIES:-2.0.0}" \
 	-w /repo --entrypoint php "$WP_IMAGE" -d memory_limit=512M vendor/bin/phpunit -c phpunit.xml.dist "$@"
