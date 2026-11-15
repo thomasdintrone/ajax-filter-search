@@ -15,7 +15,7 @@ IMAGE="mcr.microsoft.com/playwright:v${PW_VERSION}-noble"
 if [ -n "${AFS_THEME:-}" ]; then
 	export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-afse2e-classic}" AFS_PORT="${AFS_PORT:-8891}" COMPOSE_FILE="docker-compose.yml:tests/e2e/compose.classic.yml"
 	# Screenshots and the speed budget belong to the default theme; every other spec must pass on this one too.
-	[ "$#" -gt 0 ] || set -- feed.spec.mjs a11y.spec.mjs contract.spec.mjs
+	[ "$#" -gt 0 ] || set -- feed.spec.mjs a11y.spec.mjs contract.spec.mjs extension.spec.mjs
 else
 	export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-afse2e}"
 fi

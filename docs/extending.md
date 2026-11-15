@@ -36,6 +36,29 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_cache_version` | The counter behind the `ETag` and the cached results. It changes when posts, terms, the plugin's settings or the theme change; append to it to invalidate everything. A change to a template override or to your own filter is not detected, so give those a new value here. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
 
+## JavaScript
+
+The front-end script exposes `window.afsRegistry`. An add-on can load before or after it:
+
+```js
+( window.afsRegistry = window.afsRegistry || { q: [] } );
+var use = function ( api ) {
+    api.on( 'results', function ( e ) { /* e.root, e.data (html, found, pages, meta), e.state */ } );
+};
+window.afsRegistry.use ? window.afsRegistry.use( use ) : window.afsRegistry.q.push( use );
+```
+
+| Hook | Payload |
+|---|---|
+| `loaded` | `{ root, config }`, once per feed when it is ready |
+| `before-request` | `{ url, state, root }`; change `url.searchParams` to add parameters to the request |
+| `results` | `{ root, data, state }`, after new results are in the page |
+| `error` | `{ root, error }`, when a request fails |
+
+`loaded`, `results` and `error` are also dispatched on the feed element as bubbling DOM events `afs:loaded`, `afs:results` and `afs:error`, with the payload in `event.detail`. A hook that throws is logged and ignored. `api.version` matches `AFS_API_VERSION`.
+
+If a request cannot complete (network failure, server error, a response that is not JSON), the feed that owns the address bar falls back to a normal page load of the same filter state, which the server renders in full. Any other feed shows an error message.
+
 ## One query
 
 Every output goes through `AFS_Query::args()` / `AFS_Query::run()` so the visibility rules are identical for the page, the REST route and anything built later.
