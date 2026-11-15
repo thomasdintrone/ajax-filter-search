@@ -49,7 +49,7 @@ Test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and W
 1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and in `readme.txt` (Stable tag, Tested up to, changelog, Upgrade Notice).
 2. Run the tests above; build the zip; list its contents; confirm no docs, design, bin or private files.
 3. In an SVN checkout: update `trunk/` to the package, copy `.wordpress-org/*` to `assets/` (set `svn:mime-type image/png`), `svn cp trunk tags/<version>`, review `svn status`, and commit trunk, tag and assets in one revision.
-4. After publishing, verify: the plugins API, the downloaded zip against your package, the assets, and the readme. WordPress.org holds updates for about 6 hours before offering them to sites.
+4. After publishing, verify: the plugins API, the downloaded zip against your package, the assets, and the readme. WordPress.org holds updates for about 6 hours before offering them to sites; once it has passed, `bin/verify-live-release.sh <new> <previous>` checks the API version, that the downloadable zip equals the tag, and that a site on the previous version is offered the update.
 5. Tag the same Git commit (`v<version>`) and push.
 
 ## Security considerations
