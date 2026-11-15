@@ -25,49 +25,56 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 		 */
 		public static function fields() {
 			return array(
-				'afs_general_post_type'      => array(
+				'afs_general_post_type'        => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'post_type',
 					'label'   => __( 'Post type', 'ajax-filter-search' ),
 					'help'    => __( 'Select a post type to pull the feed from.', 'ajax-filter-search' ),
 					'default' => 'post',
 				),
-				'afs_general_post_taxonomy'  => array(
+				'afs_general_post_taxonomy'    => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'taxonomy',
 					'label'   => __( 'Taxonomy', 'ajax-filter-search' ),
 					'help'    => __( 'Select a taxonomy for the tabbed filters.', 'ajax-filter-search' ),
 					'default' => 'category',
 				),
-				'afs_general_posts_per_page' => array(
+				'afs_general_posts_per_page'   => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'number',
 					'label'   => __( 'Posts per page', 'ajax-filter-search' ),
 					'help'    => __( 'How many posts to display per page (1 to 100).', 'ajax-filter-search' ),
 					'default' => 10,
 				),
-				'afs_general_show_filters'   => array(
+				'afs_general_show_filters'     => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'yesno',
 					'label'   => __( 'Category tabs', 'ajax-filter-search' ),
 					'help'    => __( 'Display tabbed filters.', 'ajax-filter-search' ),
 					'default' => 1,
 				),
-				'afs_general_views'          => array(
+				'afs_general_views'            => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'yesno',
 					'label'   => __( 'Layout switcher', 'ajax-filter-search' ),
 					'help'    => __( 'Show the List View / Grid View switcher.', 'ajax-filter-search' ),
 					'default' => 1,
 				),
-				'afs_general_layout'         => array(
+				'afs_general_layout'           => array(
 					'section' => self::SECTION_GENERAL,
 					'type'    => 'layout',
 					'label'   => __( 'Default layout', 'ajax-filter-search' ),
 					'help'    => __( 'The layout used when a page first loads.', 'ajax-filter-search' ),
 					'default' => 'list',
 				),
-				'afs_appearance_accent'      => array(
+				'afs_general_noindex_filtered' => array(
+					'section' => self::SECTION_GENERAL,
+					'type'    => 'yesno',
+					'label'   => __( 'Hide filtered views from search engines', 'ajax-filter-search' ),
+					'help'    => __( 'Adds noindex to a page when it is shown with a filter, search or page number in the address, so only the main page is indexed.', 'ajax-filter-search' ),
+					'default' => 1,
+				),
+				'afs_appearance_accent'        => array(
 					'section' => self::SECTION_APPEARANCE,
 					'type'    => 'color',
 					'label'   => __( 'Accent color', 'ajax-filter-search' ),
@@ -203,7 +210,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 			$per_page                          = isset( $input['afs_general_posts_per_page'] ) ? absint( $input['afs_general_posts_per_page'] ) : 10;
 			$out['afs_general_posts_per_page'] = min( 100, max( 1, $per_page ) );
 
-			foreach ( array( 'afs_general_show_filters', 'afs_general_views' ) as $key ) {
+			foreach ( array( 'afs_general_show_filters', 'afs_general_views', 'afs_general_noindex_filtered' ) as $key ) {
 				$out[ $key ] = ( isset( $input[ $key ] ) && '0' !== (string) $input[ $key ] ) ? 1 : 0;
 			}
 
