@@ -60,17 +60,15 @@ class SecurityRegressionTest extends AFS_Test_Case {
 	}
 
 	/**
-	 * Planned hardening: published-only must hold even if a site's afs_query_args filter widens the status.
-	 * Currently the filter runs after post_status is set and can override it. Needs the single query choke point
-	 * (roadmap Sprint 0); run with: bin/test.sh --group known-gap
-	 *
-	 * @group known-gap
+	 * Published-only must hold even if a site's afs_query_args filter widens the status or asks for permission-based
+	 * visibility. AFS_Query resets both after the filter runs.
 	 */
 	public function test_published_only_survives_query_args_filter() {
 		add_filter(
 			'afs_query_args',
 			static function ( $args ) {
 				$args['post_status'] = 'any';
+				$args['perm']        = 'readable';
 				return $args;
 			}
 		);

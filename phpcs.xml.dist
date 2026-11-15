@@ -12,6 +12,7 @@
 	<exclude-pattern>*/docs/*</exclude-pattern>
 	<exclude-pattern>*/docs-private/*</exclude-pattern>
 	<exclude-pattern>*/design/*</exclude-pattern>
+	<exclude-pattern>*/spikes/*</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
 	<arg name="colors"/>

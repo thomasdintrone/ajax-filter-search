@@ -35,6 +35,8 @@ bin/check-guards.sh                            # protected text (header, LICENSE
 bin/build-zip.sh                               # release zip plus the package allowlist check
 composer lint                                  # WordPress coding standards + PHP 7.4 compatibility
 ```
+Extension points for add-ons (registries, `AFS_API_VERSION`, filters) are documented in [docs/extending.md](docs/extending.md).
+
 `tests/snapshots/2.0.0` freezes the rendered output of every 2.0.0 entry point (shortcodes, block, REST, deep links, a 1.0.3 theme override, compat on and off). A refactor must keep them green; an intentional change needs a reviewed snapshot update.
 
 ### A running site (for browsing, seeding, `bin/smoke-test.sh`)

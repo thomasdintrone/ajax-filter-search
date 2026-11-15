@@ -161,7 +161,12 @@ abstract class AFS_Test_Case extends WP_UnitTestCase {
 			$this->addToAssertionCount( 1 );
 			return;
 		}
+		// The test factory numbers generated excerpts with a process-wide counter, so the number depends on how many
+		// posts earlier test classes created. Neutralise it on both sides; the stored files stay as generated.
+		$strip = static function ( $text ) {
+			return preg_replace( '/Post excerpt \d+/', 'Post excerpt N', $text );
+		};
 		$this->assertFileExists( $file, 'Missing snapshot ' . $name . '. Generate it from the release tag with bin/generate-snapshots.sh.' );
-		$this->assertSame( file_get_contents( $file ), $content, 'Output differs from snapshot ' . $series . '/' . $name );
+		$this->assertSame( $strip( file_get_contents( $file ) ), $strip( $content ), 'Output differs from snapshot ' . $series . '/' . $name );
 	}
 }
