@@ -17,6 +17,7 @@ docker compose "${FILES[@]}" cp "$tmp/ajax-filter-search" wordpress:/var/www/htm
 docker compose "${FILES[@]}" exec -T -u root wordpress chown -R www-data:www-data /var/www/html/pc.zip /var/www/html/wp-content/plugins/ajax-filter-search
 wp plugin install /var/www/html/pc.zip --activate >/dev/null
 wp plugin activate ajax-filter-search >/dev/null
+mkdir -p .cache
 out="$(wp plugin check ajax-filter-search --format=json 2>&1 || true)"
 printf '%s\n' "$out" > .cache/plugin-check.json
 python3 - <<'PY'
