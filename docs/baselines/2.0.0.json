@@ -18,5 +18,10 @@
     "source": "tests/e2e/perf.spec.mjs, 38-post seeded stack, Playwright image, 2026-11-15",
     "interactions": 38, "interaction_p75_ms": 24, "interaction_max_ms": 64, "cls": 0, "own_js_gzip_bytes": 3008,
     "note": "Script cost only (small data set). CI budgets: interaction p75 <= 200 ms, CLS <= 0.1, own JS <= 12 KB gzip."
+  },
+  "http_latency_10k_posts": {
+    "source": "tests/e2e/perf-10k.spec.mjs (AFS_PERF_10K=1 bin/e2e.sh), 2026-11-15, Docker Desktop arm64, no page or object cache",
+    "posts": 10037, "states": 28, "rest_p95_ms": 113, "rest_median_ms": 42, "page_p95_ms": 121,
+    "note": "Real HTTP, uncached. Nightly budgets: REST p95 <= 300 ms, full page p95 <= 600 ms."
   }
 }

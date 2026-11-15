@@ -1,0 +1,8 @@
+# Adds a minimal classic (non-block) theme to the e2e stack. Used by: AFS_THEME=afs-classic-min bin/e2e.sh
+services:
+  wordpress:
+    volumes:
+      - ./tests/e2e/themes/afs-classic-min:/var/www/html/wp-content/themes/afs-classic-min:ro
+  wpcli:
+    volumes:
+      - ./tests/e2e/themes/afs-classic-min:/var/www/html/wp-content/themes/afs-classic-min:ro

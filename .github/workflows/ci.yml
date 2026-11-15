@@ -26,6 +26,11 @@ jobs:
       - run: vendor/bin/phpcs -q
       - name: Static analysis (PHPStan level 5)
         run: composer analyse
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: JavaScript lint (ESLint)
+        run: npm ci --ignore-scripts && npm run lint:js
 
   guards:
     name: Hard-rule guards
@@ -133,6 +138,22 @@ jobs:
         if: failure()
         with:
           name: e2e-results
+          path: .cache/e2e-results
+
+  e2e-classic:
+    name: Browser tests on a classic theme
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: AFS_THEME=afs-classic-min bin/e2e.sh
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-classic-results
           path: .cache/e2e-results
 
   plugin-check:
