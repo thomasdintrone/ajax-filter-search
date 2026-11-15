@@ -36,7 +36,7 @@ CI (`.github/workflows/ci.yml`) runs lint and PHPStan, the guards, PHPUnit on Wo
 
 A nightly workflow (`.github/workflows/nightly.yml`) runs the behaviour, accessibility and contract specs in Firefox and WebKit (`PW_BROWSER=firefox bin/e2e.sh feed.spec.mjs`), and a latency check on about 10,000 posts (`AFS_PERF_10K=1 bin/e2e.sh`, budget REST p95 under 300 ms). `tests/e2e/contract.spec.mjs` holds the HTTP checks that used to exist only in `bin/smoke-test.sh` and `bin/compat-test.sh`; those scripts stay for manual use against a running site.
 
-**Visual baselines** (`tests/e2e/__screenshots__`) are only valid inside the Playwright image that `bin/e2e.sh` uses. When a change is meant to alter the look, run `bin/e2e.sh --update-snapshots`, look at every changed image, and commit them with the change. The dark-mode baseline equals the light one today because neither the plugin nor the default theme has dark styling; it exists to catch a future dark design.
+**Visual baselines** (`tests/e2e/__screenshots__`) are only valid inside the Playwright image that `bin/e2e.sh` uses. When a change is meant to alter the look, run `bin/e2e.sh --update-snapshots`, look at every changed image, and commit them with the change. The comparison tolerance is 0.2% of pixels, tight enough to notice a button appearing or disappearing. The dark-mode baseline equals the light one today because neither the plugin nor the default theme has dark styling; it exists to catch a future dark design.
 
 The e2e stack uses the seeded content from `bin/seed-test-content.php` (the default "Hello world!" post is deleted so dates stay fixed). Browser tests scan only the plugin's own region (`.afs`) with axe; theme markup is out of scope.
 

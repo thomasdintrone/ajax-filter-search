@@ -77,6 +77,19 @@ test.describe( 'filters, paging and history (JavaScript on)', () => {
 	} );
 } );
 
+test.describe( 'the Update button', () => {
+	test( 'is hidden when JavaScript runs, and Enter in the search box still applies the search', async ( { page, request } ) => {
+		await page.goto( '/afs-single/' );
+		await settled( page );
+		await expect( feed( page ).locator( '.afs-update' ) ).toBeHidden();
+		await expect( feed( page ).locator( '.afs-reset' ) ).toBeVisible();
+		await feed( page ).locator( 'input[name="afs_s"]' ).fill( 'Quarterly' );
+		await page.keyboard.press( 'Enter' );
+		await settled( page );
+		expect( await titles( page ) ).toEqual( await serverTitles( request, page.url() ) );
+	} );
+} );
+
 test.describe( 'keyboard only', () => {
 	test( 'search, submit and page links work without a mouse', async ( { page, request } ) => {
 		await page.goto( '/afs-single/' );
