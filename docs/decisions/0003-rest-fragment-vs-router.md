@@ -35,3 +35,12 @@ Keep the REST fragment as the transport. Add JSON `meta` (found, pages, page, pe
 ## Not covered
 
 Persistent object cache, real HTTP timing at 10k posts, CDN behavior for `stale-while-revalidate`, classic and Twenty Twenty-Five theme comparison, and screen-reader announcements.
+
+## Implementation notes (2026-11-15)
+
+Shipped as `meta`, `ETag`, `Cache-Control` and an object cache on `/afs/v1/results`; the 2.0.0 keys (`html`, `found`, `pages`) are unchanged and the frozen snapshots still pass. Signed config is not built yet.
+
+- **A bug the PHPUnit run could not see.** The first version built the `ETag` from core's `wp_cache_get_last_changed()`. That value is only stable with a persistent object cache; on a site without Redis or Memcached it is regenerated on every request, so a conditional request never matched. Real HTTP tests caught it. The validator now comes from `AFS_Cache`, one autoloaded option bumped once per request when posts, terms, the plugin settings or the theme change.
+- **Signed-in requests are never cached** and get `Cache-Control: private, no-cache`, because a site's own `afs_query_args` filter may depend on the visitor. A site can also turn caching off with `afs_rest_cacheable`.
+- **Known limit:** edits to a theme template override or to a site's own filter code do not change the counter. The 60-second `max-age` and the 5-minute object-cache lifetime bound the staleness; `afs_cache_version` lets a site invalidate on demand.
+

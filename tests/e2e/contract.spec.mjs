@@ -53,6 +53,31 @@ test.describe( 'REST route', () => {
 	} );
 } );
 
+test.describe( 'REST caching (anonymous visitors)', () => {
+	test( 'sends meta, a validator and Cache-Control; a matching validator gets an empty 304', async ( { request } ) => {
+		const url = restUrl( 'posts_per_page=5&afs_term=news' );
+		const first = await request.get( url );
+		expect( first.status() ).toBe( 200 );
+		const body = await first.json();
+		expect( Object.keys( body ).sort() ).toEqual( [ 'found', 'html', 'meta', 'pages' ] );
+		expect( body.meta.per_page ).toBe( 5 );
+		const etag = first.headers().etag;
+		expect( etag ).toMatch( /^"[a-f0-9]{32}"$/ );
+		expect( first.headers()[ 'cache-control' ] ).toContain( 'max-age=60' );
+
+		const again = await request.get( url, { headers: { 'If-None-Match': etag } } );
+		expect( again.status() ).toBe( 304 );
+		expect( ( await again.body() ).length ).toBe( 0 );
+		expect( again.headers().etag ).toBe( etag );
+	} );
+
+	test( 'a different state gets a different validator', async ( { request } ) => {
+		const a = ( await request.get( restUrl( 'posts_per_page=5&afs_term=news' ) ) ).headers().etag;
+		const b = ( await request.get( restUrl( 'posts_per_page=5&afs_term=events' ) ) ).headers().etag;
+		expect( a ).not.toBe( b );
+	} );
+} );
+
 test.describe( '1.x ajax action (my_action)', () => {
 	test( 'returns a page of results, supports paging, and matches the REST route', async ( { request } ) => {
 		expect( items( await ( await legacy( request, { filingType: '', filterBy: '', filterMonths: '', filterYears: '' } ) ).text() ) ).toBe( 10 );
