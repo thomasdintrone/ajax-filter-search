@@ -13,6 +13,7 @@ Everything since 2.0.0, all backward compatible:
 - Results endpoint: a `meta` block, cache validators and `Cache-Control` for logged-out visitors, empty 304 answers.
 - Filtered views are `noindex, follow` (setting, on by default).
 - Dismissible admin notice for 1.x theme overrides and styles, with a link to the migration guide.
+- Fix: in the block editor, clicking the preview no longer navigates the canvas to a raw REST URL.
 - Extension points for add-ons (registries, `AFS_API_VERSION`, `afs_register`, `afs_rest_response`, `afs_cache_version`, `afs_feed_url()`, JavaScript hooks and DOM events).
 - The Update button is hidden when JavaScript is active.
 - Tab list cached.
@@ -30,12 +31,13 @@ Modified (14): `ajax-filter-search.php`, `blocks/feed/block.json`, `blocks/feed/
 
 Added (6): `includes/api.php`, `includes/class-afs-cache.php`, `includes/class-afs-feed.php`, `includes/class-afs-migration.php`, `includes/class-afs-query.php`, `includes/class-afs-registry.php`.
 
-Unchanged: `LICENSE`, the copyright line, the plugin title and tags, and everything in `.wordpress-org/` (banner, icon, screenshots).
+Unchanged: `LICENSE`, the copyright line, the plugin title and tags, and the banner and icon in `.wordpress-org/`.
 
-## Not changed, on purpose (decide separately)
+Screenshots (`.wordpress-org/`, copied to SVN `assets/`): `screenshot-1.png` to `screenshot-7.png` are retaken (the Update button is hidden with JavaScript, the settings screen has new fields, and the block has new controls); `screenshot-8.png` (sort control and chips) and `screenshot-9.png` (empty state) are new. They come from a fictional demo site; `docs/screenshots/` has the seed and the capture script so they can be retaken.
 
-- **Screenshots and banner.** The listing still shows the 2.0.0 screenshots. The sort control, chips and empty state are not shown in any of them. Adding screenshots means updating `.wordpress-org/` and the `== Screenshots ==` list in `readme.txt`.
-- **Tested up to** stays 7.1 and **Requires at least** stays 6.0 (the script-module path needs 6.5 and is not used).
+## Not changed, on purpose
+
+**Tested up to** stays 7.1 and **Requires at least** stays 6.0 (the script-module path needs 6.5 and is not used).
 
 ## Checks run on this exact build
 
@@ -66,12 +68,18 @@ svn status | grep '^!' | awk '{print $2}' | xargs -r svn rm   # only if anything
 svn status                                   # expect: 14 M and 6 A under trunk/, nothing else
 svn diff trunk | less                        # eyeball: version 2.1.0, readme, the new includes
 
+# 1b. Screenshots: copy the nine to assets/ and set the image type on the two new ones.
+cp ~/Repos/streetcar-productions/ajax-filter-search/.wordpress-org/screenshot-*.png assets/
+svn add --force assets
+svn propset svn:mime-type image/png assets/screenshot-8.png assets/screenshot-9.png
+svn status assets                            # expect: M for screenshot-1 to 7, A for screenshot-8 and 9
+
 # 2. Tag.
 svn cp trunk tags/2.1.0
 diff -rq trunk tags/2.1.0 -x .svn            # expect no output
 
-# 3. One commit for trunk and the tag. assets/ is unchanged.
-svn commit trunk tags/2.1.0 --username longislandfreelancewebdesigner \
+# 3. One commit for trunk, the tag and the screenshots.
+svn commit trunk tags/2.1.0 assets --username longislandfreelancewebdesigner \
   -m "Release 2.1.0: sort, filter chips, RSS feed, caching headers, noindex for filtered views, extension points"
 ```
 
@@ -82,7 +90,7 @@ svn up && svn log -v -l 1                    # one revision: trunk changes and t
 svn diff ^/ajax-filter-search/trunk ^/ajax-filter-search/tags/2.1.0   # empty
 ```
 
-WordPress.org holds a new release for about six hours before offering it to sites. Then verify the live update with `docs-private/verify/verify-live-update.sh` (the plugins API reports 2.1.0, the downloaded zip matches the package, and a site on 2.0.0 is offered the update).
+WordPress.org holds a new release for about six hours before offering it to sites. Then verify the live update with `docs-private/verify/verify-live-update.sh` (the plugins API reports 2.1.0, the downloaded zip matches the package, and a site on 2.0.0 is offered the update). Also check that the listing shows all nine screenshots in order.
 
 ## After publishing
 
