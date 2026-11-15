@@ -1,6 +1,6 @@
 # 0003: REST fragment with JSON `meta`, or the Interactivity router (spike 2)
 
-Date: 2026-11-14. Status: **recommendation, awaiting owner approval**. Code: `spikes/rest/` (PHPUnit) and `spikes/frontend/` (router arm). Numbers: `.cache/spike-rest-results.json`, `.cache/spike-frontend-results.json`.
+Date: 2026-11-14. Status: **accepted** (owner approved all three recommendations, 2026-11-15). Code: `spikes/rest/` (PHPUnit) and `spikes/frontend/` (router arm). Numbers: `.cache/spike-rest-results.json`, `.cache/spike-frontend-results.json`.
 
 ## REST fragment prototype (PHPUnit, WordPress 7.1.4, 10,015 posts)
 

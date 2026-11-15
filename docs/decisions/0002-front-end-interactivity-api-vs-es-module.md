@@ -1,6 +1,6 @@
 # 0002: Interactivity API or a hand-written ES module (spike 1)
 
-Date: 2026-11-14. Status: **recommendation, awaiting owner approval**. Code: `spikes/frontend/`. Raw numbers: `.cache/spike-frontend-results.json` (not committed; reproduce with `spikes/frontend/measure.mjs`).
+Date: 2026-11-14. Status: **accepted** (owner approved all three recommendations, 2026-11-15). Code: `spikes/frontend/`. Raw numbers: `.cache/spike-frontend-results.json` (not committed; reproduce with `spikes/frontend/measure.mjs`).
 
 ## Setup
 

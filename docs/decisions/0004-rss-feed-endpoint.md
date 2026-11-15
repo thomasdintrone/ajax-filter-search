@@ -1,6 +1,6 @@
 # 0004: RSS feed for a filtered view (spike 3)
 
-Date: 2026-11-14. Status: **recommendation, awaiting owner approval**. Code: `spikes/rss/` (not shipped; excluded from the package).
+Date: 2026-11-14. Status: **accepted** (owner approved all three recommendations, 2026-11-15). Code: `spikes/rss/` (not shipped; excluded from the package).
 
 Decision rule from the plan: use core feed URLs if they give full parity with the REST results; otherwise a thin endpoint that reuses the plugin's own query.
 
