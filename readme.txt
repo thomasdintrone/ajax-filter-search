@@ -133,9 +133,11 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 2. Filtered results, with the filters kept in the address bar so the view can be shared.
 3. Grid layout.
 4. Two feeds with different settings on one page.
-5. The settings screen.
-6. The "Ajax Filter Search" block in the editor, with a live preview and controls.
+5. The settings screen, including the optional sort control, filter chips and the noindex setting.
+6. The "Ajax Filter Search" block in the editor, with a live preview and controls, including the sort and filter chip options.
 7. The feed on a phone.
+8. The optional sort control and active filter chips, with Clear all.
+9. An empty result, with a link to clear the filters.
 
 == Changelog ==
 
@@ -150,6 +152,7 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Improved: The Update button is hidden when JavaScript is active. It stays for visitors without JavaScript.
 * Improved: If an update request fails, the first feed on a page falls back to a normal page load and any other feed shows a Try again button.
 * Improved: The category tab list is cached.
+* Fix: In the block editor, clicking the preview no longer sends the editor canvas to a raw REST address; the preview is inert and a click selects the block.
 * Security: Only published content can be listed, even if a site's `afs_query_args` filter tries to widen the post status.
 
 = 2.0.0 =

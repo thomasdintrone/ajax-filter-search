@@ -16,6 +16,7 @@
 	var TextControl = wp.components.TextControl;
 	var ToggleControl = wp.components.ToggleControl;
 	var RangeControl = wp.components.RangeControl;
+	var Disabled = wp.components.Disabled;
 	var ServerSideRender = wp.serverSideRender;
 
 	var DEFAULT = { label: __( 'Use plugin setting', 'ajax-filter-search' ), value: '' };
@@ -203,10 +204,16 @@
 					} )
 				)
 			),
-			el( ServerSideRender, {
-				block: 'ajax-filter-search/feed',
-				attributes: attributes,
-			} )
+			// The preview is server-rendered markup with real links (tabs, pagination). Disabled makes it inert in the editor,
+			// so clicking it selects the block instead of navigating the canvas to the block-renderer URL.
+			el(
+				Disabled,
+				null,
+				el( ServerSideRender, {
+					block: 'ajax-filter-search/feed',
+					attributes: attributes,
+				} )
+			)
 		);
 	}
 
