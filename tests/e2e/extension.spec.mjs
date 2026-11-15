@@ -80,7 +80,7 @@ test.describe( 'graceful fallback when the request cannot complete', () => {
 		await settled( page );
 		await page.route( REST, ( route ) => route.abort() );
 		await feed( page ).locator( 'input[name="afs_s"]' ).fill( 'Quarterly' );
-		await feed( page ).locator( 'button[type="submit"]' ).click();
+		await page.keyboard.press( 'Enter' ); // The Update button is hidden when JavaScript runs.
 		await page.waitForURL( /afs_s=Quarterly/ );
 		await expect( feed( page ).locator( 'input[name="afs_s"]' ) ).toHaveValue( 'Quarterly' );
 	} );

@@ -34,6 +34,7 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_rest_cacheable` | Return `false` to stop the results route from sending validators or caching (for example when your own `afs_query_args` filter depends on the visitor). Signed-in requests are never cached. |
 | `afs_rest_cache_control` | The `Cache-Control` value of an anonymous results response (default `public, max-age=60, stale-while-revalidate=300`); return `''` to send none. |
 | `afs_cache_version` | The counter behind the `ETag` and the cached results. It changes when posts, terms, the plugin's settings or the theme change; append to it to invalidate everything. A change to a template override or to your own filter is not detected, so give those a new value here. |
+| `afs_noindex_filtered_states` | Return `false` to stop filtered views of a feed page from being marked `noindex, follow`. The setting "Hide filtered views from search engines" (default on) does the same for the whole site. The unfiltered page stays indexable and WordPress already sets its canonical link to the permalink without query arguments. |
 | `afs_enable_feed` | Return `false` to remove the RSS route. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
 

@@ -138,6 +138,11 @@
 	margin-left: auto;
 }
 
+/* With JavaScript every control applies as it changes (and Enter submits the search), so the button is only needed without it. */
+.afs-js .afs-update {
+	display: none;
+}
+
 .afs-btn {
 	display: inline-block;
 	min-height: 2.5rem;

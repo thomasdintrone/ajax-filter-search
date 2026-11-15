@@ -14,6 +14,50 @@ class AFS_Frontend {
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register' ) );
+		add_filter( 'wp_robots', array( __CLASS__, 'robots' ) );
+	}
+
+	/**
+	 * Keep filtered views out of search indexes: a page that shows a feed and was requested with any of the plugin's
+	 * URL parameters gets `noindex, follow`. The unfiltered page stays indexable, and WordPress already points the
+	 * canonical link of a page at its permalink without query arguments.
+	 *
+	 * @param array $robots Directives from wp_robots.
+	 * @return array
+	 */
+	public static function robots( $robots ) {
+		if ( ! is_singular() || ! (int) AFSAdmin::afs_get_option( 'afs_general_noindex_filtered' ) ) {
+			return $robots;
+		}
+
+		$filtered = false;
+		foreach ( AFS_Renderer::URL_KEYS as $key ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public, read-only filter state.
+			if ( isset( $_GET[ $key ] ) ) {
+				$filtered = true;
+				break;
+			}
+		}
+		$post = get_queried_object();
+		if ( ! $filtered || ! ( $post instanceof WP_Post ) ) {
+			return $robots;
+		}
+
+		$content  = (string) $post->post_content;
+		$has_feed = has_shortcode( $content, 'ajax_filter_search' ) || has_shortcode( $content, 'afs_feed' ) || has_block( 'ajax-filter-search/feed', $content );
+
+		/**
+		 * Filters whether a filtered view of a feed page is marked noindex, follow.
+		 *
+		 * @param bool    $noindex Default true when the page shows a feed and a plugin URL parameter is present.
+		 * @param WP_Post $post    The page.
+		 */
+		if ( $has_feed && apply_filters( 'afs_noindex_filtered_states', true, $post ) ) {
+			unset( $robots['index'] );
+			$robots['noindex'] = true;
+			$robots['follow']  = true;
+		}
+		return $robots;
 	}
 
 	public static function register() {

@@ -13,7 +13,7 @@ export default defineConfig( {
 	reporter: [ [ 'list' ] ],
 	outputDir: '../../.cache/e2e-results',
 	snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
-	expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled' } },
+	expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.002, animations: 'disabled' } },
 	use: {
 		...engine,
 		baseURL: process.env.BASE_URL || 'http://localhost:8890',
