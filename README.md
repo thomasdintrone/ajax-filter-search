@@ -15,26 +15,42 @@ WordPress plugin: a filterable, searchable, paginated list of posts or custom po
 | `public/` | Front-end CSS and JS (no dependencies) |
 | `admin/js/` | Settings-screen script |
 | `.wordpress-org/` | Store assets (banner, screenshots). Synced to SVN `/assets`, never shipped in the zip |
-| `bin/` | Dev scripts (seed content, smoke test, zip build) |
+| `bin/` | Dev scripts (tests, snapshot generator, guards, seed content, smoke test, zip build and package check) |
+| `tests/` | PHPUnit suite (`tests/phpunit`), 2.0.0 snapshots, fixtures |
+| `.github/workflows/ci.yml` | CI: lint, guards, PHPUnit matrix, frozen-snapshot check, package build |
 
 ## Development
 
-Requires Docker, Node and Composer.
+Requires Docker and Composer (Node is only needed for future front-end tooling).
 
+### Tests (Docker, no local WordPress needed)
 ```bash
 composer install
-npx @wordpress/env start          # http://localhost:8890  (admin / password)
-npx @wordpress/env run cli wp eval-file wp-content/plugins/ajax-filter-search/bin/seed-test-content.php
-bin/smoke-test.sh                 # HTTP checks against the seeded site
-composer lint                     # WordPress coding standards + PHP 7.4 compatibility
+bin/test.sh                                    # PHPUnit on the default stack (WordPress 7.1 / PHP 8.3)
+WP_IMAGE=wordpress:6.0-php7.4-apache bin/test.sh   # any wordpress:<ver>-php<ver>-apache image (the CI matrix)
+bin/test.sh --group security                   # one group: snapshot, security
+bin/test.sh --group known-gap                  # documented open gaps; these are expected to fail today
+bin/generate-snapshots.sh                      # rebuild tests/snapshots/2.0.0 from the v2.0.0 tag (never from the working tree)
+bin/check-guards.sh                            # protected text (header, LICENSE, readme, .wordpress-org) and no Pro/license/HTTP code
+bin/build-zip.sh                               # release zip plus the package allowlist check
+composer lint                                  # WordPress coding standards + PHP 7.4 compatibility
 ```
+`tests/snapshots/2.0.0` freezes the rendered output of every 2.0.0 entry point (shortcodes, block, REST, deep links, a 1.0.3 theme override, compat on and off). A refactor must keep them green; an intentional change needs a reviewed snapshot update.
 
-To test another PHP/WordPress version, add a git-ignored `.wp-env.override.json`, for example `{ "phpVersion": "7.4", "core": "WordPress/WordPress#6.0" }`.
+### A running site (for browsing, seeding, `bin/smoke-test.sh`)
+```bash
+docker compose up -d --wait                    # http://localhost:8890
+docker compose run --rm wpcli wp core install --url=http://localhost:8890 --title=AFS --admin_user=admin --admin_password=password --admin_email=dev@example.com --skip-email
+docker compose run --rm wpcli wp plugin activate ajax-filter-search
+docker compose run --rm wpcli wp eval-file wp-content/plugins/ajax-filter-search/bin/seed-test-content.php
+bin/smoke-test.sh
+```
+`wp-env` (`.wp-env.json`) also works where its image build succeeds; `bin/compat-test.sh` still drives a wp-env site.
 
 ## Release
 
 1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and `Stable tag` / changelog in `readme.txt`; update `Tested up to`.
-2. `bin/build-zip.sh` builds `build/ajax-filter-search-<version>.zip` from `.distignore`.
+2. `bin/build-zip.sh` builds `build/ajax-filter-search-<version>.zip` from tracked files and `.distignore`, then `bin/check-package.sh` verifies it (allowlist of top-level entries, no repo-only files such as `.ai/`, `tests/`, `docs/`).
 3. Copy the built tree into SVN `trunk/`, `svn add`/`svn rm` as needed, and sync `.wordpress-org/` into SVN `assets/`.
 4. `svn cp trunk tags/<version>`, then `svn ci`.
 5. Tag the same commit in git: `git tag -a v<version> && git push --tags`.

@@ -20,11 +20,13 @@ The script starts from `git archive HEAD` (tracked files only), then removes eve
 
 ## Test
 ```bash
-npx @wordpress/env start
-npx @wordpress/env run cli wp eval-file wp-content/plugins/ajax-filter-search/bin/seed-test-content.php
-bin/smoke-test.sh && bin/compat-test.sh
+composer install
+bin/test.sh                      # PHPUnit in Docker: 2.0.0 snapshots, security regression, no-outbound-HTTP, published-only
+bin/check-guards.sh              # protected text and no Pro/license code
+bin/smoke-test.sh && bin/compat-test.sh   # HTTP-level checks against a running seeded site (docker compose or wp-env)
 composer lint
 ```
+CI (`.github/workflows/ci.yml`) runs lint, the guards, PHPUnit on WordPress 6.0/PHP 7.4, 6.5/8.2, 6.8/8.2 and latest/8.4, and checks that the committed 2.0.0 snapshots equal what tag `v2.0.0` produces.
 Also run the official Plugin Check against the shipping files, and test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and WordPress 6.0) and the latest stack. Accessibility was checked with axe (WCAG 2.2 AA) at desktop and phone widths.
 
 ## Release checklist

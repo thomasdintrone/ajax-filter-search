@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "source": "docs/planning/PERFORMANCE-BASELINE.md (measured 2026-11-04) plus asset and payload sizes measured 2026-11-14. Development container numbers, not product claims.",
+  "environment": { "php": "8.4.27", "wordpress": "7.1.4", "database": "MariaDB 12.3.3", "object_cache": "none", "host": "Docker Desktop on arm64 macOS, 10 CPUs" },
+  "assets_gzip_bytes": { "public/js/afs.js": 3016, "public/css/afs.css": 1847, "total": 4863 },
+  "assets_raw_bytes": { "public/js/afs.js": 9870, "public/css/afs.css": 6757 },
+  "payload_per_interaction_bytes": { "rest_fragment_10_items_raw_json": 13145, "rest_fragment_10_items_gzip": 1341, "full_page_raw": 82821, "full_page_gzip": 13786, "note": "Twenty Twenty-Five, 10 items; single sample" },
+  "core_interactivity_runtime_gzip_bytes": { "6.5.5": 13162, "6.8.3": 14070, "7.1.4": 16083, "router_6.5.5": 1389, "router_7.1.4": 11955, "note": "Measured from WordPress core files; shown for the Sprint 0 spike decision" },
+  "renderer_cold_ms_median": {
+    "1000_posts":  { "page1": 8.7,  "keyword_search": 12.5, "category": 8.5,  "month_year": 3.8, "deep_page": 8.1,  "per_page_100": 65.9, "widget_shell_cold": 10.5 },
+    "10000_posts": { "page1": 12.0, "keyword_search": 53.4, "category": 8.7,  "month_year": 8.1, "deep_page": 11.4, "per_page_100": 70.6, "widget_shell_cold": 18.5 },
+    "50000_posts": { "page1": 27.6, "keyword_search": 245.3, "category": 13.8, "month_year": 9.9, "deep_page": 27.7, "per_page_100": 93.5, "widget_shell_cold": 53.8 }
+  },
+  "http_avg_ms": { "10000_posts": { "keyword_search": 110, "category": 56, "deep_page": 68 }, "50000_posts": { "keyword_search": 301, "category": 61, "deep_page": 76 } },
+  "queries_per_request": "8 to 12",
+  "not_yet_measured": ["INP and CLS in a real browser", "Lighthouse scores", "memory per request", "concurrent load", "persistent object cache", "mid-tier mobile profile"]
+}
