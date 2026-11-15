@@ -1,0 +1,54 @@
+found=2
+pages=1
+---
+<div class="afs-TableHeader" aria-hidden="true">
+<div class="afs-col-date">Date</div>
+<div class="afs-col-title">Headline</div>
+</div>
+<div class="afs-items">
+<article class="afs-TableRowItem afs-item gridPR1 post-1003 post type-post status-publish format-standard category-press-releases" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 20, 2024</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">2:00 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Press Releases</p>
+<h3>
+<a href="http://example.org/?p=1003">Charlie notice three</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N1">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N1" hidden>
+<p>Post excerpt 0000023&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1003">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR2 post-1002 post type-post status-publish format-standard category-events category-news" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 5, 2024</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">9:30 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Events, News</p>
+<h3>
+<a href="http://example.org/?p=1002">Bravo update two</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N2">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N2" hidden>
+<p>Post excerpt 0000022&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1002">Continue Reading</a>
+</div>
+</div>
+</article>
+</div>
+<p class="afs-count">Displaying <span class="afs-first">1</span> to <span class="afs-last">2</span> (of <span class="afs-total">2</span>)</p>

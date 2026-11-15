@@ -1,0 +1,237 @@
+found=15
+pages=2
+---
+<div class="afs-TableHeader" aria-hidden="true">
+<div class="afs-col-date">Date</div>
+<div class="afs-col-title">Headline</div>
+</div>
+<div class="afs-items">
+<article class="afs-TableRowItem afs-item gridPR1 post-2005 post type-post status-publish format-standard post-password-required category-news" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">October 1, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">10:00 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">News</p>
+<h3>
+<a href="http://example.org/?p=2005">Protected: UNPUB-password</a>
+</h3>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR2 post-1014 post type-post status-publish format-standard category-press-releases" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">September 9, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">9:09 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Press Releases</p>
+<h3>
+<a href="http://example.org/?p=1014">November summary fourteen</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N1">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N1" hidden>
+<p>Post excerpt 0000034&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1014">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR3 post-1013 post type-post status-publish format-standard category-news" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">August 19, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">6:00 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">News</p>
+<h3>
+<a href="http://example.org/?p=1013">Mike notice thirteen</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N2">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N2" hidden>
+<p>Post excerpt 0000033&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1013">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR4 post-1012 post type-post status-publish format-standard category-uncategorized" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">May 5, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">9:00 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<h3>
+<a href="http://example.org/?p=1012">Lima report twelve</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N3">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N3" hidden>
+<p>Post excerpt 0000032&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1012">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR5 post-1011 post type-post status-publish format-standard category-events" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 28, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">3:30 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Events</p>
+<h3>
+<a href="http://example.org/?p=1011">Kilo update eleven</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N4">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N4" hidden>
+<p>Post excerpt 0000031&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1011">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR6 post-1010 post type-post status-publish format-standard category-news category-press-releases" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 15, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">1:00 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">News, Press Releases</p>
+<h3>
+<a href="http://example.org/?p=1010">Juliet quarterly results ten</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N5">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N5" hidden>
+<p>Post excerpt 0000030&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1010">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR7 post-1009 post type-post status-publish format-standard category-press-releases" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">January 2, 2026</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">7:00 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Press Releases</p>
+<h3>
+<a href="http://example.org/?p=1009">India notice nine</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N6">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N6" hidden>
+<p>Post excerpt 0000029&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1009">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR8 post-1008 post type-post status-publish format-standard category-news" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">October 10, 2025</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">10:10 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">News</p>
+<h3>
+<a href="http://example.org/?p=1008">Hotel report eight</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N7">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N7" hidden>
+<p>Post excerpt 0000028&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1008">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR9 post-1007 post type-post status-publish format-standard category-events" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">June 30, 2025</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">4:45 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Events</p>
+<h3>
+<a href="http://example.org/?p=1007">Golf guide seven</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N8">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N8" hidden>
+<p>Post excerpt 0000027&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1007">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR10 post-1006 post type-post status-publish format-standard category-news category-press-releases" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 3, 2025</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">12:00 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">News, Press Releases</p>
+<h3>
+<a href="http://example.org/?p=1006">Foxtrot summary six</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N9">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N9" hidden>
+<p>Post excerpt 0000026&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1006">Continue Reading</a>
+</div>
+</div>
+</article>
+</div>
+<p class="afs-count">Displaying <span class="afs-first">1</span> to <span class="afs-last">10</span> (of <span class="afs-total">15</span>)</p>
+<nav class="afs-pagination post-nav" aria-label="Pagination">
+<ul class="pagination">
+<li>
+<a class="afs-btn afs-btn-primary" href="http://example.org/sample-page/" data-afs-page="1" aria-current="page">1</a>
+</li>
+<li>
+<a class="afs-btn " href="http://example.org/sample-page/?afs_page=2" data-afs-page="2">2</a>
+</li>
+<li>
+<a class="afs-btn afs-next" href="http://example.org/sample-page/?afs_page=2" data-afs-page="2" aria-label="Next page">
+<span aria-hidden="true">&rsaquo;</span>
+</a>
+</li>
+</ul>
+</nav>
