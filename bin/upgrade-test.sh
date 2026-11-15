@@ -41,7 +41,9 @@ before_settings="$(wp option get afs_settings --format=json)"
 
 pages=( afs-single afs-double afs-legacy )
 for p in "${pages[@]}"; do curl -s "$B/$p/" | norm > "$tmp/before-$p.txt"; done
-rest_before="$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
+rest_before=""
+# 1.x has no REST route, so there is nothing to compare before the upgrade.
+[ "$BASE" != "2.0.0" ] || rest_before="$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
 echo "-- on $BASE: single page lists $(curl -s "$B/afs-single/" | items) items"
 
 # Anything the OLD release logged is its own business; only entries after the swap count.
