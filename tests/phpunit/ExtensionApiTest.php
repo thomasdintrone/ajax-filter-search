@@ -104,7 +104,7 @@ class ExtensionApiTest extends AFS_Test_Case {
 		$default = $this->rest( array( 'posts_per_page' => 5 ) )->get_data();
 		$keys    = array_keys( $default );
 		sort( $keys );
-		$this->assertSame( array( 'found', 'html', 'pages' ), $keys );
+		$this->assertSame( array( 'found', 'html', 'meta', 'pages' ), $keys, 'The 2.0.0 keys stay; meta is additive' );
 
 		add_filter( 'afs_rest_response', static function ( $data, $config, $state ) { $data['extra'] = $config['per_page'] . ':' . $state['paged']; return $data; }, 10, 3 );
 		$data = $this->rest( array( 'posts_per_page' => 5 ) )->get_data();

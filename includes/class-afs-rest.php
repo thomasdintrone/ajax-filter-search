@@ -18,6 +18,15 @@ class AFS_REST {
 
 	public static function init() {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+		add_filter( 'rest_pre_serve_request', array( __CLASS__, 'serve_not_modified' ), 10, 3 );
+	}
+
+	/** A 304 has no body: headers are already sent by the server, so stop it from printing `null`. */
+	public static function serve_not_modified( $served, $result, $request ) {
+		if ( $result instanceof WP_REST_Response && 304 === $result->get_status() && 0 === strpos( (string) $request->get_route(), '/' . self::NAMESPACE_ . '/' ) ) {
+			return true;
+		}
+		return $served;
 	}
 
 	public static function register_routes() {
@@ -106,13 +115,50 @@ class AFS_REST {
 		$base = wp_validate_redirect( esc_url_raw( (string) $request->get_param( 'base_url' ) ), home_url( '/' ) );
 		$base = remove_query_arg( AFS_Renderer::URL_KEYS, $base );
 
-		$result = AFS_Renderer::render_results( $config, $state, $base, max( 1, (int) $request->get_param( 'instance' ) ) );
+		$instance = max( 1, (int) $request->get_param( 'instance' ) );
 
-		$data = array(
-			'html'  => $result['html'],
-			'found' => $result['found'],
-			'pages' => $result['pages'],
-		);
+		// Anonymous responses can be cached and revalidated; a signed-in request may be personalised by a site's own
+		// filters, so it is never cached or stored. Sites can opt out with the filter.
+		$cacheable = ! is_user_logged_in() && (bool) apply_filters( 'afs_rest_cacheable', true, $config, $state );
+		$key       = md5( wp_json_encode( array( $config, $state, $base, $instance ) ) );
+		$etag      = self::etag( $key );
+
+		if ( $cacheable ) {
+			$none = trim( (string) $request->get_header( 'if_none_match' ) );
+			if ( '' !== $none && $none === $etag ) {
+				$response = new WP_REST_Response( null, 304 );
+				self::cache_headers( $response, $etag );
+				return $response;
+			}
+			$data = wp_cache_get( $key . '|' . $etag, 'afs' );
+		} else {
+			$data = false;
+		}
+
+		if ( false === $data || ! is_array( $data ) ) {
+			$result = AFS_Renderer::render_results( $config, $state, $base, $instance );
+			$data   = array(
+				'html'  => $result['html'],
+				'found' => $result['found'],
+				'pages' => $result['pages'],
+				'meta'  => array(
+					'found'    => $result['found'],
+					'pages'    => $result['pages'],
+					'page'     => $state['paged'],
+					'per_page' => $config['per_page'],
+					'instance' => $instance,
+					'state'    => array(
+						's'     => $state['s'],
+						'term'  => $state['term'],
+						'month' => $state['month'],
+						'year'  => $state['year'],
+					),
+				),
+			);
+			if ( $cacheable ) {
+				wp_cache_set( $key . '|' . $etag, $data, 'afs', 5 * MINUTE_IN_SECONDS );
+			}
+		}
 
 		/**
 		 * Filters the results response before it is sent. Keep `html`, `found` and `pages`.
@@ -123,6 +169,33 @@ class AFS_REST {
 		 */
 		$data = apply_filters( 'afs_rest_response', $data, $config, $state );
 
-		return rest_ensure_response( $data );
+		$response = rest_ensure_response( $data );
+		if ( $cacheable ) {
+			self::cache_headers( $response, $etag );
+		} else {
+			$response->header( 'Cache-Control', 'private, no-cache' );
+		}
+		return $response;
+	}
+
+	/**
+	 * Cheap validator that needs no query: changes whenever AFS_Cache notes a post, term, settings or theme change, or
+	 * the plugin is updated. A published, edited, trashed or re-termed post therefore invalidates every cached result.
+	 */
+	private static function etag( $key ) {
+		return '"' . md5( $key . '|' . AFS_Cache::version() . '|' . AFS_VERSION ) . '"';
+	}
+
+	private static function cache_headers( $response, $etag ) {
+		$response->header( 'ETag', $etag );
+		/**
+		 * Filters the Cache-Control value of an anonymous results response. Return '' to send none.
+		 *
+		 * @param string $value Default: public, one minute, stale-while-revalidate five.
+		 */
+		$value = (string) apply_filters( 'afs_rest_cache_control', 'public, max-age=60, stale-while-revalidate=300' );
+		if ( '' !== $value ) {
+			$response->header( 'Cache-Control', $value );
+		}
 	}
 }

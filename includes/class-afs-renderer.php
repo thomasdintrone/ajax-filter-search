@@ -154,14 +154,20 @@ class AFS_Renderer {
 		if ( ! $config['taxonomy'] ) {
 			return array();
 		}
-		$terms = get_terms(
-			array(
-				'taxonomy' => $config['taxonomy'],
-				'orderby'  => 'term_id',
-			)
-		);
-		if ( is_wp_error( $terms ) ) {
-			return array();
+		// Cached per taxonomy and invalidated whenever any term changes (core bumps the terms change counter).
+		$cache_key = 'afs_tabs_' . $config['taxonomy'] . '_' . wp_cache_get_last_changed( 'terms' );
+		$terms     = wp_cache_get( $cache_key, 'afs' );
+		if ( false === $terms ) {
+			$terms = get_terms(
+				array(
+					'taxonomy' => $config['taxonomy'],
+					'orderby'  => 'term_id',
+				)
+			);
+			if ( is_wp_error( $terms ) ) {
+				return array();
+			}
+			wp_cache_set( $cache_key, $terms, 'afs', DAY_IN_SECONDS );
 		}
 		$list = array();
 		foreach ( $terms as $term ) {
