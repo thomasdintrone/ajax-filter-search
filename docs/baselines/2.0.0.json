@@ -13,5 +13,10 @@
   },
   "http_avg_ms": { "10000_posts": { "keyword_search": 110, "category": 56, "deep_page": 68 }, "50000_posts": { "keyword_search": 301, "category": 61, "deep_page": 76 } },
   "queries_per_request": "8 to 12",
-  "not_yet_measured": ["INP and CLS in a real browser", "Lighthouse scores", "memory per request", "concurrent load", "persistent object cache", "mid-tier mobile profile"]
+  "not_yet_measured": ["INP and CLS in a real browser", "Lighthouse scores", "memory per request", "concurrent load", "persistent object cache", "mid-tier mobile profile"],
+  "frontend_interaction_4x_cpu": {
+    "source": "tests/e2e/perf.spec.mjs, 38-post seeded stack, Playwright image, 2026-11-15",
+    "interactions": 38, "interaction_p75_ms": 24, "interaction_max_ms": 64, "cls": 0, "own_js_gzip_bytes": 3008,
+    "note": "Script cost only (small data set). CI budgets: interaction p75 <= 200 ms, CLS <= 0.1, own JS <= 12 KB gzip."
+  }
 }

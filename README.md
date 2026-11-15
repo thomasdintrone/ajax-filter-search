@@ -31,6 +31,9 @@ WP_IMAGE=wordpress:6.0-php7.4-apache bin/test.sh   # any wordpress:<ver>-php<ver
 bin/test.sh --group security                   # one group: snapshot, security
 bin/test.sh --group known-gap                  # documented open gaps; these are expected to fail today
 bin/generate-snapshots.sh                      # rebuild tests/snapshots/2.0.0 from the v2.0.0 tag (never from the working tree)
+bin/e2e.sh                                     # Playwright + axe + visual + interaction budget (needs: npm ci --ignore-scripts)
+bin/upgrade-test.sh 1.0.4                      # published release -> this build (also 2.0.0)
+bin/plugin-check.sh                            # official Plugin Check on the release package
 bin/check-guards.sh                            # protected text (header, LICENSE, readme, .wordpress-org) and no Pro/license/HTTP code
 bin/build-zip.sh                               # release zip plus the package allowlist check
 composer lint                                  # WordPress coding standards + PHP 7.4 compatibility

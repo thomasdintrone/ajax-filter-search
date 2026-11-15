@@ -1,0 +1,12 @@
+{
+  "name": "ajax-filter-search-dev",
+  "private": true,
+  "description": "Development tooling only (browser tests). Nothing here ships in the plugin package.",
+  "scripts": {
+    "e2e": "bin/e2e.sh"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
+    "@playwright/test": "1.49.1"
+  }
+}

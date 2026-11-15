@@ -97,3 +97,37 @@ jobs:
         with:
           name: ajax-filter-search-zip
           path: build/ajax-filter-search-*.zip
+
+  e2e:
+    name: Browser tests (Playwright, axe, visual, budget)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: bin/e2e.sh
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-results
+          path: .cache/e2e-results
+
+  plugin-check:
+    name: Plugin Check (release package)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bin/plugin-check.sh
+
+  upgrade:
+    name: Upgrade from ${{ matrix.base }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        base: [ '1.0.4', '2.0.0' ]
+    steps:
+      - uses: actions/checkout@v4
+      - run: bin/upgrade-test.sh ${{ matrix.base }}
