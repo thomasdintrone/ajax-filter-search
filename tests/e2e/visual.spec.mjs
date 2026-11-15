@@ -27,3 +27,16 @@ test( 'visual: grid layout, second page', async ( { page } ) => {
 	await settled( page );
 	await expect( feed( page ) ).toHaveScreenshot( 'grid-page2.png' );
 } );
+
+test( 'visual: sort control, chips and Clear all', async ( { page } ) => {
+	await page.goto( '/afs-tools/?afs_term=news&afs_year=2024&afs_sort=oldest' );
+	await settled( page );
+	await expect( feed( page ) ).toHaveScreenshot( 'tools-chips.png' );
+} );
+
+test( 'visual: empty state with recovery', async ( { page } ) => {
+	await page.goto( '/afs-tools/?afs_s=zzzznomatch' );
+	await settled( page );
+	await expect( feed( page ) ).toHaveScreenshot( 'tools-empty.png' );
+} );
+

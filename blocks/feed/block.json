@@ -20,7 +20,9 @@
 		"showViews": { "type": "string", "default": "" },
 		"showSearch": { "type": "boolean", "default": true },
 		"showMonths": { "type": "boolean", "default": true },
-		"showYears": { "type": "boolean", "default": true }
+		"showYears": { "type": "boolean", "default": true },
+		"showSort": { "type": "string", "default": "" },
+		"showChips": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"html": false,

@@ -9,7 +9,7 @@
 	'use strict';
 
 	var settings = window.afsSettings || {};
-	var URL_KEYS = [ 'afs_s', 'afs_term', 'afs_month', 'afs_year', 'afs_page', 'afs_layout' ];
+	var URL_KEYS = [ 'afs_s', 'afs_term', 'afs_month', 'afs_year', 'afs_page', 'afs_layout', 'afs_sort' ];
 	var SEARCH_DELAY = 400;
 
 	/**
@@ -123,7 +123,14 @@
 			year: this.read( 'afs_year' ),
 			page: this.page,
 			layout: this.layout(),
+			sort: this.read( 'afs_sort' ),
 		};
+	};
+
+	/** The sort the feed starts with (the select's own default), or '' when the control is not shown. */
+	Widget.prototype.defaultSort = function () {
+		var select = this.form.elements.afs_sort;
+		return select ? select.getAttribute( 'data-default' ) || '' : '';
 	};
 
 	Widget.prototype.bind = function () {
@@ -146,7 +153,7 @@
 			);
 		}
 
-		[ 'afs_month', 'afs_year' ].forEach( function ( name ) {
+		[ 'afs_month', 'afs_year', 'afs_sort' ].forEach( function ( name ) {
 			var el = self.form.elements[ name ];
 			if ( el ) {
 				el.addEventListener( 'change', function () {
@@ -167,6 +174,23 @@
 
 		// Category tabs.
 		this.root.addEventListener( 'click', function ( event ) {
+			// A filter chip, Clear all, or the recovery link in an empty result: plain links that also work without JavaScript.
+			var clear = event.target.closest( 'a[data-afs-clear]' );
+			if ( clear && self.root.contains( clear ) ) {
+				event.preventDefault();
+				var key = clear.getAttribute( 'data-afs-clear' );
+				self.apply( key === 'all' ? { s: '', term: '', month: '', year: '' } : ( function ( v ) { v[ key ] = ''; return v; }( {} ) ) );
+				self.page = 1;
+				self.load( true );
+				return;
+			}
+
+			if ( event.target.closest( '.afs-retry' ) ) {
+				event.preventDefault();
+				self.load( false );
+				return;
+			}
+
 			var tab = event.target.closest( '.afs-Tabs a[data-afs-term]' );
 			if ( tab ) {
 				event.preventDefault();
@@ -224,7 +248,7 @@
 	/** Push values into the form controls and tab highlight. */
 	Widget.prototype.apply = function ( values ) {
 		var form = this.form;
-		[ [ 's', 'afs_s' ], [ 'term', 'afs_term' ], [ 'month', 'afs_month' ], [ 'year', 'afs_year' ] ].forEach( function ( pair ) {
+		[ [ 's', 'afs_s' ], [ 'term', 'afs_term' ], [ 'month', 'afs_month' ], [ 'year', 'afs_year' ], [ 'sort', 'afs_sort' ] ].forEach( function ( pair ) {
 			if ( Object.prototype.hasOwnProperty.call( values, pair[ 0 ] ) && form.elements[ pair[ 1 ] ] ) {
 				form.elements[ pair[ 1 ] ].value = values[ pair[ 0 ] ];
 			}
@@ -265,6 +289,7 @@
 			term: params.get( 'afs_term' ) || '',
 			month: params.get( 'afs_month' ) || '',
 			year: params.get( 'afs_year' ) || '',
+			sort: params.get( 'afs_sort' ) || this.defaultSort(),
 		} );
 		this.page = parseInt( params.get( 'afs_page' ), 10 ) || 1;
 		this.setLayout( params.get( 'afs_layout' ) || this.config.layout || 'list' );
@@ -290,6 +315,9 @@
 		}
 		if ( state.layout !== ( this.config.layout || 'list' ) ) {
 			url.searchParams.set( 'afs_layout', state.layout );
+		}
+		if ( state.sort && state.sort !== this.defaultSort() ) {
+			url.searchParams.set( 'afs_sort', state.sort );
 		}
 		return url;
 	};
@@ -322,6 +350,9 @@
 		url.searchParams.set( 'afs_month', state.month || 0 );
 		url.searchParams.set( 'afs_year', state.year || 0 );
 		url.searchParams.set( 'afs_page', state.page );
+		if ( state.sort && state.sort !== this.defaultSort() ) {
+			url.searchParams.set( 'afs_sort', state.sort );
+		}
 		url.searchParams.set( 'base_url', cleanUrl().href );
 		url.searchParams.set( 'instance', this.root.getAttribute( 'data-afs-instance' ) || 1 );
 		run( 'before-request', { url: url, state: state, root: this.root } );
@@ -371,7 +402,12 @@
 				var message = document.createElement( 'p' );
 				message.className = 'afs-error';
 				message.setAttribute( 'role', 'alert' );
-				message.textContent = ( settings.i18n && settings.i18n.error ) || 'Error';
+				message.textContent = ( ( settings.i18n && settings.i18n.error ) || 'Error' ) + ' ';
+				var retry = document.createElement( 'button' );
+				retry.type = 'button';
+				retry.className = 'afs-btn afs-retry';
+				retry.textContent = ( settings.i18n && settings.i18n.retry ) || 'Retry';
+				message.appendChild( retry );
 				self.results.replaceChildren( message );
 				self.finish();
 			} );

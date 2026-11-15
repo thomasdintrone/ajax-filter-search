@@ -164,6 +164,22 @@
 							set( { showViews: value } );
 						},
 					} ),
+					el( SelectControl, {
+						label: __( 'Sort control', 'ajax-filter-search' ),
+						value: attributes.showSort,
+						options: showHide,
+						onChange: function ( value ) {
+							set( { showSort: value } );
+						},
+					} ),
+					el( SelectControl, {
+						label: __( 'Active filter chips', 'ajax-filter-search' ),
+						value: attributes.showChips,
+						options: showHide,
+						onChange: function ( value ) {
+							set( { showChips: value } );
+						},
+					} ),
 					el( ToggleControl, {
 						label: __( 'Search box', 'ajax-filter-search' ),
 						checked: attributes.showSearch,

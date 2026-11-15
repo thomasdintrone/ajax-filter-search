@@ -101,7 +101,8 @@ class AFS_Frontend {
 				array(
 					'restUrl' => esc_url_raw( rest_url( AFS_REST::NAMESPACE_ . '/results' ) ),
 					'i18n'    => array(
-						'error' => __( 'Sorry, the results could not be loaded. Please try again.', 'ajax-filter-search' ),
+						'error' => __( 'Sorry, the results could not be loaded.', 'ajax-filter-search' ),
+						'retry' => __( 'Try again', 'ajax-filter-search' ),
 					),
 				)
 			) . ';',
@@ -130,6 +131,8 @@ class AFS_Frontend {
 			'show_search'    => '',
 			'show_months'    => '',
 			'show_years'     => '',
+			'show_sort'      => '',
+			'show_chips'     => '',
 		);
 	}
 
@@ -164,6 +167,8 @@ class AFS_Frontend {
 			'showSearch' => 'show_search',
 			'showMonths' => 'show_months',
 			'showYears'  => 'show_years',
+			'showSort'   => 'show_sort',
+			'showChips'  => 'show_chips',
 		);
 		$atts = array();
 		foreach ( $map as $from => $to ) {

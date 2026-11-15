@@ -30,7 +30,7 @@ class AFS_Feed {
 
 		// The feed has no layout or instance, so it takes the results route's parameters minus those two.
 		$args = AFS_REST::route_args();
-		unset( $args['instance'], $args['base_url'] );
+		unset( $args['instance'], $args['base_url'], $args['show_chips'] );
 
 		register_rest_route(
 			AFS_REST::NAMESPACE_,
@@ -64,6 +64,7 @@ class AFS_Feed {
 			'afs_month'      => $state['month'],
 			'afs_year'       => $state['year'],
 			'afs_page'       => $state['paged'],
+			'afs_sort'       => $state['sort'],
 		);
 		if ( $state['paged'] <= 1 ) {
 			unset( $args['afs_page'] );

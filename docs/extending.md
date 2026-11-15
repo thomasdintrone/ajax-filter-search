@@ -38,6 +38,19 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_enable_feed` | Return `false` to remove the RSS route. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
 
+## Sort, filter chips and empty states (opt-in)
+
+Three helpers are off unless turned on, so existing feeds render exactly as in 2.0.0:
+
+| Option | Shortcode | Block | Setting |
+|---|---|---|---|
+| Sort control: Newest, Oldest, A to Z, Recently updated, Most commented | `show_sort="true"` | Sort control | Settings > Sort control |
+| Active filter chips, Clear all, and a "Clear all filters" link when nothing matches | `show_chips="true"` | Active filter chips | Settings > Active filter chips |
+
+The shortcode or block value overrides the setting. The sort is the visitor's choice and is kept in the address bar as `afs_sort` (left out when it equals the feed's own order) and accepted by `/afs/v1/results` and `/afs/v1/feed`; an unknown value is ignored. Chips are plain links, so they work without JavaScript; the script turns a click into an update. The sort is not a filter: Clear all and the chips keep it.
+
+When an update fails, a feed that does not own the address bar shows a message with a Try again button; the first feed falls back to a normal page load.
+
 ## RSS feed
 
 `GET /wp-json/afs/v1/feed` returns an RSS 2.0 feed for any filter state. It takes the same parameters as `/afs/v1/results` (`post_type`, `post_tax`, `terms`, `posts_per_page`, `orderby`, `order`, `afs_s`, `afs_term`, `afs_month`, `afs_year`, `afs_page`), validated the same way. It uses the same query as the results (`AFS_Query`), so only published content is listed and `afs_query_args` applies, and WordPress's own RSS template renders it, so escaping is core's. Anonymous responses carry an `ETag` and `Cache-Control`; signed-in requests are never cached. Validator matching tolerates the `-gzip` suffix Apache adds.
