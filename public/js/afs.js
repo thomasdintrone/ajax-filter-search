@@ -12,6 +12,60 @@
 	var URL_KEYS = [ 'afs_s', 'afs_term', 'afs_month', 'afs_year', 'afs_page', 'afs_layout' ];
 	var SEARCH_DELAY = 400;
 
+	/**
+	 * Extension points for add-ons. An add-on can load before or after this script:
+	 *
+	 *   ( window.afsRegistry = window.afsRegistry || { q: [] } );
+	 *   var use = function ( api ) { api.on( 'results', function ( e ) { ... } ); };
+	 *   window.afsRegistry.use ? window.afsRegistry.use( use ) : window.afsRegistry.q.push( use );
+	 *
+	 * Hooks: 'loaded' ( { root, config } ), 'before-request' ( { url, state, root }, may change url.searchParams ),
+	 * 'results' ( { root, data, state } ), 'error' ( { root, error } ). The same events (except before-request) are
+	 * also dispatched on the feed element as DOM events: afs:loaded, afs:results, afs:error (bubbling, e.detail).
+	 * A hook that throws is logged and ignored.
+	 */
+	var hooks = {};
+	var api = {
+		version: 1,
+		on: function ( name, fn ) {
+			( hooks[ name ] = hooks[ name ] || [] ).push( fn );
+		},
+	};
+	var registry = ( window.afsRegistry = window.afsRegistry || { q: [] } );
+	registry.api = api;
+	registry.use = function ( fn ) {
+		try {
+			fn( api );
+		} catch ( e ) {
+			log( e );
+		}
+	};
+	( registry.q || [] ).forEach( registry.use );
+	registry.q = [];
+
+	function log( e ) {
+		if ( window.console && window.console.error ) {
+			window.console.error( e );
+		}
+	}
+
+	function run( name, payload ) {
+		( hooks[ name ] || [] ).forEach( function ( fn ) {
+			try {
+				fn( payload );
+			} catch ( e ) {
+				log( e );
+			}
+		} );
+	}
+
+	function emit( name, payload, announce ) {
+		run( name, payload );
+		if ( announce && typeof window.CustomEvent === 'function' ) {
+			payload.root.dispatchEvent( new window.CustomEvent( 'afs:' + name, { bubbles: true, detail: payload } ) );
+		}
+	}
+
 	function debounce( fn, wait ) {
 		var timer;
 		return function () {
@@ -58,6 +112,7 @@
 
 		this.bind();
 		root.classList.add( 'afs-js' );
+		emit( 'loaded', { root: root, config: this.config }, true );
 	}
 
 	Widget.prototype.state = function () {
@@ -215,8 +270,8 @@
 		this.setLayout( params.get( 'afs_layout' ) || this.config.layout || 'list' );
 	};
 
-	Widget.prototype.writeUrl = function ( push ) {
-		var state = this.state();
+	/** The page URL that shows the current state (what writeUrl puts in the address bar). */
+	Widget.prototype.urlFor = function ( state ) {
 		var url = cleanUrl();
 		if ( state.s ) {
 			url.searchParams.set( 'afs_s', state.s );
@@ -236,6 +291,11 @@
 		if ( state.layout !== ( this.config.layout || 'list' ) ) {
 			url.searchParams.set( 'afs_layout', state.layout );
 		}
+		return url;
+	};
+
+	Widget.prototype.writeUrl = function ( push ) {
+		var url = this.urlFor( this.state() );
 		if ( url.href !== window.location.href ) {
 			window.history[ push ? 'pushState' : 'replaceState' ]( null, '', url.href );
 		}
@@ -264,6 +324,7 @@
 		url.searchParams.set( 'afs_page', state.page );
 		url.searchParams.set( 'base_url', cleanUrl().href );
 		url.searchParams.set( 'instance', this.root.getAttribute( 'data-afs-instance' ) || 1 );
+		run( 'before-request', { url: url, state: state, root: this.root } );
 
 		if ( this.controller ) {
 			this.controller.abort();
@@ -287,6 +348,7 @@
 			.then( function ( data ) {
 				self.results.innerHTML = data.html;
 				self.finish();
+				emit( 'results', { root: self.root, data: data, state: state }, true );
 				if ( self.syncsUrl ) {
 					self.writeUrl( push );
 				}
@@ -296,6 +358,14 @@
 			} )
 			.catch( function ( error ) {
 				if ( error && error.name === 'AbortError' ) {
+					return;
+				}
+				emit( 'error', { root: self.root, error: error }, true );
+				// The server renders every state, so when the request cannot be completed the visitor still gets
+				// their results with a normal page load. Only the feed that owns the address bar can do that;
+				// any other feed shows a message instead.
+				if ( self.syncsUrl ) {
+					window.location.assign( self.urlFor( state ).href );
 					return;
 				}
 				var message = document.createElement( 'p' );

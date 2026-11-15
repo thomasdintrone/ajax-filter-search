@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 22
       - run: npm ci --ignore-scripts
-      - run: PW_BROWSER=${{ matrix.engine }} bin/e2e.sh feed.spec.mjs a11y.spec.mjs contract.spec.mjs
+      - run: PW_BROWSER=${{ matrix.engine }} bin/e2e.sh feed.spec.mjs a11y.spec.mjs contract.spec.mjs extension.spec.mjs
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

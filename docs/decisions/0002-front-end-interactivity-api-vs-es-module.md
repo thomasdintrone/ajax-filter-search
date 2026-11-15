@@ -40,3 +40,8 @@ Reasons: equal speed and no-JS behavior; no added runtime; the extension story i
 ## Not covered
 
 Classic-theme runtime weight, Twenty Twenty-Five specifically (the stack used the image's default block theme), screen-reader announcement testing, and real-device INP.
+
+## Implementation notes (2026-11-15)
+
+"ES module" in the recommendation meant the extension model (a registry that works in any load order), not the script type. Script modules need WordPress 6.5 (`wp_enqueue_script_module`), and the minimum is still 6.0, so the shipping script stays a classic script. The registry and DOM events from the prototype are now in `public/js/afs.js` (documented in `docs/extending.md`), at about 3.8 KB gzip against the 12 KB budget. Moving to a script module can wait for the minimum-version decision.
+
