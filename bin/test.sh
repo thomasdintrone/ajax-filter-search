@@ -21,8 +21,18 @@ lib=".cache/wp-tests/$core_version"
 if [ ! -d "$lib/includes" ]; then
 	echo "Fetching WordPress $core_version test library..."
 	mkdir -p "$lib"
-	svn export -q --force "https://develop.svn.wordpress.org/tags/$core_version/tests/phpunit/includes" "$lib/includes"
-	svn export -q --force "https://develop.svn.wordpress.org/tags/$core_version/tests/phpunit/data" "$lib/data"
+	if command -v svn >/dev/null 2>&1 && [ -z "${AFS_NO_SVN:-}" ]; then
+		svn export -q --force "https://develop.svn.wordpress.org/tags/$core_version/tests/phpunit/includes" "$lib/includes"
+		svn export -q --force "https://develop.svn.wordpress.org/tags/$core_version/tests/phpunit/data" "$lib/data"
+	else
+		# No svn (for example on GitHub runners): sparse git checkout of just the test library at the release tag.
+		tmp="$(mktemp -d)"
+		git clone -q --depth 1 --filter=blob:none --sparse --branch "$core_version" https://github.com/WordPress/wordpress-develop.git "$tmp"
+		git -C "$tmp" sparse-checkout set tests/phpunit/includes tests/phpunit/data
+		cp -R "$tmp/tests/phpunit/includes" "$lib/includes"
+		cp -R "$tmp/tests/phpunit/data" "$lib/data"
+		rm -rf "$tmp"
+	fi
 fi
 
 net="afs-test-net-$$"; db="afs-test-db"
