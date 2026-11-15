@@ -38,6 +38,7 @@ bin/check-guards.sh                            # protected text (header, LICENSE
 bin/build-zip.sh                               # release zip plus the package allowlist check
 composer lint                                  # WordPress coding standards + PHP 7.4 compatibility
 composer analyse                               # PHPStan level 5 on the shipping code
+npm run lint:js                                # ESLint on the shipping JavaScript
 ```
 Extension points for add-ons (registries, `AFS_API_VERSION`, filters) are documented in [docs/extending.md](docs/extending.md).
 

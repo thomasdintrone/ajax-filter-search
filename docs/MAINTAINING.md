@@ -27,10 +27,14 @@ bin/smoke-test.sh && bin/compat-test.sh   # HTTP-level checks against a running 
 composer lint                    # WordPress coding standards + PHP 7.4 compatibility
 composer analyse                 # PHPStan level 5 on the shipping code
 npm ci --ignore-scripts && bin/e2e.sh   # Playwright + axe (WCAG 2.2 AA) + visual snapshots + interaction budget, inside the Playwright image
+npm run lint:js                  # ESLint on the shipping JavaScript
+AFS_THEME=afs-classic-min bin/e2e.sh   # behaviour, accessibility and HTTP-contract specs on a classic theme
 bin/upgrade-test.sh 1.0.4        # install a published release, swap in this build, check nothing broke (also: 2.0.0)
 bin/plugin-check.sh              # official Plugin Check against the release package
 ```
-CI (`.github/workflows/ci.yml`) runs lint and PHPStan, the guards, PHPUnit on WordPress 6.0/PHP 7.4, 6.5/8.2, 6.5/8.3, 6.8/8.1, 6.8/8.2 and latest/8.4 (plus a latest multisite cell and a WordPress beta job that is allowed to fail; run multisite locally with `AFS_MULTISITE=1 bin/test.sh`), checks that the committed 2.0.0 snapshots equal what tag `v2.0.0` produces, builds the package, and runs the browser tests, Plugin Check and the two upgrade paths.
+CI (`.github/workflows/ci.yml`) runs lint and PHPStan, the guards, PHPUnit on WordPress 6.0/PHP 7.4, 6.5/8.2, 6.5/8.3, 6.8/8.1, 6.8/8.2 and latest/8.4 (plus a latest multisite cell and a WordPress beta job that is allowed to fail; run multisite locally with `AFS_MULTISITE=1 bin/test.sh`), checks that the committed 2.0.0 snapshots equal what tag `v2.0.0` produces, builds the package, and runs the browser tests (block theme and a classic theme), Plugin Check and the two upgrade paths.
+
+A nightly workflow (`.github/workflows/nightly.yml`) runs the behaviour, accessibility and contract specs in Firefox and WebKit (`PW_BROWSER=firefox bin/e2e.sh feed.spec.mjs`), and a latency check on about 10,000 posts (`AFS_PERF_10K=1 bin/e2e.sh`, budget REST p95 under 300 ms). `tests/e2e/contract.spec.mjs` holds the HTTP checks that used to exist only in `bin/smoke-test.sh` and `bin/compat-test.sh`; those scripts stay for manual use against a running site.
 
 **Visual baselines** (`tests/e2e/__screenshots__`) are only valid inside the Playwright image that `bin/e2e.sh` uses. When a change is meant to alter the look, run `bin/e2e.sh --update-snapshots`, look at every changed image, and commit them with the change. The dark-mode baseline equals the light one today because neither the plugin nor the default theme has dark styling; it exists to catch a future dark design.
 

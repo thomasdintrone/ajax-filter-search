@@ -1,0 +1,11 @@
+/*
+Theme Name: AFS Classic Minimal
+Description: Spike-only classic (non-block) theme with typical global styles that can interfere with a plugin.
+Version: 1.0
+*/
+body{font:16px/1.5 Georgia,serif;margin:0;color:#222}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+a{color:#a00}
+ul{margin:0 0 1em 1.2em}
+button,input,select{font:inherit}
+h2,h3{font-family:Georgia,serif}

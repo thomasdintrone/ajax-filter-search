@@ -1,0 +1,47 @@
+name: Nightly
+
+# Slower checks that do not run on every push: other browser engines and a 10,000-post latency check.
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browsers:
+    name: Browser tests in ${{ matrix.engine }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [ firefox, webkit ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: PW_BROWSER=${{ matrix.engine }} bin/e2e.sh feed.spec.mjs a11y.spec.mjs contract.spec.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-${{ matrix.engine }}-results
+          path: .cache/e2e-results
+
+  performance:
+    name: Latency at 10,000 posts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: AFS_PERF_10K=1 bin/e2e.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-10k
+          path: .cache/e2e-perf-10k.json

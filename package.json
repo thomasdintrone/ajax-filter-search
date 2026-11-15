@@ -1,12 +1,16 @@
 {
   "name": "ajax-filter-search-dev",
   "private": true,
-  "description": "Development tooling only (browser tests). Nothing here ships in the plugin package.",
+  "description": "Development tooling only (browser tests, JS lint). Nothing here ships in the plugin package.",
   "scripts": {
-    "e2e": "bin/e2e.sh"
+    "e2e": "bin/e2e.sh",
+    "lint:js": "eslint public blocks admin"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.1",
-    "@playwright/test": "1.49.1"
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "1.49.1",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0"
   }
 }
