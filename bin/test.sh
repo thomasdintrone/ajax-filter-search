@@ -22,12 +22,16 @@ if [ ! -d "$lib/includes" ]; then
 	echo "Fetching WordPress $core_version test library..."
 	mkdir -p "$lib"
 	if command -v svn >/dev/null 2>&1 && [ -z "${AFS_NO_SVN:-}" ]; then
-		svn export -q --force "https://develop.svn.wordpress.org/tags/$core_version/tests/phpunit/includes" "$lib/includes"
-		svn export -q --force "https://develop.svn.wordpress.org/tags/$core_version/tests/phpunit/data" "$lib/data"
+		ref="tags/$core_version"
+		svn info -q "https://develop.svn.wordpress.org/$ref/tests/phpunit/includes" >/dev/null 2>&1 || ref="trunk"   # pre-releases have no tag
+		svn export -q --force "https://develop.svn.wordpress.org/$ref/tests/phpunit/includes" "$lib/includes"
+		svn export -q --force "https://develop.svn.wordpress.org/$ref/tests/phpunit/data" "$lib/data"
 	else
 		# No svn (for example on GitHub runners): sparse git checkout of just the test library at the release tag.
 		tmp="$(mktemp -d)"
-		git clone -q --depth 1 --filter=blob:none --sparse --branch "$core_version" https://github.com/WordPress/wordpress-develop.git "$tmp"
+		# Pre-release versions (for example 7.2-beta5) have no tag in the git mirror: use trunk for those.
+		git clone -q --depth 1 --filter=blob:none --sparse --branch "$core_version" https://github.com/WordPress/wordpress-develop.git "$tmp" 2>/dev/null \
+			|| { rm -rf "$tmp"; tmp="$(mktemp -d)"; git clone -q --depth 1 --filter=blob:none --sparse --branch trunk https://github.com/WordPress/wordpress-develop.git "$tmp"; }
 		git -C "$tmp" sparse-checkout set tests/phpunit/includes tests/phpunit/data
 		cp -R "$tmp/tests/phpunit/includes" "$lib/includes"
 		cp -R "$tmp/tests/phpunit/data" "$lib/data"
@@ -51,5 +55,5 @@ echo "Testing $plugin_dir on WordPress $core_version ($WP_IMAGE), series ${AFS_S
 docker run --rm --network "$net" \
 	-v "$repo":/repo -v "$plugin_dir":/plugin:ro -v "$repo/$lib":/wp-tests:ro \
 	-e WP_TESTS_DIR=/wp-tests -e AFS_TEST_PLUGIN_DIR=/plugin -e WP_TESTS_DB_HOST="$db" \
-	-e UPDATE_SNAPSHOTS="${UPDATE_SNAPSHOTS:-}" -e AFS_SNAPSHOT_SERIES="${AFS_SNAPSHOT_SERIES:-2.0.0}" \
+	-e AFS_MULTISITE="${AFS_MULTISITE:-}" -e UPDATE_SNAPSHOTS="${UPDATE_SNAPSHOTS:-}" -e AFS_SNAPSHOT_SERIES="${AFS_SNAPSHOT_SERIES:-2.0.0}" \
 	-w /repo --entrypoint php "$WP_IMAGE" -d memory_limit=512M vendor/bin/phpunit -c phpunit.xml.dist "$@"

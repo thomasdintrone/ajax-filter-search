@@ -16,6 +16,11 @@ define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', dirname( __DIR__ ) . '/vendor/yoast/p
 // 1.x theme overrides read this global constant; define it once so output does not depend on test order.
 define( 'FILTER_TYPE', '' );
 
+// AFS_MULTISITE=1 runs the whole suite as a network (bin/test.sh passes it through).
+if ( getenv( 'AFS_MULTISITE' ) ) {
+	define( 'WP_TESTS_MULTISITE', true );
+}
+
 require_once $afs_tests_dir . '/includes/functions.php';
 
 tests_add_filter(

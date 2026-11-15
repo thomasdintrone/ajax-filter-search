@@ -1,0 +1,16 @@
+# Static analysis of the shipping code only (not tests, spikes or tooling).
+parameters:
+    level: 5
+    paths:
+        - ajax-filter-search.php
+        - uninstall.php
+        - includes
+        - admin
+        - blocks
+    excludePaths:
+        - blocks/*/build/*
+    bootstrapFiles:
+        - tests/phpstan-constants.php
+    scanFiles:
+        - includes/functions.php
+    treatPhpDocTypesAsCertain: false
