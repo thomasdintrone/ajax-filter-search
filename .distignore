@@ -9,6 +9,7 @@
 .wp-env.override.json
 .phpcs-cache
 phpcs.xml.dist
+phpstan.neon.dist
 composer.json
 composer.lock
 package.json

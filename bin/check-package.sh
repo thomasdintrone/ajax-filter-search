@@ -16,7 +16,7 @@ for top in $(echo "$entries" | sed -n 's#^ajax-filter-search/\([^/]*\).*#\1#p' |
 done
 
 # 2. Forbidden material, wherever it appears in the zip.
-forbidden='(^|/)(\.ai|spikes|\.git[a-z]*|docs|docs-private|design|bin|tests|\.github|\.wordpress-org|node_modules|vendor|build|_notes|\.sass-cache)(/|$)|\.(md|patch|zip|log|map|scss|scssc|sh)$|(^|/)(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml\.dist|docker-compose(\.[a-z]+)?\.yml|phpcs\.xml\.dist|\.wp-env[a-z.]*|\.distignore|config\.codekit)$'
+forbidden='(^|/)(\.ai|spikes|\.git[a-z]*|docs|docs-private|design|bin|tests|\.github|\.wordpress-org|node_modules|vendor|build|_notes|\.sass-cache)(/|$)|\.(md|patch|zip|log|map|scss|scssc|sh)$|(^|/)(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml\.dist|docker-compose(\.[a-z]+)?\.yml|phpcs\.xml\.dist|phpstan\.neon\.dist|\.wp-env[a-z.]*|\.distignore|config\.codekit)$'
 echo "$entries" | grep -E "$forbidden" | sed 's/^/FAIL  forbidden file in zip: /' | { grep . && fail=1; }
 
 # 3. A zip must contain the essentials.
