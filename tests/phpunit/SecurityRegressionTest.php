@@ -177,15 +177,20 @@ class SecurityRegressionTest extends AFS_Test_Case {
 		$this->assertSame( array(), $calls, 'The plugin must not make outbound HTTP requests' );
 	}
 
-	public function test_public_read_route_registered_without_write_methods() {
+	/** The plugin's public routes are an explicit list: adding one must be a deliberate change to this test. */
+	public function test_public_routes_are_exactly_the_known_read_only_ones() {
 		$routes = $this->server->get_routes();
-		$this->assertArrayHasKey( '/afs/v1/results', $routes );
-		foreach ( $routes['/afs/v1/results'] as $handler ) {
-			$this->assertSame( array( 'GET' => true ), $handler['methods'], 'The route must be read-only' );
+		$expect = array( '/afs/v1/feed', '/afs/v1/results' );
+		foreach ( $expect as $route ) {
+			$this->assertArrayHasKey( $route, $routes );
+			foreach ( $routes[ $route ] as $handler ) {
+				$this->assertSame( array( 'GET' => true ), $handler['methods'], $route . ' must be read-only' );
+			}
 		}
 		$mine = array_values( array_filter( array_keys( $routes ), static function ( $r ) {
 			return 0 === strpos( $r, '/afs/' ) && '/afs/v1' !== $r;
 		} ) );
-		$this->assertSame( array( '/afs/v1/results' ), $mine, 'Unexpected additional /afs routes' );
+		sort( $mine );
+		$this->assertSame( $expect, $mine, 'Unexpected additional /afs routes' );
 	}
 }

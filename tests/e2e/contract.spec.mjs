@@ -78,6 +78,40 @@ test.describe( 'REST caching (anonymous visitors)', () => {
 	} );
 } );
 
+test.describe( 'RSS feed endpoint', () => {
+	const feedUrl = ( q ) => `/wp-json/afs/v1/feed?${ q }`;
+
+	test( 'serves well-formed RSS 2.0 with the right content type and the same number of items as the results', async ( { page, request } ) => {
+		const q = 'posts_per_page=5&afs_term=news&afs_year=2024';
+		const res = await request.get( feedUrl( q ) );
+		expect( res.status() ).toBe( 200 );
+		expect( res.headers()[ 'content-type' ] ).toContain( 'application/rss+xml' );
+		expect( res.headers().etag ).toMatch( /^"[a-f0-9]{32}(-gzip)?"$/ ); // Apache appends -gzip to compressed bodies
+
+		await page.goto( '/' );
+		const parsed = await page.evaluate( async ( u ) => {
+			const doc = new DOMParser().parseFromString( await ( await fetch( u ) ).text(), 'application/xml' );
+			return { broken: !! doc.querySelector( 'parsererror' ), version: doc.documentElement.getAttribute( 'version' ), items: doc.querySelectorAll( 'item' ).length };
+		}, feedUrl( q ) );
+		expect( parsed ).toEqual( { broken: false, version: '2.0', items: items( await rest( request, q ) ) } );
+	} );
+
+	test( 'a matching validator gets an empty 304', async ( { request } ) => {
+		const first = await request.get( feedUrl( 'posts_per_page=5' ) );
+		const again = await request.get( feedUrl( 'posts_per_page=5' ), { headers: { 'If-None-Match': first.headers().etag } } );
+		expect( again.status() ).toBe( 304 );
+		expect( ( await again.body() ).length ).toBe( 0 );
+	} );
+
+	test( 'never lists unpublished posts and validates input', async ( { request } ) => {
+		const xml = await ( await request.get( feedUrl( 'afs_s=SECRET' ) ) ).text();
+		expect( ( xml.match( /<item>/g ) || [] ).length ).toBe( 0 );
+		for ( const q of [ 'posts_per_page=9999', 'afs_month=13', 'afs_page=0' ] ) {
+			expect( ( await request.get( feedUrl( q ) ) ).status(), q ).toBe( 400 );
+		}
+	} );
+} );
+
 test.describe( '1.x ajax action (my_action)', () => {
 	test( 'returns a page of results, supports paging, and matches the REST route', async ( { request } ) => {
 		expect( items( await ( await legacy( request, { filingType: '', filterBy: '', filterMonths: '', filterYears: '' } ) ).text() ) ).toBe( 10 );

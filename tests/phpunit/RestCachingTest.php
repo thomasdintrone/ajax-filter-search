@@ -162,4 +162,16 @@ class RestCachingTest extends AFS_Test_Case {
 		$this->assertNotSame( $first, $this->get( array( 'posts_per_page' => 5 ) )->get_headers()['ETag'] );
 		remove_all_filters( 'afs_cache_version' );
 	}
+
+	/** Apache's mod_deflate rewrites "abc" to "abc-gzip" on compressed bodies; the browser then sends that back. */
+	public function test_validator_matching_tolerates_compression_suffixes_weak_prefixes_lists_and_wildcard() {
+		$etag = '"0123456789abcdef0123456789abcdef"';
+		$bare = substr( $etag, 0, -1 );
+		foreach ( array( $etag, $bare . '-gzip"', $bare . '-br"', 'W/' . $etag, '"other", ' . $etag, '*' ) as $header ) {
+			$this->assertTrue( AFS_REST::matches( $header, $etag ), $header );
+		}
+		foreach ( array( '', '"nope"', '"0123456789abcdef0123456789abcdee"', $bare . '-gzip' ) as $header ) {
+			$this->assertFalse( AFS_REST::matches( $header, $etag ), 'Must not match: ' . $header );
+		}
+	}
 }

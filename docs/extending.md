@@ -34,7 +34,14 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_rest_cacheable` | Return `false` to stop the results route from sending validators or caching (for example when your own `afs_query_args` filter depends on the visitor). Signed-in requests are never cached. |
 | `afs_rest_cache_control` | The `Cache-Control` value of an anonymous results response (default `public, max-age=60, stale-while-revalidate=300`); return `''` to send none. |
 | `afs_cache_version` | The counter behind the `ETag` and the cached results. It changes when posts, terms, the plugin's settings or the theme change; append to it to invalidate everything. A change to a template override or to your own filter is not detected, so give those a new value here. |
+| `afs_enable_feed` | Return `false` to remove the RSS route. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
+
+## RSS feed
+
+`GET /wp-json/afs/v1/feed` returns an RSS 2.0 feed for any filter state. It takes the same parameters as `/afs/v1/results` (`post_type`, `post_tax`, `terms`, `posts_per_page`, `orderby`, `order`, `afs_s`, `afs_term`, `afs_month`, `afs_year`, `afs_page`), validated the same way. It uses the same query as the results (`AFS_Query`), so only published content is listed and `afs_query_args` applies, and WordPress's own RSS template renders it, so escaping is core's. Anonymous responses carry an `ETag` and `Cache-Control`; signed-in requests are never cached. Validator matching tolerates the `-gzip` suffix Apache adds.
+
+`afs_feed_url( $config, $state )` builds the URL for a normalized config and state (`AFS_Renderer::normalize_config()` and `normalize_state()`). Return `false` from the `afs_enable_feed` filter to remove the route. The plugin does not yet print a subscribe link or a `<link rel="alternate">`; that is a visible change left for the design work.
 
 ## JavaScript
 
