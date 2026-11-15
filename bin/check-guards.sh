@@ -22,7 +22,8 @@ if git show "$base:ajax-filter-search.php" >/dev/null 2>&1; then
 	head_hdr="$(header_of < ajax-filter-search.php)"
 	[ "$base_hdr" != "$head_hdr" ] && prot_files="$prot_files"$'\n'"ajax-filter-search.php (plugin header block)"
 fi
-copyright_changes="$(git diff -U0 "$base" -- . ':(exclude)docs' ':(exclude).ai' ':(exclude)tests/snapshots' | grep -iE '^[+-].*(copyright|drive media)' | grep -vE '^(\+\+\+|---)' || true)"
+# Only plugin source is scanned (not this script, docs, tests or snapshots, which legitimately mention the word).
+copyright_changes="$(git diff -U0 "$base" -- ajax-filter-search.php uninstall.php includes admin afs-template blocks public languages | grep -iE '^[+-].*(copyright|drive media)' | grep -vE '^(\+\+\+|---)' || true)"
 [ -n "$copyright_changes" ] && prot_files="$prot_files"$'\n'"copyright lines:"$'\n'"$copyright_changes"
 prot_files="$(echo "$prot_files" | sed '/^$/d')"
 if [ -n "$prot_files" ]; then
