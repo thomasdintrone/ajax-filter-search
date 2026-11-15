@@ -2,7 +2,7 @@
 # Verify a release zip contains only approved production files, and that `git archive` honors export-ignore.
 # Usage: bin/check-package.sh [build/ajax-filter-search-<version>.zip]   (exit 1 on any violation)
 set -u
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 zip="${1:-$(ls build/ajax-filter-search-*.zip 2>/dev/null | head -1)}"
 [ -f "$zip" ] || { echo "check-package: no zip found (run bin/build-zip.sh first)"; exit 1; }
 fail=0; bad() { echo "FAIL  $1"; fail=1; }
@@ -16,7 +16,7 @@ for top in $(echo "$entries" | sed -n 's#^ajax-filter-search/\([^/]*\).*#\1#p' |
 done
 
 # 2. Forbidden material, wherever it appears in the zip.
-forbidden='(^|/)(\.ai|\.git[a-z]*|docs|docs-private|design|bin|tests|\.github|\.wordpress-org|node_modules|vendor|build|_notes|\.sass-cache)(/|$)|\.(md|patch|zip|log|map|scss|scssc|sh)$|(^|/)(composer\.(json|lock)|phpcs\.xml\.dist|\.wp-env[a-z.]*|\.distignore|config\.codekit)$'
+forbidden='(^|/)(\.ai|\.git[a-z]*|docs|docs-private|design|bin|tests|\.github|\.wordpress-org|node_modules|vendor|build|_notes|\.sass-cache)(/|$)|\.(md|patch|zip|log|map|scss|scssc|sh)$|(^|/)(composer\.(json|lock)|phpunit\.xml\.dist|docker-compose\.yml|phpcs\.xml\.dist|\.wp-env[a-z.]*|\.distignore|config\.codekit)$'
 echo "$entries" | grep -E "$forbidden" | sed 's/^/FAIL  forbidden file in zip: /' | { grep . && fail=1; }
 
 # 3. A zip must contain the essentials.

@@ -28,3 +28,6 @@ design
 docs-private
 .ai
 .gitattributes
+phpunit.xml.dist
+docker-compose.yml
+.cache

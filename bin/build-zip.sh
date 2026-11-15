@@ -2,7 +2,7 @@
 # Build a release zip of exactly what ships to WordPress.org (honors .distignore).
 # Usage: bin/build-zip.sh      ->  build/ajax-filter-search-<version>.zip
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 slug="ajax-filter-search"
 version="$(sed -n 's/^ \* Version:[[:space:]]*//p' ajax-filter-search.php | head -1)"

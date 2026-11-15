@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, 'feat/**', 'chore/**' ]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Coding standards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+      - run: composer install --no-interaction --prefer-dist
+      - run: vendor/bin/phpcs -q
+
+  guards:
+    name: Hard-rule guards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Protected text, no Pro or outbound-HTTP code
+        env:
+          # A maintainer adds the "approved-protected" label to a PR to allow touching protected text.
+          AFS_APPROVED_PROTECTED: ${{ contains(github.event.pull_request.labels.*.name, 'approved-protected') && '1' || '' }}
+          BASE_REF: ${{ github.base_ref || 'master' }}
+        run: bin/check-guards.sh "origin/${BASE_REF}"
+
+  test:
+    name: PHPUnit (${{ matrix.label }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { label: 'WP 6.0 / PHP 7.4 (current floor)', image: 'wordpress:6.0-php7.4-apache' }
+          - { label: 'WP 6.5 / PHP 8.2',                 image: 'wordpress:6.5-php8.2-apache' }
+          - { label: 'WP 6.8 / PHP 8.2',                 image: 'wordpress:6.8-php8.2-apache' }
+          - { label: 'WP latest / PHP 8.4',              image: 'wordpress:php8.4-apache' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer, subversion
+      - run: composer install --no-interaction --prefer-dist
+      - name: Cache the WordPress test library
+        uses: actions/cache@v4
+        with:
+          path: .cache/wp-tests
+          key: wp-tests-${{ matrix.image }}
+      - run: bin/test.sh
+        env:
+          WP_IMAGE: ${{ matrix.image }}
+
+  snapshots-frozen:
+    name: 2.0.0 snapshots match the release tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer, subversion
+      - run: composer install --no-interaction --prefer-dist
+      - name: Regenerate from the tag and require no diff
+        run: |
+          git fetch --tags --force
+          bin/generate-snapshots.sh
+          if [ -n "$(git status --porcelain -- tests/snapshots)" ]; then
+            git status --short -- tests/snapshots
+            echo "Committed snapshots differ from what tag v2.0.0 produces."; exit 1
+          fi
+
+  package:
+    name: Release package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bin/build-zip.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ajax-filter-search-zip
+          path: build/ajax-filter-search-*.zip
