@@ -14,11 +14,16 @@
 		<testsuite name="afs">
 			<directory suffix="Test.php">tests/phpunit</directory>
 		</testsuite>
+		<testsuite name="spikes">
+			<directory suffix="Test.php">spikes</directory>
+		</testsuite>
 	</testsuites>
 	<groups>
 		<exclude>
 			<!-- Documented gaps that need the planned query choke point. Run them with: known-gap group, see bin/test.sh -->
 			<group>known-gap</group>
+			<!-- Sprint 0 experiments in spikes/. Run: bin/test.sh with the spikes testsuite and the spike group, see spikes/README.md -->
+			<group>spike</group>
 		</exclude>
 	</groups>
 </phpunit>

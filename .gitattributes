@@ -18,3 +18,4 @@
 /.gitattributes      export-ignore
 /phpunit.xml.dist export-ignore
 /docker-compose.yml export-ignore
+/spikes export-ignore

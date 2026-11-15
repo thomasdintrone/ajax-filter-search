@@ -31,3 +31,4 @@ docs-private
 phpunit.xml.dist
 docker-compose.yml
 .cache
+spikes
