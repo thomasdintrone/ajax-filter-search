@@ -1,0 +1,4 @@
+found=0
+pages=0
+---
+<p class="afs-none">No results found.</p>

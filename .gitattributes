@@ -1,0 +1,24 @@
+# Keep repository-only material out of `git archive` (and therefore out of GitHub "Download ZIP"
+# and any release build that starts from git archive). bin/check-package.sh enforces this.
+/.ai                 export-ignore
+/docs                export-ignore
+/docs-private        export-ignore
+/design              export-ignore
+/bin                 export-ignore
+/tests               export-ignore
+/.github             export-ignore
+/.wordpress-org      export-ignore
+/.wp-env.json        export-ignore
+/composer.json       export-ignore
+/composer.lock       export-ignore
+/package.json        export-ignore
+/package-lock.json   export-ignore
+/phpcs.xml.dist      export-ignore
+/README.md           export-ignore
+/.distignore         export-ignore
+/.gitignore          export-ignore
+/.gitattributes      export-ignore
+/phpunit.xml.dist export-ignore
+/docker-compose.yml export-ignore
+/docker-compose.upgrade.yml export-ignore
+/spikes export-ignore

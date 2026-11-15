@@ -26,3 +26,10 @@ _notes
 *.zip
 design
 docs-private
+.ai
+.gitattributes
+phpunit.xml.dist
+docker-compose.yml
+docker-compose.upgrade.yml
+.cache
+spikes

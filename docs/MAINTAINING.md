@@ -20,12 +20,22 @@ The script starts from `git archive HEAD` (tracked files only), then removes eve
 
 ## Test
 ```bash
-npx @wordpress/env start
-npx @wordpress/env run cli wp eval-file wp-content/plugins/ajax-filter-search/bin/seed-test-content.php
-bin/smoke-test.sh && bin/compat-test.sh
+composer install
+bin/test.sh                      # PHPUnit in Docker: 2.0.0 snapshots, security regression, no-outbound-HTTP, published-only
+bin/check-guards.sh              # protected text and no Pro/license code
+bin/smoke-test.sh && bin/compat-test.sh   # HTTP-level checks against a running seeded site (docker compose or wp-env)
 composer lint
+npm ci --ignore-scripts && bin/e2e.sh   # Playwright + axe (WCAG 2.2 AA) + visual snapshots + interaction budget, inside the Playwright image
+bin/upgrade-test.sh 1.0.4        # install a published release, swap in this build, check nothing broke (also: 2.0.0)
+bin/plugin-check.sh              # official Plugin Check against the release package
 ```
-Also run the official Plugin Check against the shipping files, and test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and WordPress 6.0) and the latest stack. Accessibility was checked with axe (WCAG 2.2 AA) at desktop and phone widths.
+CI (`.github/workflows/ci.yml`) runs lint, the guards, PHPUnit on WordPress 6.0/PHP 7.4, 6.5/8.2, 6.8/8.2 and latest/8.4, checks that the committed 2.0.0 snapshots equal what tag `v2.0.0` produces, builds the package, and runs the browser tests, Plugin Check and the two upgrade paths.
+
+**Visual baselines** (`tests/e2e/__screenshots__`) are only valid inside the Playwright image that `bin/e2e.sh` uses. When a change is meant to alter the look, run `bin/e2e.sh --update-snapshots`, look at every changed image, and commit them with the change. The dark-mode baseline equals the light one today because neither the plugin nor the default theme has dark styling; it exists to catch a future dark design.
+
+The e2e stack uses the seeded content from `bin/seed-test-content.php` (the default "Hello world!" post is deleted so dates stay fixed). Browser tests scan only the plugin's own region (`.afs`) with axe; theme markup is out of scope.
+
+Test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and WordPress 6.0) and the latest stack when changing anything version-sensitive.
 
 ## Release checklist
 1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and in `readme.txt` (Stable tag, Tested up to, changelog, Upgrade Notice).

@@ -1,0 +1,9 @@
+# Used by bin/upgrade-test.sh: the same stack, but WITHOUT the working tree mounted as the plugin, so a published
+# release can be installed first and then replaced by the build, the way a WordPress update does.
+services:
+  wordpress:
+    volumes: !override
+      - wp:/var/www/html
+  wpcli:
+    volumes: !override
+      - wp:/var/www/html

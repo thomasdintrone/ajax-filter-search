@@ -1,0 +1,116 @@
+<div id="afs-wrapper" class="afs afs-wrapper afs-layout-list" data-afs-config="{&quot;post_type&quot;:&quot;post&quot;,&quot;post_tax&quot;:&quot;category&quot;,&quot;terms&quot;:&quot;&quot;,&quot;posts_per_page&quot;:4,&quot;orderby&quot;:&quot;date&quot;,&quot;order&quot;:&quot;DESC&quot;,&quot;layout&quot;:&quot;list&quot;}" data-afs-instance="1" data-afs-url="1">
+<h2 class="afs-sr-only">Filterable posts</h2>
+<form id="newsForm" class="afs-form" method="get" action="http://example.org/sample-page" role="search" aria-label="Filter posts">
+<input type="hidden" name="afs_term" value="" class="afs-term-input">
+<nav class="afs-Tabs" aria-label="Categories">
+<ul class="afs-CommonTabs">
+<li class="active">
+<a href="http://example.org/sample-page?afs_month=3&#038;afs_year=2024" data-afs-term="" aria-current="true">All</a>
+</li>
+<li class="">
+<a href="http://example.org/sample-page?afs_term=news&#038;afs_month=3&#038;afs_year=2024" data-afs-term="news">News</a>
+</li>
+<li class="">
+<a href="http://example.org/sample-page?afs_term=press-releases&#038;afs_month=3&#038;afs_year=2024" data-afs-term="press-releases">Press Releases</a>
+</li>
+<li class="">
+<a href="http://example.org/sample-page?afs_term=events&#038;afs_month=3&#038;afs_year=2024" data-afs-term="events">Events</a>
+</li>
+</ul>
+</nav>
+<div class="afs-Filters">
+<div class="afs-field afs-field-search">
+<label for="afs-wrapper-s">Search</label>
+<input type="search" id="afs-wrapper-s" name="afs_s" value="" autocomplete="off">
+</div>
+<div class="afs-field">
+<label for="afs-wrapper-month">Month</label>
+<select id="afs-wrapper-month" name="afs_month">
+<option value="">All Months</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3" selected='selected'>March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select>
+</div>
+<div class="afs-field">
+<label for="afs-wrapper-year">Year</label>
+<select id="afs-wrapper-year" name="afs_year">
+<option value="">All Years</option>
+<option value="2026">2026</option>
+<option value="2025">2025</option>
+<option value="2024" selected='selected'>2024</option>
+</select>
+</div>
+<div class="afs-actions">
+<button type="submit" id="updateBtn" class="afs-btn afs-btn-primary afs-update">Update</button>
+<button type="button" id="resetBtn" class="afs-btn afs-reset">Reset</button>
+</div>
+</div>
+<div id="newsViewOptionsPanel" class="afs-Switch" role="group" aria-label="Layout">
+<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="list" aria-pressed="true">List View</button>
+<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="grid" aria-pressed="false">Grid View</button>
+</div>
+</form>
+<div id="newsPanelResults" class="afs-results" aria-live="polite" aria-busy="false">
+<div class="afs-TableHeader" aria-hidden="true">
+<div class="afs-col-date">Date</div>
+<div class="afs-col-title">Headline</div>
+</div>
+<div class="afs-items">
+<article class="afs-TableRowItem afs-item gridPR1 post-1003 post type-post status-publish format-standard category-press-releases" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 20, 2024</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">2:00 pm</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Press Releases</p>
+<h3>
+<a href="http://example.org/?p=1003">Charlie notice three</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N1">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N1" hidden>
+<p>Post excerpt 0000023&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1003">Continue Reading</a>
+</div>
+</div>
+</article>
+<article class="afs-TableRowItem afs-item gridPR2 post-1002 post type-post status-publish format-standard category-events category-news" itemscope itemtype="https://schema.org/BlogPosting">
+<div class="prDateCol col-sm-2 afs-col-date">
+<div class="afs-PRDate">March 5, 2024</div>
+<div class="afs-PRTimezone">
+<span class="afs-PRTime">9:30 am</span>
+<span class="afs-timezone">UTC</span>
+</div>
+</div>
+<div class="col-sm-10 afs-col-title">
+<p class="afs-terms">Events, News</p>
+<h3>
+<a href="http://example.org/?p=1002">Bravo update two</a>
+</h3>
+<div class="afs-PRTools">
+<button type="button" class="afs-summary-toggle" aria-expanded="false" aria-controls="afs-summary-N2">Summary</button>
+</div>
+<div class="afs-PRSummary" id="afs-summary-N2" hidden>
+<p>Post excerpt 0000022&hellip;</p>
+<a class="afs-more" href="http://example.org/?p=1002">Continue Reading</a>
+</div>
+</div>
+</article>
+</div>
+<p class="afs-count">Displaying <span class="afs-first">1</span> to <span class="afs-last">2</span> (of <span class="afs-total">2</span>)</p>
+</div>
+</div>

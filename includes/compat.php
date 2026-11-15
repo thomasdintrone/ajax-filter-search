@@ -83,6 +83,18 @@ class AFS_Compat {
 		return (bool) apply_filters( 'afs_enable_legacy_compat', true );
 	}
 
+	/**
+	 * 1.x theme overrides read the global FILTER_TYPE constant. Defined once (the first feed's value sticks, as in
+	 * 1.x); new code should use the `$afs_terms` and `$afs_taxonomy` variables passed to the template instead.
+	 *
+	 * @param string[] $terms Term slugs the feed is limited to.
+	 */
+	public static function define_filter_type( $terms ) {
+		if ( self::enabled() && ! defined( 'FILTER_TYPE' ) ) {
+			define( 'FILTER_TYPE', implode( ',', (array) $terms ) );
+		}
+	}
+
 	public static function init() {
 		// 4. Old script/style handles, so code that depends on them keeps working.
 		add_action( 'init', array( __CLASS__, 'register_handles' ), 20 );

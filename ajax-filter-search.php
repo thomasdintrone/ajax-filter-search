@@ -36,6 +36,9 @@ define( 'AFS_PLUGIN_URL', untrailingslashit( plugins_url( '', __FILE__ ) ) );
 
 require_once AFS_PLUGIN_PATH . 'includes/functions.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-settings.php';
+require_once AFS_PLUGIN_PATH . 'includes/class-afs-registry.php';
+require_once AFS_PLUGIN_PATH . 'includes/api.php';
+require_once AFS_PLUGIN_PATH . 'includes/class-afs-query.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-renderer.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-rest.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-frontend.php';
@@ -45,3 +48,4 @@ AFSAdmin::init();
 AFS_Frontend::init();
 AFS_REST::init();
 AFS_Compat::init();
+AFS_Registry::init();

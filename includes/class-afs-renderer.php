@@ -146,53 +146,7 @@ class AFS_Renderer {
 	 * @return WP_Query
 	 */
 	public static function query( $config, $state ) {
-		$args = array(
-			'post_type'           => $config['post_type'],
-			'post_status'         => 'publish',
-			'posts_per_page'      => $config['per_page'],
-			'paged'               => $state['paged'],
-			'orderby'             => $config['orderby'],
-			'order'               => $config['order'],
-			'ignore_sticky_posts' => true,
-		);
-
-		if ( '' !== $state['s'] ) {
-			$args['s'] = $state['s'];
-		}
-
-		$date_query = array();
-		if ( $state['year'] ) {
-			$date_query['year'] = $state['year'];
-		}
-		if ( $state['month'] ) {
-			$date_query['month'] = $state['month'];
-		}
-		if ( $date_query ) {
-			$args['date_query'] = array( $date_query );
-		}
-
-		$slugs = $state['term'] ? array( $state['term'] ) : $config['terms'];
-		if ( $config['taxonomy'] && $slugs ) {
-			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Filtering by term is the feature; the query is bounded to one taxonomy.
-			$args['tax_query'] = array(
-				array(
-					'taxonomy' => $config['taxonomy'],
-					'field'    => 'slug',
-					'terms'    => $slugs,
-				),
-			);
-		}
-
-		/**
-		 * Filters the WP_Query arguments for a feed.
-		 *
-		 * @param array $args   Query arguments.
-		 * @param array $config Normalized widget config.
-		 * @param array $state  Normalized visitor state.
-		 */
-		$args = apply_filters( 'afs_query_args', $args, $config, $state );
-
-		return new WP_Query( $args );
+		return AFS_Query::run( $config, $state );
 	}
 
 	/** Terms shown as tabs (WP_Term[]). */
@@ -479,10 +433,7 @@ class AFS_Renderer {
 		$found = (int) $query->found_posts;
 		$pages = (int) $query->max_num_pages;
 
-		if ( ! defined( 'FILTER_TYPE' ) ) {
-			// Back-compat for theme template overrides written for 1.x.
-			define( 'FILTER_TYPE', implode( ',', $config['terms'] ) );
-		}
+		AFS_Compat::define_filter_type( $config['terms'] );
 
 		ob_start();
 

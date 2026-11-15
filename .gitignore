@@ -20,3 +20,7 @@ build/
 
 # Private notes (security assessments, runbooks); never tracked or shipped
 docs-private/
+
+# Test caches and per-run worktrees
+.cache/
+docs-private/

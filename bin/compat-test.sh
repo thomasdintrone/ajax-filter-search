@@ -2,7 +2,7 @@
 # Dev only: 1.x compatibility and security checks against the seeded wp-env site.
 # Usage: bin/compat-test.sh [base-url]
 B="${1:-http://localhost:8890}"
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 fail=0
 check() { if [ "$2" == "$3" ]; then echo "ok    $1"; else echo "FAIL  $1 (expected '$2', got '$3')"; fail=1; fi; }
 wp() { npx @wordpress/env run cli wp "$@" 2>&1 | sed 's/✔ Ran .*//' | grep -v '^ℹ\|^$'; }

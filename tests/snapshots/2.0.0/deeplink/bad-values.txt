@@ -1,0 +1,66 @@
+<div id="afs-wrapper" class="afs afs-wrapper afs-layout-list" data-afs-config="{&quot;post_type&quot;:&quot;post&quot;,&quot;post_tax&quot;:&quot;category&quot;,&quot;terms&quot;:&quot;&quot;,&quot;posts_per_page&quot;:4,&quot;orderby&quot;:&quot;date&quot;,&quot;order&quot;:&quot;DESC&quot;,&quot;layout&quot;:&quot;list&quot;}" data-afs-instance="1" data-afs-url="1">
+<h2 class="afs-sr-only">Filterable posts</h2>
+<form id="newsForm" class="afs-form" method="get" action="http://example.org/sample-page" role="search" aria-label="Filter posts">
+<input type="hidden" name="afs_term" value="x" class="afs-term-input">
+<nav class="afs-Tabs" aria-label="Categories">
+<ul class="afs-CommonTabs">
+<li class="">
+<a href="http://example.org/sample-page" data-afs-term="">All</a>
+</li>
+<li class="">
+<a href="http://example.org/sample-page?afs_term=news" data-afs-term="news">News</a>
+</li>
+<li class="">
+<a href="http://example.org/sample-page?afs_term=press-releases" data-afs-term="press-releases">Press Releases</a>
+</li>
+<li class="">
+<a href="http://example.org/sample-page?afs_term=events" data-afs-term="events">Events</a>
+</li>
+</ul>
+</nav>
+<div class="afs-Filters">
+<div class="afs-field afs-field-search">
+<label for="afs-wrapper-s">Search</label>
+<input type="search" id="afs-wrapper-s" name="afs_s" value="" autocomplete="off">
+</div>
+<div class="afs-field">
+<label for="afs-wrapper-month">Month</label>
+<select id="afs-wrapper-month" name="afs_month">
+<option value="">All Months</option>
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select>
+</div>
+<div class="afs-field">
+<label for="afs-wrapper-year">Year</label>
+<select id="afs-wrapper-year" name="afs_year">
+<option value="">All Years</option>
+<option value="2026">2026</option>
+<option value="2025">2025</option>
+<option value="2024">2024</option>
+</select>
+</div>
+<div class="afs-actions">
+<button type="submit" id="updateBtn" class="afs-btn afs-btn-primary afs-update">Update</button>
+<button type="button" id="resetBtn" class="afs-btn afs-reset">Reset</button>
+</div>
+</div>
+<div id="newsViewOptionsPanel" class="afs-Switch" role="group" aria-label="Layout">
+<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="list" aria-pressed="true">List View</button>
+<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="grid" aria-pressed="false">Grid View</button>
+</div>
+</form>
+<div id="newsPanelResults" class="afs-results" aria-live="polite" aria-busy="false">
+<p class="afs-none">No results found.</p>
+</div>
+</div>

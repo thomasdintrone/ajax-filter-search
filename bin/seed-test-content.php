@@ -7,6 +7,12 @@
  * @package ajax-filter-search
  */
 
+// WordPress's default post carries the install date, which would make date-based output differ per run.
+$default = get_post( 1 );
+if ( $default && 'Hello world!' === $default->post_title ) {
+	wp_delete_post( 1, true );
+}
+
 $cats = array();
 foreach ( array( 'News', 'Press Releases', 'Events' ) as $name ) {
 	$term = wp_insert_term( $name, 'category' );

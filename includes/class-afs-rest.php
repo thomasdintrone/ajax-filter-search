@@ -108,12 +108,21 @@ class AFS_REST {
 
 		$result = AFS_Renderer::render_results( $config, $state, $base, max( 1, (int) $request->get_param( 'instance' ) ) );
 
-		return rest_ensure_response(
-			array(
-				'html'  => $result['html'],
-				'found' => $result['found'],
-				'pages' => $result['pages'],
-			)
+		$data = array(
+			'html'  => $result['html'],
+			'found' => $result['found'],
+			'pages' => $result['pages'],
 		);
+
+		/**
+		 * Filters the results response before it is sent. Keep `html`, `found` and `pages`.
+		 *
+		 * @param array $data   Response data.
+		 * @param array $config Normalized widget config.
+		 * @param array $state  Normalized visitor state.
+		 */
+		$data = apply_filters( 'afs_rest_response', $data, $config, $state );
+
+		return rest_ensure_response( $data );
 	}
 }
