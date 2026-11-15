@@ -44,3 +44,14 @@ function afs_register_rest_meta( $id, $args = array() ) {
 function afs_registered( $type ) {
 	return AFS_Registry::all( $type );
 }
+
+/**
+ * URL of the RSS feed for a filter state.
+ *
+ * @param array $config Normalized config (AFS_Renderer::normalize_config()).
+ * @param array $state  Normalized state (AFS_Renderer::normalize_state()).
+ * @return string
+ */
+function afs_feed_url( $config, $state ) {
+	return AFS_Feed::url( $config, $state );
+}

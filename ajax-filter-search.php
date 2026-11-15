@@ -42,12 +42,14 @@ require_once AFS_PLUGIN_PATH . 'includes/class-afs-query.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-cache.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-renderer.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-rest.php';
+require_once AFS_PLUGIN_PATH . 'includes/class-afs-feed.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-frontend.php';
 require_once AFS_PLUGIN_PATH . 'includes/compat.php';
 
 AFSAdmin::init();
 AFS_Frontend::init();
 AFS_REST::init();
+AFS_Feed::init();
 AFS_Compat::init();
 AFS_Registry::init();
 AFS_Cache::init();

@@ -30,11 +30,6 @@ class AFS_REST {
 	}
 
 	public static function register_routes() {
-		$text = array(
-			'type'              => 'string',
-			'sanitize_callback' => 'sanitize_text_field',
-		);
-
 		register_rest_route(
 			self::NAMESPACE_,
 			'/results',
@@ -42,53 +37,64 @@ class AFS_REST {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( __CLASS__, 'get_results' ),
 				'permission_callback' => '__return_true',
-				'args'                => array(
-					'post_type'      => $text,
-					'post_tax'       => $text,
-					'terms'          => $text,
-					'posts_per_page' => array(
-						'type'    => 'integer',
-						'minimum' => 1,
-						'maximum' => 100,
-					),
-					'orderby'        => $text,
-					'order'          => $text,
-					'afs_s'          => $text,
-					'afs_term'       => $text,
-					'afs_month'      => array(
-						'type'    => 'integer',
-						'minimum' => 0,
-						'maximum' => 12,
-					),
-					'afs_year'       => array(
-						'type'    => 'integer',
-						'minimum' => 0,
-						'maximum' => 9999,
-					),
-					'afs_page'       => array(
-						'type'    => 'integer',
-						'minimum' => 1,
-						'maximum' => 100000,
-					),
-					'instance'       => array(
-						'type'    => 'integer',
-						'minimum' => 1,
-						'maximum' => 50,
-					),
-					'base_url'       => array(
-						'type'   => 'string',
-						'format' => 'uri',
-					),
-				),
+				'args'                => self::route_args(),
 			)
 		);
 	}
 
 	/**
-	 * @param WP_REST_Request $request Request.
-	 * @return WP_REST_Response
+	 * Validated request parameters shared by the results route and the feed route.
+	 *
+	 * @return array
 	 */
-	public static function get_results( $request ) {
+	public static function route_args() {
+		$text = array(
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_text_field',
+		);
+
+		return array(
+			'post_type'      => $text,
+			'post_tax'       => $text,
+			'terms'          => $text,
+			'posts_per_page' => array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 100,
+			),
+			'orderby'        => $text,
+			'order'          => $text,
+			'afs_s'          => $text,
+			'afs_term'       => $text,
+			'afs_month'      => array(
+				'type'    => 'integer',
+				'minimum' => 0,
+				'maximum' => 12,
+			),
+			'afs_year'       => array(
+				'type'    => 'integer',
+				'minimum' => 0,
+				'maximum' => 9999,
+			),
+			'afs_page'       => array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 100000,
+			),
+			'instance'       => array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 50,
+			),
+			'base_url'       => array(
+				'type'   => 'string',
+				'format' => 'uri',
+			),
+		);
+	}
+
+	/** @return array{0:array,1:array} Normalized config and state for a request. */
+	public static function config_and_state( $request ) {
 		$config = AFS_Renderer::normalize_config(
 			array(
 				'post_type'      => $request->get_param( 'post_type' ),
@@ -111,6 +117,16 @@ class AFS_REST {
 			$config
 		);
 
+		return array( $config, $state );
+	}
+
+	/**
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public static function get_results( $request ) {
+		list( $config, $state ) = self::config_and_state( $request );
+
 		// Links in the fragment are built from the caller's page URL, but only if it is on this site.
 		$base = wp_validate_redirect( esc_url_raw( (string) $request->get_param( 'base_url' ) ), home_url( '/' ) );
 		$base = remove_query_arg( AFS_Renderer::URL_KEYS, $base );
@@ -124,8 +140,7 @@ class AFS_REST {
 		$etag      = self::etag( $key );
 
 		if ( $cacheable ) {
-			$none = trim( (string) $request->get_header( 'if_none_match' ) );
-			if ( '' !== $none && $none === $etag ) {
+			if ( self::matches( (string) $request->get_header( 'if_none_match' ), $etag ) ) {
 				$response = new WP_REST_Response( null, 304 );
 				self::cache_headers( $response, $etag );
 				return $response;
@@ -182,11 +197,38 @@ class AFS_REST {
 	 * Cheap validator that needs no query: changes whenever AFS_Cache notes a post, term, settings or theme change, or
 	 * the plugin is updated. A published, edited, trashed or re-termed post therefore invalidates every cached result.
 	 */
-	private static function etag( $key ) {
+	public static function etag( $key ) {
 		return '"' . md5( $key . '|' . AFS_Cache::version() . '|' . AFS_VERSION ) . '"';
 	}
 
-	private static function cache_headers( $response, $etag ) {
+	/**
+	 * Does an If-None-Match header match our validator? Servers often rewrite a validator when they compress the
+	 * body (Apache's mod_deflate turns "abc" into "abc-gzip"), so a weak prefix and a content-coding suffix are ignored.
+	 * A list of validators and the wildcard are honoured.
+	 *
+	 * @param string $header If-None-Match request header.
+	 * @param string $etag   Our validator, quoted.
+	 * @return bool
+	 */
+	public static function matches( $header, $etag ) {
+		$header = trim( $header );
+		if ( '' === $header ) {
+			return false;
+		}
+		if ( '*' === $header ) {
+			return true;
+		}
+		foreach ( explode( ',', $header ) as $candidate ) {
+			$candidate = preg_replace( '/^W\//', '', trim( $candidate ) );
+			$candidate = preg_replace( '/-(gzip|br|deflate|zstd)"$/', '"', $candidate );
+			if ( $candidate === $etag ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static function cache_headers( $response, $etag ) {
 		$response->header( 'ETag', $etag );
 		/**
 		 * Filters the Cache-Control value of an anonymous results response. Return '' to send none.

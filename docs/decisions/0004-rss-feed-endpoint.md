@@ -40,3 +40,11 @@ ETag / Last-Modified / conditional GET, cache headers, auto-discovery `<link rel
 ## Consequences
 
 No production code changed. If approved, the feed becomes a Sprint 1+ item behind the `AFS_Query` refactor. It adds a read-only public endpoint, so it falls under the security regression suite (published-only, input caps) before release.
+
+## Implementation notes (2026-11-15)
+
+Shipped as `GET /wp-json/afs/v1/feed` (`AFS_Feed`), reusing `AFS_Query` and core's RSS 2.0 template, with the same validation, `ETag` and `Cache-Control` rules as the results route. Documented in `docs/extending.md`. The three gaps listed above are closed: `afs_query_args` applies, the post type and taxonomy come from the request's validated parameters rather than a free-form feed URL, and the length follows `posts_per_page`.
+
+- **Found on a real server:** Apache's compression rewrites the ETag of XML bodies from `"abc"` to `"abc-gzip"`, so the browser's conditional request never matched. Validator matching now ignores weak prefixes and `-gzip`/`-br`/`-deflate` suffixes (both routes).
+- **Not built:** a visible subscribe link, `<link rel="alternate">` auto-discovery and a feed URL on filtered pages. These change page output and are left for the design work.
+
