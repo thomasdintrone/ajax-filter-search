@@ -16,6 +16,9 @@ check() { if [ "$2" == "$3" ]; then echo "ok    $1"; else echo "FAIL  $1 (expect
 wp() { docker compose "${FILES[@]}" run --rm -T wpcli wp "$@" 2>&1 | grep -vE '^ Container ' || true; }
 items() { grep -o '<article class="[^"]*afs-item' | wc -l | tr -d ' '; }
 # Output made comparable between two runs: the per-request summary ids and whitespace between tags.
+# The 2.0.0 response keys only; newer versions add keys (for example meta) and must not fail this comparison.
+rest_core() { python3 -c 'import sys,json; d=json.load(sys.stdin); print(json.dumps({k: d[k] for k in ("html","found","pages")}))' | norm; }
+rest_items() { python3 -c 'import sys,json; print(json.load(sys.stdin)["html"])' | items; }
 norm() { sed -E 's/afs-summary-[0-9]+/afs-summary-N/g; s/Post excerpt [0-9]+/Post excerpt N/g' | tr -s '\n\t ' ' ' | sed 's/> </></g'; }
 
 bin/build-zip.sh >/dev/null
@@ -38,7 +41,7 @@ before_settings="$(wp option get afs_settings --format=json)"
 
 pages=( afs-single afs-double afs-legacy )
 for p in "${pages[@]}"; do curl -s "$B/$p/" | norm > "$tmp/before-$p.txt"; done
-rest_before="$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | norm)"
+rest_before="$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
 echo "-- on $BASE: single page lists $(curl -s "$B/afs-single/" | items) items"
 
 # Anything the OLD release logged is its own business; only entries after the swap count.
@@ -57,7 +60,7 @@ for p in "${pages[@]}"; do
 done
 check "single page honours the saved page size (7)"  7 "$(curl -s "$B/afs-single/" | items)"
 check "REST route answers"                           200 "$(curl -s -o /dev/null -w '%{http_code}' "$B/wp-json/afs/v1/results?posts_per_page=5")"
-check "REST only lists published content"            0 "$(curl -s "$B/wp-json/afs/v1/results?afs_s=SECRET" | grep -c 'SECRET')"
+check "REST only lists published content"            0 "$(curl -s "$B/wp-json/afs/v1/results?afs_s=SECRET" | rest_items)"
 check "1.x ajax action still answers"                200 "$(curl -s -o /dev/null -w '%{http_code}' -d 'action=my_action&filingType=news' "$B/wp-admin/admin-ajax.php")"
 check "settings page callback loads without error"   ok "$(wp eval 'require_once ABSPATH . "wp-admin/includes/plugin.php"; echo class_exists("AFSAdmin") ? "ok" : "missing";' | tail -1 | tr -d '\r')"
 log="$(wp eval 'echo file_exists( WP_CONTENT_DIR . "/debug.log" ) ? file_get_contents( WP_CONTENT_DIR . "/debug.log" ) : "";')"
@@ -69,6 +72,6 @@ if [ "$BASE" == "2.0.0" ]; then
 	echo "-- 2.0.0 to this build: output must be identical"
 	for p in "${pages[@]}"; do check "$p output identical" "$(cat "$tmp/before-$p.txt")" "$(curl -s "$B/$p/" | norm)"; done
 	# afs-single page size changed? settings were identical, so the markup must be too
-	check "REST output identical" "$rest_before" "$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | norm)"
+	check "REST output identical (2.0.0 keys)" "$rest_before" "$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
 fi
 exit $fail
