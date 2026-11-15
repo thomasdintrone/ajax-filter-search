@@ -1,0 +1,15 @@
+# Adds the spike plugins and a minimal classic theme to the dev stack. Use with the base compose file:
+#   docker compose -p afs71 -f docker-compose.yml -f spikes/frontend/compose.spikes.yml up -d --wait
+services:
+  wordpress:
+    volumes:
+      - ./spikes/frontend/interactivity:/var/www/html/wp-content/plugins/afs-spike-interactivity:ro
+      - ./spikes/frontend/esm:/var/www/html/wp-content/plugins/afs-spike-esm:ro
+      - ./spikes/frontend/pro-stub:/var/www/html/wp-content/plugins/afs-spike-pro-stub:ro
+      - ./spikes/frontend/theme-classic:/var/www/html/wp-content/themes/afs-classic-min:ro
+  wpcli:
+    volumes:
+      - ./spikes/frontend/interactivity:/var/www/html/wp-content/plugins/afs-spike-interactivity:ro
+      - ./spikes/frontend/esm:/var/www/html/wp-content/plugins/afs-spike-esm:ro
+      - ./spikes/frontend/pro-stub:/var/www/html/wp-content/plugins/afs-spike-pro-stub:ro
+      - ./spikes/frontend/theme-classic:/var/www/html/wp-content/themes/afs-classic-min:ro
