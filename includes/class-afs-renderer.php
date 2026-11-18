@@ -105,6 +105,8 @@ class AFS_Renderer {
 			// Opt-in helpers (off unless the shortcode, block or setting turns them on, so existing output is unchanged).
 			'show_sort'   => $bool( 'show_sort', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_sort' ) ),
 			'show_chips'  => $bool( 'show_chips', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_chips' ) ),
+			// classic (the 2.0 look) or modern; the markup is the same, only a class and a stylesheet differ.
+			'design'      => AFS_Design::resolve( isset( $raw['design'] ) ? $raw['design'] : '' ),
 			// Starting values for the filters.
 			'search'      => isset( $raw['search'] ) ? sanitize_text_field( $raw['search'] ) : '',
 			'month'       => isset( $raw['filter_months'] ) ? self::clean_month( $raw['filter_months'] ) : 0,
@@ -325,7 +327,7 @@ class AFS_Renderer {
 
 		ob_start();
 		?>
-		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?>" data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
+		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo AFS_Design::MODERN === $config['design'] ? ' afs-design-modern' : ''; ?>" data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
 			<h2 class="afs-sr-only"><?php echo esc_html( self::label( __( 'Filterable posts', 'ajax-filter-search' ), $n ) ); ?></h2>
 			<form<?php echo $legacy ? ' id="newsForm"' : ''; ?> class="afs-form" method="get" action="<?php echo esc_url( $base ); ?>" role="search" aria-label="<?php echo esc_attr( self::label( __( 'Filter posts', 'ajax-filter-search' ), $n ) ); ?>">
 				<?php

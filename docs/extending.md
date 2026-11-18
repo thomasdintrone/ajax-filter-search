@@ -38,6 +38,16 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_enable_feed` | Return `false` to remove the RSS route. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
 
+## Designs
+
+A feed has one of two designs. **Classic** is the look of 2.0 and 2.1; **Modern** is a cleaner card-based look. New installs get Modern; a site that already had the plugin keeps Classic until it chooses otherwise (Settings > Appearance > Design).
+
+- Per feed: `design="modern"` or `design="classic"` on the shortcode, or the Design setting of the block. It overrides the site setting.
+- The markup is the same in both designs. A Modern feed only adds the class `afs-design-modern` to its wrapper, and its stylesheet (`public/css/afs-modern.css`) is loaded only when a Modern feed is on the page, so Classic pages are unchanged.
+- Theming: both designs read the `--afs-*` custom properties. Modern also has `--afs-radius`, `--afs-radius-lg`, `--afs-border`, `--afs-surface`, `--afs-soft`, `--afs-muted`, `--afs-ink`, `--afs-tint` and `--afs-on-accent`, for example `.afs-design-modern { --afs-radius: 4px; --afs-surface: #fafafa; }`.
+- Text on the accent colour is chosen automatically (white or near-black, whichever contrasts more), so any accent colour stays readable in both designs.
+- `AFS_Design::resolve()` returns the design for a request and `AFS_Design::site_default()` the site-wide default.
+
 ## Sort, filter chips and empty states (opt-in)
 
 Three helpers are off unless turned on, so existing feeds render exactly as in 2.0.0:

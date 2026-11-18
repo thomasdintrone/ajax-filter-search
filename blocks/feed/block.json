@@ -22,12 +22,14 @@
 		"showMonths": { "type": "boolean", "default": true },
 		"showYears": { "type": "boolean", "default": true },
 		"showSort": { "type": "string", "default": "" },
-		"showChips": { "type": "string", "default": "" }
+		"showChips": { "type": "string", "default": "" },
+		"design": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"html": false,
 		"align": [ "wide", "full" ]
 	},
 	"editorScript": "file:./editor.js",
-	"style": "afs-styles"
+	"style": "afs-styles",
+	"editorStyle": "afs-modern"
 }

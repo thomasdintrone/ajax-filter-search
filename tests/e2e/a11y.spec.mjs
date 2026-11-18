@@ -4,7 +4,7 @@ import { feed, settled } from './helpers.mjs';
 
 // Scans only the plugin's own region (.afs); the theme's markup is not ours to fix.
 const TAGS = [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ];
-const PAGES = [ '/afs-single/', '/afs-double/', '/afs-block/', '/afs-single/?afs_term=news&afs_year=2024', '/afs-legacy/', '/afs-tools/', '/afs-tools/?afs_term=news&afs_year=2024&afs_sort=oldest&afs_s=Announcement' ];
+const PAGES = [ '/afs-single/', '/afs-double/', '/afs-block/', '/afs-single/?afs_term=news&afs_year=2024', '/afs-legacy/', '/afs-tools/', '/afs-tools/?afs_term=news&afs_year=2024&afs_sort=oldest&afs_s=Announcement', '/afs-classic/', '/afs-classic/?afs_term=news&afs_year=2024' ];
 
 async function scan( page ) {
 	const { violations } = await new AxeBuilder( { page } ).include( '.afs' ).withTags( TAGS ).analyze();

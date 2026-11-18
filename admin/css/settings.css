@@ -1,0 +1,459 @@
+/**
+ * Ajax Filter Search: settings screen.
+ * Scoped to .afs-admin and loaded only on the plugin's own settings page.
+ */
+
+.afs-admin {
+	--afs-a-blue: #2563eb;
+	--afs-a-blue-dark: #1d4ed8;
+	--afs-a-ink: #0f172a;
+	--afs-a-sub: #475569;
+	--afs-a-line: #e2e8f0;
+	--afs-a-paper: #ffffff;
+	--afs-a-soft: #f1f5f9;
+	--afs-a-tint: #eaf1ff;
+	--afs-a-radius: 14px;
+	max-width: 1080px;
+	color: var(--afs-a-ink);
+}
+
+.afs-admin * {
+	box-sizing: border-box;
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.afs-admin__header {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin: 18px 0 20px;
+}
+
+.afs-admin__icon {
+	flex: none;
+	width: 52px;
+	height: 52px;
+	border-radius: 14px;
+	box-shadow: 0 6px 16px rgba(15, 41, 107, 0.25);
+}
+
+.afs-admin__title {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.afs-admin__title h1 {
+	margin: 0;
+	padding: 0;
+	font-size: 24px;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+}
+
+.afs-admin__title p {
+	margin: 3px 0 0;
+	color: var(--afs-a-sub);
+	font-size: 14px;
+}
+
+.afs-admin__version {
+	flex: none;
+	padding: 4px 12px;
+	border: 1px solid var(--afs-a-line);
+	border-radius: 999px;
+	background: var(--afs-a-paper);
+	color: var(--afs-a-sub);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+/* Shell: section navigation + cards ------------------------------------------ */
+
+.afs-admin__shell {
+	display: grid;
+	grid-template-columns: 200px minmax(0, 1fr);
+	gap: 20px;
+	align-items: start;
+}
+
+.afs-admin__nav {
+	position: sticky;
+	top: 48px;
+	padding: 10px;
+	border: 1px solid var(--afs-a-line);
+	border-radius: var(--afs-a-radius);
+	background: var(--afs-a-paper);
+}
+
+.afs-admin__nav ul {
+	display: grid;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.afs-admin__nav a {
+	display: flex;
+	align-items: center;
+	min-height: 40px;
+	padding: 6px 12px;
+	border-radius: 9px;
+	color: var(--afs-a-sub);
+	font-size: 14px;
+	text-decoration: none;
+}
+
+.afs-admin__nav a:hover {
+	background: var(--afs-a-soft);
+	color: var(--afs-a-ink);
+}
+
+.afs-admin__nav a.is-current {
+	background: var(--afs-a-tint);
+	box-shadow: inset 3px 0 0 var(--afs-a-blue);
+	color: var(--afs-a-ink);
+	font-weight: 650;
+}
+
+.afs-admin a:focus-visible,
+.afs-admin button:focus-visible,
+.afs-admin select:focus-visible,
+.afs-admin input:focus-visible {
+	outline: 2px solid transparent;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--afs-a-blue);
+}
+
+.afs-admin__main {
+	display: grid;
+	gap: 16px;
+	min-width: 0;
+}
+
+.afs-card {
+	padding: 22px 26px 8px;
+	border: 1px solid var(--afs-a-line);
+	border-radius: var(--afs-a-radius);
+	background: var(--afs-a-paper);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	scroll-margin-top: 48px;
+}
+
+.afs-card h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 17px;
+	font-weight: 700;
+	letter-spacing: -0.005em;
+}
+
+.afs-card__intro {
+	margin: 4px 0 14px;
+	color: var(--afs-a-sub);
+	font-size: 14px;
+}
+
+/* Rows: label and help on the left, the control on the right --------------------- */
+
+.afs-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+	gap: 8px 28px;
+	align-items: center;
+	padding: 16px 0;
+	border-top: 1px solid var(--afs-a-line);
+}
+
+.afs-row__label label,
+.afs-row__title {
+	display: block;
+	font-size: 14px;
+	font-weight: 650;
+}
+
+.afs-row__label .description {
+	margin: 4px 0 0;
+	color: var(--afs-a-sub);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.afs-row__control {
+	min-width: 0;
+}
+
+.afs-admin select,
+.afs-admin input[type="number"],
+.afs-admin input[type="text"] {
+	min-height: 40px;
+	padding: 0 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 10px;
+	background-color: var(--afs-a-paper);
+	color: var(--afs-a-ink);
+	font-size: 14px;
+}
+
+.afs-admin select {
+	min-width: 220px;
+	max-width: 100%;
+}
+
+.afs-admin input[type="number"] {
+	width: 110px;
+}
+
+/* Segmented Yes / No --------------------------------------------------------------- */
+
+.afs-seg {
+	display: inline-flex;
+	margin: 0;
+	padding: 3px;
+	border: 0;
+	border-radius: 11px;
+	background: var(--afs-a-soft);
+}
+
+.afs-seg__opt {
+	position: relative;
+	margin: 0;
+	cursor: pointer;
+}
+
+.afs-seg__opt input {
+	position: absolute;
+	opacity: 0;
+	inset: 0;
+	margin: 0;
+	cursor: pointer;
+}
+
+.afs-seg__opt span {
+	display: block;
+	min-width: 64px;
+	padding: 7px 16px;
+	border-radius: 8px;
+	color: var(--afs-a-sub);
+	font-size: 14px;
+	font-weight: 600;
+	text-align: center;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.afs-seg__opt input:checked + span {
+	background: var(--afs-a-paper);
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+	color: var(--afs-a-blue-dark);
+}
+
+.afs-seg__opt input:focus-visible + span {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--afs-a-blue);
+}
+
+/* Design picker ----------------------------------------------------------------------- */
+
+.afs-design-picker {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.afs-design-option {
+	position: relative;
+	display: block;
+	margin: 0;
+	border: 2px solid var(--afs-a-line);
+	border-radius: 14px;
+	background: var(--afs-a-paper);
+	cursor: pointer;
+	overflow: hidden;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.afs-design-option:hover {
+	border-color: #b6c4de;
+}
+
+.afs-design-option input {
+	position: absolute;
+	opacity: 0;
+	inset: 0;
+	margin: 0;
+	cursor: pointer;
+}
+
+.afs-design-option__preview {
+	display: block;
+	border-bottom: 1px solid var(--afs-a-line);
+}
+
+.afs-design-option__preview svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.afs-design-option__name {
+	display: block;
+	padding: 10px 14px;
+	font-size: 14px;
+	font-weight: 650;
+}
+
+.afs-design-option:has(input:checked) {
+	border-color: var(--afs-a-blue);
+	box-shadow: 0 6px 18px rgba(37, 99, 235, 0.18);
+}
+
+.afs-design-option:has(input:checked) .afs-design-option__name::after {
+	content: "\2713";
+	float: right;
+	color: var(--afs-a-blue);
+}
+
+.afs-design-option:has(input:focus-visible) {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--afs-a-blue);
+}
+
+/* Copyable shortcodes --------------------------------------------------------------------- */
+
+.afs-copy {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 12px;
+	padding: 6px 6px 6px 14px;
+	border: 1px solid var(--afs-a-line);
+	border-radius: 12px;
+	background: var(--afs-a-soft);
+}
+
+.afs-copy code {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	color: var(--afs-a-ink);
+	font-size: 13px;
+	overflow-wrap: anywhere;
+}
+
+.afs-copy__btn {
+	flex: none;
+	min-height: 34px;
+	padding: 0 14px;
+	border: 1px solid #cbd5e1;
+	border-radius: 9px;
+	background: var(--afs-a-paper);
+	color: var(--afs-a-ink);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afs-copy__btn:hover {
+	border-color: var(--afs-a-blue);
+	color: var(--afs-a-blue-dark);
+}
+
+.afs-copy__btn.is-copied {
+	border-color: #15803d;
+	color: #166534;
+}
+
+/* Colour picker (core's control, tidied) ----------------------------------------------------- */
+
+.afs-admin .wp-picker-container .wp-color-result.button {
+	min-height: 40px;
+	border-radius: 10px;
+}
+
+/* Sticky save bar ------------------------------------------------------------------------------ */
+
+.afs-savebar {
+	position: sticky;
+	bottom: 12px;
+	z-index: 5;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 16px;
+	margin-top: 16px;
+	padding: 12px 16px;
+	border: 1px solid var(--afs-a-line);
+	border-radius: var(--afs-a-radius);
+	background: var(--afs-a-paper);
+	box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+}
+
+.afs-savebar .button-primary {
+	min-height: 40px;
+	padding: 0 24px;
+	border-color: var(--afs-a-blue);
+	border-radius: 10px;
+	background: var(--afs-a-blue);
+	font-weight: 600;
+	box-shadow: none;
+}
+
+.afs-savebar .button-primary:hover {
+	border-color: var(--afs-a-blue-dark);
+	background: var(--afs-a-blue-dark);
+}
+
+.afs-savebar__note {
+	color: var(--afs-a-sub);
+	font-size: 13px;
+}
+
+.afs-savebar__note.is-dirty {
+	color: #7a4b00;
+	font-weight: 650;
+}
+
+/* Small screens ------------------------------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+	.afs-admin__shell {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.afs-admin__nav {
+		position: static;
+	}
+
+	.afs-admin__nav ul {
+		grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+	}
+
+	.afs-row {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.afs-savebar {
+		position: static;
+		box-shadow: none;
+	}
+}
+
+@media (max-width: 520px) {
+	.afs-design-picker {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.afs-card {
+		padding: 18px 18px 6px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afs-admin * {
+		transition: none !important;
+	}
+}

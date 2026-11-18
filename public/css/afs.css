@@ -165,7 +165,8 @@
 .afs-btn[aria-pressed="true"] {
 	background: var(--afs-accent);
 	border-color: var(--afs-accent);
-	color: #1b1b1b;
+	/* Dark text unless the plugin finds the accent needs white (it sets --afs-on-accent then). */
+	color: var(--afs-on-accent, #1b1b1b);
 }
 
 /* Layout switch --------------------------------------------------------- */

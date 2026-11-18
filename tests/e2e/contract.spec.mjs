@@ -32,6 +32,25 @@ test.describe( 'pages', () => {
 	} );
 } );
 
+test.describe( 'designs', () => {
+	test( 'a Modern feed carries its class and loads the Modern stylesheet; a Classic feed does neither', async ( { request } ) => {
+		const modern = await ( await request.get( '/afs-single/' ) ).text();
+		expect( modern ).toContain( 'afs-design-modern' );
+		expect( modern ).toContain( 'afs-modern.css' );
+		const classic = await ( await request.get( '/afs-classic/' ) ).text();
+		expect( classic ).not.toContain( 'afs-design-modern' );
+		expect( classic ).not.toContain( 'afs-modern.css' );
+	} );
+
+	test( 'the Modern stylesheet is served', async ( { request } ) => {
+		const html = await ( await request.get( '/afs-single/' ) ).text();
+		const href = html.match( /href=['"]([^'"]*afs-modern\.css[^'"]*)['"]/ )[ 1 ];
+		const css = await request.get( href.replace( /^https?:\/\/[^/]+/, '' ) );
+		expect( css.status() ).toBe( 200 );
+		expect( await css.text() ).toContain( '.afs-design-modern' );
+	} );
+} );
+
 test.describe( 'REST route', () => {
 	test( 'validation rejects out-of-range values with 400', async ( { request } ) => {
 		for ( const q of [ 'posts_per_page=9999', 'afs_month=13', 'afs_page=0', 'afs_page=99999999999999999999' ] ) {

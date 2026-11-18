@@ -76,15 +76,23 @@ class AFS_Frontend {
 	public static function register_assets() {
 		wp_register_style( 'afs-styles', AFS_PLUGIN_URL . '/public/css/afs.css', array(), AFS_VERSION );
 		wp_register_script( 'afs-script', AFS_PLUGIN_URL . '/public/js/afs.js', array(), AFS_VERSION, true );
+		// The Modern design's rules, loaded only for feeds that use it.
+		wp_register_style( 'afs-modern', AFS_PLUGIN_URL . '/public/css/afs-modern.css', array( 'afs-styles' ), AFS_VERSION );
 	}
 
 	/** Enqueue (once) the CSS and JS, plus the settings the script needs. */
-	private static function enqueue_assets() {
+	private static function enqueue_assets( $design = AFS_Design::CLASSIC ) {
 		if ( ! wp_style_is( 'afs-styles', 'registered' ) ) {
 			self::register_assets();
 		}
 		wp_enqueue_style( 'afs-styles' );
 		wp_enqueue_script( 'afs-script' );
+
+		if ( AFS_Design::MODERN === $design && ! wp_style_is( 'afs-modern', 'enqueued' ) ) {
+			wp_enqueue_style( 'afs-modern' );
+			// Text on the accent colour (buttons, the active tab) is white or dark, whichever reads better on it.
+			wp_add_inline_style( 'afs-modern', '.afs-design-modern{--afs-on-accent:' . AFS_Design::on_colour( AFSAdmin::afs_retrieve( '_appearance_accent' ) ) . ';}' );
+		}
 
 		if ( self::$rendered > 0 ) {
 			return;
@@ -92,7 +100,10 @@ class AFS_Frontend {
 
 		$accent = sanitize_hex_color( AFSAdmin::afs_retrieve( '_appearance_accent' ) );
 		if ( $accent ) {
-			wp_add_inline_style( 'afs-styles', '.afs{--afs-accent:' . $accent . ';}' );
+			// Dark button text is the default; a dark accent needs white, and only then is the variable written, so a
+			// site on the default accent outputs exactly what it always has.
+			$on = '#ffffff' === AFS_Design::on_colour( $accent ) ? '--afs-on-accent:#ffffff;' : '';
+			wp_add_inline_style( 'afs-styles', '.afs{--afs-accent:' . $accent . ';' . $on . '}' );
 		}
 
 		wp_add_inline_script(
@@ -133,6 +144,7 @@ class AFS_Frontend {
 			'show_years'     => '',
 			'show_sort'      => '',
 			'show_chips'     => '',
+			'design'         => '',
 		);
 	}
 
@@ -169,6 +181,7 @@ class AFS_Frontend {
 			'showYears'  => 'show_years',
 			'showSort'   => 'show_sort',
 			'showChips'  => 'show_chips',
+			'design'     => 'design',
 		);
 		$atts = array();
 		foreach ( $map as $from => $to ) {
@@ -195,7 +208,7 @@ class AFS_Frontend {
 		$first = 0 === self::$rendered;
 		$state = AFS_Renderer::normalize_state( $first ? AFS_Renderer::request_state() : array(), $config );
 
-		self::enqueue_assets();
+		self::enqueue_assets( $config['design'] );
 		$html = AFS_Renderer::render_widget( $config, $state, $first );
 		++self::$rendered;
 
@@ -208,10 +221,10 @@ class AFS_Frontend {
 		$config = AFS_Renderer::normalize_config( $atts );
 		$state  = AFS_Renderer::normalize_state( array(), $config );
 
-		self::enqueue_assets();
+		self::enqueue_assets( $config['design'] );
 		$result = AFS_Renderer::render_results( $config, $state, AFS_Renderer::current_url() );
 		++self::$rendered;
 
-		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . '"><div class="afs-results">' . $result['html'] . '</div></div>';
+		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . ( AFS_Design::MODERN === $config['design'] ? ' afs-design-modern' : '' ) . '"><div class="afs-results">' . $result['html'] . '</div></div>';
 	}
 }
