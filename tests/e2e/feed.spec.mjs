@@ -77,6 +77,32 @@ test.describe( 'filters, paging and history (JavaScript on)', () => {
 	} );
 } );
 
+test.describe( 'search requests', () => {
+	test( 'submitting the search with Enter sends one request, not a second debounced one', async ( { page } ) => {
+		await page.goto( '/afs-single/' );
+		await settled( page );
+		const requests = [];
+		page.on( 'request', ( r ) => { if ( /afs\/v1\/results/.test( r.url() ) ) requests.push( r.url() ); } );
+		await feed( page ).locator( 'input[name="afs_s"]' ).focus();
+		await page.keyboard.type( 'Quarterly' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForTimeout( 1200 ); // Longer than the 400 ms debounce.
+		expect( requests ).toHaveLength( 1 );
+	} );
+
+	test( 'a page link clicked right after submitting a search is not undone by the debounce timer', async ( { page } ) => {
+		await page.goto( '/afs-single/' );
+		await settled( page );
+		await feed( page ).locator( 'input[name="afs_s"]' ).focus();
+		await page.keyboard.type( 'Announcement' );
+		await page.keyboard.press( 'Enter' );
+		await settled( page );
+		await feed( page ).locator( '.afs-pagination a[data-afs-page="2"]:not(.afs-next)' ).click();
+		await page.waitForTimeout( 1200 );
+		expect( page.url() ).toContain( 'afs_page=2' );
+	} );
+} );
+
 test.describe( 'the Update button', () => {
 	test( 'is hidden when JavaScript runs, and Enter in the search box still applies the search', async ( { page, request } ) => {
 		await page.goto( '/afs-single/' );
@@ -99,12 +125,16 @@ test.describe( 'keyboard only', () => {
 		await page.keyboard.press( 'Enter' );
 		await settled( page );
 		expect( await titles( page ) ).toEqual( await serverTitles( request, page.url() ) );
-		await feed( page ).locator( '.afs-reset' ).focus();
-		await page.keyboard.press( 'Enter' );
+		await feed( page ).locator( '.afs-reset' ).press( 'Enter' );
 		await settled( page );
-		await feed( page ).locator( '.afs-pagination a[data-afs-page="2"]:not(.afs-next)' ).focus();
-		await page.keyboard.press( 'Enter' );
-		await settled( page );
+		// Wait for the reset to be fully applied before reaching for a pagination link: the results are replaced, so a
+		// link focused too early belongs to the old content (this raced in WebKit).
+		await expect( feed( page ).locator( 'input[name="afs_s"]' ) ).toHaveValue( '' );
+		await expect( feed( page ) ).not.toHaveClass( /afs-loading/ );
+		const next = feed( page ).locator( '.afs-pagination a[data-afs-page="2"]:not(.afs-next)' );
+		await expect( next ).toBeVisible();
+		await next.press( 'Enter' );
+		await expect.poll( () => page.url() ).toContain( 'afs_page=2' );
 		expect( page.url() ).toContain( 'afs_page=2' );
 	} );
 } );

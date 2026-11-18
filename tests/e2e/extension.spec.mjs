@@ -42,9 +42,14 @@ test.describe( 'front-end extension points', () => {
 	} );
 
 	test( 'a hook that throws is ignored and the feed keeps working', async ( { page, request } ) => {
-		const errors = [];
-		page.on( 'console', ( m ) => { if ( m.type() === 'error' ) errors.push( m.text() ); } );
 		await page.addInitScript( () => {
+			// Browsers print a logged Error object differently (Firefox gives just "Error Error"), so collect the message ourselves.
+			window.__errs = [];
+			const original = console.error;
+			console.error = ( ...args ) => {
+				window.__errs.push( args.map( ( a ) => ( a && a.message ? a.message : String( a ) ) ).join( ' ' ) );
+				original.apply( console, args );
+			};
 			window.afsRegistry = { q: [ ( api ) => { api.on( 'results', () => { throw new Error( 'broken add-on' ); } ); api.on( 'before-request', () => { throw new Error( 'broken add-on 2' ); } ); } ] };
 		} );
 		await page.goto( '/afs-single/' );
@@ -53,7 +58,7 @@ test.describe( 'front-end extension points', () => {
 		await settled( page );
 		expect( page.url() ).toContain( 'afs_term=news' );
 		expect( await titles( page ) ).toEqual( await serverTitles( request, page.url() ) );
-		expect( errors.join( ' ' ) ).toContain( 'broken add-on' );
+		expect( ( await page.evaluate( () => window.__errs ) ).join( ' ' ) ).toContain( 'broken add-on' );
 	} );
 } );
 

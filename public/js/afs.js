@@ -68,13 +68,17 @@
 
 	function debounce( fn, wait ) {
 		var timer;
-		return function () {
+		var debounced = function () {
 			var args = arguments;
 			clearTimeout( timer );
 			timer = setTimeout( function () {
 				fn.apply( null, args );
 			}, wait );
 		};
+		debounced.cancel = function () {
+			clearTimeout( timer );
+		};
+		return debounced;
 	}
 
 	/** Current page URL without this plugin's parameters. */
@@ -144,13 +148,12 @@
 
 		var search = this.form.elements.afs_s;
 		if ( search ) {
-			search.addEventListener(
-				'input',
-				debounce( function () {
-					self.page = 1;
-					self.load( true );
-				}, SEARCH_DELAY )
-			);
+			// Kept so that any other load can cancel a pending one (see load()).
+			this.searchTimer = debounce( function () {
+				self.page = 1;
+				self.load( true );
+			}, SEARCH_DELAY );
+			search.addEventListener( 'input', this.searchTimer );
 		}
 
 		[ 'afs_month', 'afs_year', 'afs_sort' ].forEach( function ( name ) {
@@ -337,6 +340,11 @@
 	 */
 	Widget.prototype.load = function ( push, scroll ) {
 		var self = this;
+		// A load that is already under way (Enter, a tab, a page link) supersedes a pending debounced search; left alone,
+		// it would fire 400 ms later, repeat the request and send the visitor back to page 1.
+		if ( this.searchTimer ) {
+			this.searchTimer.cancel();
+		}
 		var state = this.state();
 
 		var url = new URL( settings.restUrl, window.location.href );
