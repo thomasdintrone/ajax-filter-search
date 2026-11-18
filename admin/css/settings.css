@@ -305,15 +305,28 @@
 	font-weight: 650;
 }
 
+/* Selected state without :has() (older browsers): the name turns blue and gets a tick; :has() below adds the card border. */
+.afs-design-option input:checked ~ .afs-design-option__name {
+	color: var(--afs-a-blue-dark);
+}
+
+.afs-design-option input:checked ~ .afs-design-option__name::after {
+	content: "\2713";
+	float: right;
+	color: var(--afs-a-blue);
+}
+
+.afs-design-option input:checked ~ .afs-design-option__preview {
+	border-bottom-color: var(--afs-a-blue);
+}
+
 .afs-design-option:has(input:checked) {
 	border-color: var(--afs-a-blue);
 	box-shadow: 0 6px 18px rgba(37, 99, 235, 0.18);
 }
 
-.afs-design-option:has(input:checked) .afs-design-option__name::after {
-	content: "\2713";
-	float: right;
-	color: var(--afs-a-blue);
+.afs-design-option input:focus-visible ~ .afs-design-option__preview {
+	box-shadow: inset 0 0 0 3px var(--afs-a-blue);
 }
 
 .afs-design-option:has(input:focus-visible) {
