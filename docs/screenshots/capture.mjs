@@ -74,6 +74,12 @@ await front( { width: 1200, height: 900 }, async ( page ) => {
 	await shot( page, 'screenshot-9.png', 860 );
 } );
 
+// 10. The Classic design, for sites that prefer the 2.x look.
+await front( { width: 1200, height: 900 }, async ( page ) => {
+	await page.goto( `${ BASE }/classic/` ); await settle( page );
+	await shot( page, 'screenshot-10.png', 1100 );
+} );
+
 // Admin screens (5 settings, 6 block editor).
 const context = await browser.newContext( { viewport: { width: 1280, height: 1000 }, locale: 'en-US', timezoneId: 'UTC' } );
 const admin = await context.newPage();
@@ -83,7 +89,8 @@ await admin.fill( '#user_pass', 'password' );
 await Promise.all( [ admin.waitForURL( /wp-admin/ ), admin.click( '#wp-submit' ) ] );
 
 await admin.goto( `${ BASE }/wp-admin/options-general.php?page=ajax-filter-search` ); await settle( admin );
-await admin.screenshot( { path: path.join( OUT, 'screenshot-5.png' ), fullPage: true, clip: { x: 0, y: 0, width: 1280, height: 1240 } } );
+await admin.addStyleTag( { content: '.afs-savebar{position:static!important;box-shadow:none!important}' } ); // A full-page capture would otherwise float it mid-page.
+await admin.screenshot( { path: path.join( OUT, 'screenshot-5.png' ), fullPage: true, clip: { x: 0, y: 0, width: 1280, height: 1700 } } );
 
 await admin.goto( `${ BASE }/wp-admin/edit.php?post_type=page&post_status=draft` );
 const href = await admin.locator( 'a.row-title:has-text("Block demo")' ).first().getAttribute( 'href' );

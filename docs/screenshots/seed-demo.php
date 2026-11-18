@@ -96,6 +96,7 @@ $pages = array(
 	'Newsroom'   => "<h2>Latest news and events</h2>\n[ajax_filter_search posts_per_page=\"4\" terms=\"news,events\"]\n<h2>Press releases</h2>\n[ajax_filter_search posts_per_page=\"3\" terms=\"press-releases\" show_search=\"false\" show_views=\"false\"]",
 	'Resources'  => '[ajax_filter_search layout="grid" posts_per_page="6"]',
 	'Archive'    => '[ajax_filter_search posts_per_page="6" show_sort="true" show_chips="true"]',
+	'Classic'    => '[ajax_filter_search design="classic" posts_per_page="5"]',
 	'About'      => 'Example Newsroom is a fictional site used to show Ajax Filter Search.',
 );
 foreach ( $pages as $title => $content ) {

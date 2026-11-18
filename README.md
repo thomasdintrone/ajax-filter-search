@@ -40,7 +40,7 @@ composer lint                                  # WordPress coding standards + PH
 composer analyse                               # PHPStan level 5 on the shipping code
 npm run lint:js                                # ESLint on the shipping JavaScript
 ```
-Extension points for add-ons (registries, `AFS_API_VERSION`, filters) are documented in [docs/extending.md](docs/extending.md).
+Two designs (Modern for new installs, Classic for existing sites) are described in [docs/extending.md](docs/extending.md#designs), which also lists the extension points for add-ons (registries, `AFS_API_VERSION`, filters) are documented in [docs/extending.md](docs/extending.md).
 
 `tests/snapshots/2.0.0` freezes the rendered output of every 2.0.0 entry point (shortcodes, block, REST, deep links, a 1.0.3 theme override, compat on and off). A refactor must keep them green; an intentional change needs a reviewed snapshot update.
 

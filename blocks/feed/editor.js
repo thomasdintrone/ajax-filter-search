@@ -158,6 +158,18 @@
 						},
 					} ),
 					el( SelectControl, {
+						label: __( 'Design', 'ajax-filter-search' ),
+						value: attributes.design,
+						options: [
+							DEFAULT,
+							{ label: __( 'Modern', 'ajax-filter-search' ), value: 'modern' },
+							{ label: __( 'Classic', 'ajax-filter-search' ), value: 'classic' },
+						],
+						onChange: function ( value ) {
+							set( { design: value } );
+						},
+					} ),
+					el( SelectControl, {
 						label: __( 'Layout switcher', 'ajax-filter-search' ),
 						value: attributes.showViews,
 						options: showHide,

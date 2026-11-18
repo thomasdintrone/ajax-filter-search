@@ -1,0 +1,488 @@
+/**
+ * Ajax Filter Search: Modern design.
+ *
+ * Loaded only for feeds that use it (they carry the class .afs-design-modern); Classic feeds never load this file and the
+ * markup is the same in both designs. Themed with the same custom properties as the base styles, plus a few more, so a theme can
+ * restyle it, for example:  .afs-design-modern { --afs-radius: 4px; --afs-border: #ccd; --afs-surface: #fafafa; }
+ */
+
+.afs-design-modern {
+	--afs-radius: 12px;
+	--afs-radius-lg: 18px;
+	--afs-border: #e3e6eb;
+	--afs-surface: #ffffff;
+	--afs-soft: #f4f6f9;
+	--afs-muted: #566170;
+	--afs-ink: #111827;
+	--afs-on-accent: #ffffff; /* Set from the accent colour by the plugin (white or near-black, whichever reads better). */
+	--afs-gap: 1.25rem;
+	--afs-tint: #eef2fb;
+	--afs-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 1px 3px rgba(16, 24, 40, 0.06);
+	--afs-shadow-hover: 0 12px 28px -12px rgba(16, 24, 40, 0.28);
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+	.afs-design-modern {
+		--afs-tint: color-mix(in srgb, var(--afs-accent) 10%, #ffffff);
+	}
+}
+
+/* Focus: a white-and-ink double ring is visible on any background and in forced-colors mode. */
+.afs-design-modern a:focus-visible,
+.afs-design-modern button:focus-visible,
+.afs-design-modern input:focus-visible,
+.afs-design-modern select:focus-visible {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 2px var(--afs-surface), 0 0 0 4px var(--afs-ink);
+}
+
+/* Tabs: pills ------------------------------------------------------------- */
+
+.afs-design-modern .afs-CommonTabs {
+	gap: 0.5rem;
+	border-bottom: 0;
+}
+
+.afs-design-modern .afs-CommonTabs a {
+	margin: 0;
+	padding: 0.5rem 1.05rem;
+	border: 1px solid var(--afs-border);
+	border-radius: 999px;
+	background: var(--afs-surface);
+	color: var(--afs-muted);
+	font-size: 0.9375em;
+	font-weight: 600;
+	line-height: 1.3;
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.afs-design-modern .afs-CommonTabs a:hover {
+	border-color: var(--afs-accent);
+	background: var(--afs-tint);
+	color: var(--afs-ink);
+}
+
+.afs-design-modern .afs-CommonTabs .active a,
+.afs-design-modern .afs-CommonTabs .active a:hover {
+	border-color: var(--afs-accent);
+	background: var(--afs-accent);
+	color: var(--afs-on-accent);
+}
+
+/* Filter bar ---------------------------------------------------------------- */
+
+.afs-design-modern .afs-Filters {
+	gap: 1rem 1.25rem;
+	padding: 1.125rem 1.25rem;
+	border: 1px solid var(--afs-border);
+	border-radius: var(--afs-radius-lg);
+	background: var(--afs-surface);
+	box-shadow: var(--afs-shadow);
+}
+
+/* The search sits on its own row; the other filters and Reset share the next one. */
+.afs-design-modern .afs-field-search {
+	flex: 1 1 100%;
+}
+
+.afs-design-modern .afs-field label {
+	font-size: 0.75rem;
+	font-weight: 650;
+	letter-spacing: 0.02em;
+	color: var(--afs-muted);
+}
+
+.afs-design-modern .afs-field input,
+.afs-design-modern .afs-field select {
+	min-height: 2.75rem;
+	padding: 0.5rem 0.875rem;
+	border: 1px solid var(--afs-border);
+	border-radius: var(--afs-radius);
+	background-color: var(--afs-surface);
+	color: var(--afs-ink);
+	transition: border-color 0.15s ease;
+}
+
+.afs-design-modern .afs-field input:hover,
+.afs-design-modern .afs-field select:hover {
+	border-color: #b9c0cb;
+}
+
+.afs-design-modern .afs-field input:focus-visible,
+.afs-design-modern .afs-field select:focus-visible {
+	border-color: var(--afs-ink);
+}
+
+.afs-design-modern .afs-field input[type="search"] {
+	padding-left: 2.5rem;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23566170' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='9' cy='9' r='5.5'/%3E%3Cpath d='M13.5 13.5L17 17'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: 0.8rem 50%;
+	background-size: 1.1rem;
+}
+
+.afs-design-modern .afs-field select {
+	padding-right: 2.25rem;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23566170' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.7rem center;
+	background-size: 1.05rem;
+}
+
+/* Buttons --------------------------------------------------------------------- */
+
+.afs-design-modern .afs-btn {
+	min-height: 2.75rem;
+	padding: 0.5rem 1.15rem;
+	border: 1px solid var(--afs-border);
+	border-radius: var(--afs-radius);
+	background: var(--afs-surface);
+	color: var(--afs-ink);
+	font-weight: 600;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.afs-design-modern .afs-btn:hover {
+	border-color: var(--afs-accent);
+	background: var(--afs-tint);
+}
+
+.afs-design-modern .afs-btn-primary,
+.afs-design-modern .afs-btn-primary:hover {
+	border-color: var(--afs-accent);
+	background: var(--afs-accent);
+	color: var(--afs-on-accent);
+}
+
+.afs-design-modern .afs-btn-primary:hover {
+	filter: brightness(0.94);
+}
+
+/* Layout switch: a segmented control ----------------------------------------- */
+
+.afs-design-modern.afs-js .afs-Switch {
+	width: fit-content;
+	margin-left: auto;
+	gap: 0;
+	padding: 3px;
+	border-radius: calc(var(--afs-radius) + 3px);
+	background: var(--afs-soft);
+}
+
+.afs-design-modern .afs-switch-btn {
+	min-height: 2.25rem;
+	margin: 0;
+	padding: 0 0.95rem;
+	border: 0;
+	border-radius: var(--afs-radius);
+	background: transparent;
+	color: var(--afs-muted);
+	font-size: 0.875em;
+}
+
+.afs-design-modern .afs-switch-btn:hover {
+	background: transparent;
+	color: var(--afs-ink);
+}
+
+.afs-design-modern .afs-switch-btn[aria-pressed="true"] {
+	background: var(--afs-surface);
+	color: var(--afs-ink);
+	box-shadow: var(--afs-shadow);
+}
+
+/* Active filter chips ----------------------------------------------------------- */
+
+.afs-design-modern .afs-chips {
+	gap: 0.5rem;
+	margin: var(--afs-gap) 0 0;
+}
+
+.afs-design-modern .afs-chip {
+	min-height: 2rem;
+	padding: 0 0.8rem;
+	border: 1px solid transparent;
+	background: var(--afs-tint);
+	color: var(--afs-ink);
+	font-weight: 600;
+}
+
+.afs-design-modern .afs-chip:hover {
+	border-color: var(--afs-accent);
+}
+
+.afs-design-modern .afs-chip-clear {
+	color: var(--afs-muted);
+	font-weight: 600;
+}
+
+/* Results ----------------------------------------------------------------------------- */
+
+.afs-design-modern .afs-results {
+	position: relative;
+	margin-top: var(--afs-gap);
+}
+
+.afs-design-modern .afs-TableHeader {
+	display: none;
+}
+
+.afs-design-modern .afs-items {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.afs-design-modern .afs-item {
+	grid-template-columns: 10.5rem minmax(0, 1fr);
+	gap: 0 1.5rem;
+	padding: 1.125rem 1.375rem;
+	border: 1px solid var(--afs-border);
+	border-radius: var(--afs-radius-lg);
+	background: var(--afs-surface);
+	box-shadow: var(--afs-shadow);
+	transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.afs-design-modern .afs-item:hover {
+	border-color: #cdd3dc;
+	box-shadow: var(--afs-shadow-hover);
+}
+
+.afs-design-modern .afs-PRDate {
+	font-size: 0.9375em;
+	font-weight: 650;
+}
+
+.afs-design-modern .afs-PRTimezone {
+	margin-top: 0.125rem;
+}
+
+/* Category badge, above the title. */
+.afs-design-modern .afs-item .afs-terms {
+	display: inline-block;
+	margin: 0 0 0.5rem;
+	padding: 0.15rem 0.65rem;
+	border-radius: 999px;
+	background: var(--afs-tint);
+	color: var(--afs-ink);
+	font-size: 0.6875rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	line-height: 1.5;
+	text-transform: uppercase;
+}
+
+.afs-design-modern .afs-item h3,
+.afs-design-modern .afs-item h4 {
+	margin: 0 0 0.375rem;
+	font-size: 1.1875em;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	line-height: 1.3;
+}
+
+.afs-design-modern .afs-item h3 a,
+.afs-design-modern .afs-item h4 a {
+	text-decoration: none;
+	background-image: linear-gradient(var(--afs-accent), var(--afs-accent));
+	background-repeat: no-repeat;
+	background-position: 0 100%;
+	background-size: 0 2px;
+	transition: background-size 0.2s ease;
+}
+
+.afs-design-modern .afs-item h3 a:hover,
+.afs-design-modern .afs-item h4 a:hover {
+	background-size: 100% 2px;
+}
+
+/* Summary toggle: a small pill with a chevron. */
+.afs-design-modern .afs-summary-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	min-height: 1.75rem;
+	padding: 0.125rem 0.7rem 0.125rem 0.6rem;
+	border: 1px solid var(--afs-border);
+	border-radius: 999px;
+	background: var(--afs-surface);
+	color: var(--afs-muted);
+	font-size: 0.8125em;
+	font-weight: 600;
+}
+
+.afs-design-modern .afs-summary-toggle:hover {
+	border-color: var(--afs-accent);
+	color: var(--afs-ink);
+}
+
+.afs-design-modern .afs-summary-toggle::before,
+.afs-design-modern .afs-summary-toggle[aria-expanded="true"]::before {
+	content: "";
+	width: 0.45rem;
+	height: 0.45rem;
+	margin: -0.15rem 0.1rem 0 0.05rem;
+	border-right: 2px solid var(--afs-muted);
+	border-bottom: 2px solid var(--afs-muted);
+	transform: rotate(45deg);
+	transition: transform 0.15s ease;
+}
+
+.afs-design-modern .afs-summary-toggle[aria-expanded="true"]::before {
+	margin-top: 0.1rem;
+	transform: rotate(-135deg);
+}
+
+.afs-design-modern .afs-PRSummary {
+	margin-top: 0.75rem;
+	padding: 0.875rem 1rem;
+	border-radius: var(--afs-radius);
+	background: var(--afs-soft);
+}
+
+.afs-design-modern .afs-PRSummary p {
+	margin-bottom: 0.5rem;
+}
+
+.afs-design-modern .afs-more {
+	font-weight: 650;
+}
+
+.afs-design-modern .afs-count {
+	margin-top: var(--afs-gap);
+	text-align: center;
+}
+
+/* Grid layout -------------------------------------------------------------------------- */
+
+.afs-design-modern.afs-layout-grid .afs-items {
+	grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+	gap: 1rem;
+	margin-top: 0;
+}
+
+.afs-design-modern.afs-layout-grid .afs-item {
+	display: flex;
+	flex-direction: column;
+	padding: 1.25rem;
+}
+
+.afs-design-modern.afs-layout-grid .afs-item:hover {
+	transform: translateY(-3px);
+}
+
+.afs-design-modern.afs-layout-grid .afs-col-date {
+	margin-bottom: 0.75rem;
+}
+
+/* Pagination ------------------------------------------------------------------------------ */
+
+.afs-design-modern .afs-pagination {
+	margin-top: 1rem;
+}
+
+.afs-design-modern .afs-pagination ul {
+	justify-content: center;
+	gap: 0.375rem;
+}
+
+.afs-design-modern .afs-pagination .afs-btn {
+	min-width: 2.5rem;
+	min-height: 2.5rem;
+	padding: 0 0.5rem;
+	border-radius: 10px;
+}
+
+/* Empty and error states --------------------------------------------------------------------- */
+
+.afs-design-modern .afs-none {
+	padding: 2rem 1rem;
+	border: 1px dashed #c5cbd5;
+	border-radius: var(--afs-radius-lg);
+	background: var(--afs-soft);
+	color: var(--afs-muted);
+	font-weight: 600;
+	text-align: center;
+}
+
+.afs-design-modern .afs-recover {
+	margin-top: 0.75rem;
+	text-align: center;
+}
+
+.afs-design-modern .afs-error {
+	border: 1px solid #f3b4b4;
+	border-radius: var(--afs-radius-lg);
+	background: #fef2f2;
+	color: #7a1f1f;
+}
+
+/* Loading: dim the results and run a thin bar along the top (no layout shift). ---------------- */
+
+.afs-design-modern.afs-loading .afs-results {
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.afs-design-modern.afs-loading .afs-results::before {
+	content: "";
+	position: absolute;
+	top: -0.5rem;
+	left: 0;
+	width: 35%;
+	height: 3px;
+	border-radius: 3px;
+	background: var(--afs-accent);
+	animation: afs-modern-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes afs-modern-slide {
+	from {
+		transform: translateX(-100%);
+	}
+
+	to {
+		transform: translateX(300%);
+	}
+}
+
+/* Small screens ---------------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+	.afs-design-modern .afs-item {
+		grid-template-columns: minmax(0, 1fr);
+		padding: 1rem 1.125rem;
+	}
+
+	.afs-design-modern .afs-Filters {
+		padding: 1rem;
+	}
+
+	.afs-design-modern .afs-CommonTabs a {
+		padding: 0.45rem 0.9rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.afs-design-modern *,
+	.afs-design-modern *::before,
+	.afs-design-modern *::after {
+		animation: none !important;
+		transition: none !important;
+	}
+
+	.afs-design-modern.afs-layout-grid .afs-item:hover {
+		transform: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.afs-design-modern .afs-item,
+	.afs-design-modern .afs-Filters,
+	.afs-design-modern .afs-CommonTabs a,
+	.afs-design-modern .afs-chip {
+		border: 1px solid CanvasText;
+	}
+}

@@ -42,6 +42,7 @@ wp_insert_post( array( 'post_title' => 'SECRET PRIVATE', 'post_status' => 'priva
 $page = wp_insert_post( array( 'post_title' => 'AFS Single', 'post_name' => 'afs-single', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '[ajax_filter_search]' ) );
 wp_insert_post( array( 'post_title' => 'AFS Double', 'post_name' => 'afs-double', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '[ajax_filter_search posts_per_page="5" layout="grid"] [ajax_filter_search terms="news,events" posts_per_page="3" show_search="false"]' ) );
 wp_insert_post( array( 'post_title' => 'AFS Tools', 'post_name' => 'afs-tools', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '[ajax_filter_search posts_per_page="5" show_sort="true" show_chips="true"]' ) );
+wp_insert_post( array( 'post_title' => 'AFS Classic', 'post_name' => 'afs-classic', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '[ajax_filter_search design="classic" posts_per_page="5" show_sort="true" show_chips="true"]' ) );
 wp_insert_post( array( 'post_title' => 'AFS Legacy', 'post_name' => 'afs-legacy', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '[ajax_filter_search filter_by="press-releases,events"]' ) );
 wp_insert_post( array( 'post_title' => 'AFS Block', 'post_name' => 'afs-block', 'post_type' => 'page', 'post_status' => 'publish', 'post_content' => '<!-- wp:ajax-filter-search/feed {"perPage":4,"showViews":"hide"} /-->' ) );
 

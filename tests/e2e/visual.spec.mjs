@@ -40,3 +40,15 @@ test( 'visual: empty state with recovery', async ( { page } ) => {
 	await expect( feed( page ) ).toHaveScreenshot( 'tools-empty.png' );
 } );
 
+// The Classic design (the 2.0 look) must keep looking the same: it has its own baselines.
+for ( const c of [ { name: 'classic-light-desktop', width: 1200 }, { name: 'classic-light-mobile', width: 390 } ] ) {
+	test( `visual: ${ c.name }`, async ( { browser } ) => {
+		const context = await browser.newContext( { viewport: { width: c.width, height: 900 }, locale: 'en-US', timezoneId: 'UTC' } );
+		const page = await context.newPage();
+		await page.goto( '/afs-classic/?afs_term=news&afs_year=2024' );
+		await settled( page );
+		await expect( feed( page ) ).toHaveScreenshot( `${ c.name }.png` );
+		await context.close();
+	} );
+}
+

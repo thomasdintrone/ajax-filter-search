@@ -88,12 +88,19 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'help'    => __( 'Adds noindex to a page when it is shown with a filter, search or page number in the address, so only the main page is indexed.', 'ajax-filter-search' ),
 					'default' => 1,
 				),
+				'afs_appearance_design'        => array(
+					'section' => self::SECTION_APPEARANCE,
+					'type'    => 'design',
+					'label'   => __( 'Design', 'ajax-filter-search' ),
+					'help'    => __( 'How feeds look. You can also choose a design for a single feed with the design attribute or the block setting.', 'ajax-filter-search' ),
+					'default' => AFS_Design::site_default(),
+				),
 				'afs_appearance_accent'        => array(
 					'section' => self::SECTION_APPEARANCE,
 					'type'    => 'color',
 					'label'   => __( 'Accent color', 'ajax-filter-search' ),
 					'help'    => __( 'Used for links, the active tab and the active page.', 'ajax-filter-search' ),
-					'default' => self::DEFAULT_ACCENT,
+					'default' => AFS_Design::default_accent(),
 				),
 			);
 		}
@@ -231,8 +238,11 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 			$layout                    = isset( $input['afs_general_layout'] ) ? sanitize_key( $input['afs_general_layout'] ) : 'list';
 			$out['afs_general_layout'] = in_array( $layout, array( 'list', 'grid' ), true ) ? $layout : 'list';
 
+			$design                       = isset( $input['afs_appearance_design'] ) ? sanitize_key( $input['afs_appearance_design'] ) : '';
+			$out['afs_appearance_design'] = AFS_Design::is_valid( $design ) ? $design : AFS_Design::site_default();
+
 			$color                        = isset( $input['afs_appearance_accent'] ) ? sanitize_hex_color( $input['afs_appearance_accent'] ) : '';
-			$out['afs_appearance_accent'] = $color ? $color : self::DEFAULT_ACCENT;
+			$out['afs_appearance_accent'] = $color ? $color : AFS_Design::default_accent();
 
 			return $out;
 		}
@@ -302,9 +312,24 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					break;
 
 				case 'yesno':
-					echo '<fieldset id="' . esc_attr( $id ) . '"><legend class="screen-reader-text">' . esc_html( $args['label'] ) . '</legend>';
-					printf( '<label><input type="radio" name="%s" value="1"%s> %s</label> &nbsp; ', esc_attr( $name ), checked( (int) $value, 1, false ), esc_html__( 'Yes', 'ajax-filter-search' ) );
-					printf( '<label><input type="radio" name="%s" value="0"%s> %s</label>', esc_attr( $name ), checked( (int) $value, 0, false ), esc_html__( 'No', 'ajax-filter-search' ) );
+					echo '<fieldset id="' . esc_attr( $id ) . '" class="afs-seg"><legend class="screen-reader-text">' . esc_html( $args['label'] ) . '</legend>';
+					printf( '<label class="afs-seg__opt"><input type="radio" name="%s" value="1"%s><span>%s</span></label>', esc_attr( $name ), checked( (int) $value, 1, false ), esc_html__( 'Yes', 'ajax-filter-search' ) );
+					printf( '<label class="afs-seg__opt"><input type="radio" name="%s" value="0"%s><span>%s</span></label>', esc_attr( $name ), checked( (int) $value, 0, false ), esc_html__( 'No', 'ajax-filter-search' ) );
+					echo '</fieldset>';
+					break;
+
+				case 'design':
+					echo '<fieldset id="' . esc_attr( $id ) . '" class="afs-design-picker"><legend class="screen-reader-text">' . esc_html( $args['label'] ) . '</legend>';
+					foreach ( AFS_Design::all() as $slug => $label ) {
+						printf(
+							'<label class="afs-design-option afs-design-option--%1$s"><input type="radio" name="%2$s" value="%1$s"%3$s><span class="afs-design-option__preview" aria-hidden="true">%5$s</span><span class="afs-design-option__name">%4$s</span></label>',
+							esc_attr( $slug ),
+							esc_attr( $name ),
+							checked( $value, $slug, false ),
+							esc_html( $label ),
+							self::design_preview( $slug ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static markup built in design_preview().
+						);
+					}
 					echo '</fieldset>';
 					break;
 
@@ -321,29 +346,147 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 						esc_attr( $id ),
 						esc_attr( $name ),
 						esc_attr( $value ),
-						esc_attr( self::DEFAULT_ACCENT )
+						esc_attr( AFS_Design::default_accent() )
 					);
 					break;
 			}
 
-			if ( ! empty( $args['help'] ) ) {
+			if ( ! empty( $args['help'] ) && empty( $args['no_help'] ) ) {
 				echo '<p class="description">' . esc_html( $args['help'] ) . '</p>';
 			}
+		}
+
+		/** Which fields belong to which card, in order. */
+		private static function groups() {
+			return array(
+				'feed'       => array(
+					'title'  => __( 'Feed', 'ajax-filter-search' ),
+					'intro'  => __( 'What a feed lists by default. Every feed can override these with shortcode attributes or the block settings.', 'ajax-filter-search' ),
+					'fields' => array( 'afs_general_post_type', 'afs_general_post_taxonomy', 'afs_general_posts_per_page', 'afs_general_layout' ),
+				),
+				'filters'    => array(
+					'title'  => __( 'Filters and controls', 'ajax-filter-search' ),
+					'intro'  => __( 'What visitors can use to narrow the results.', 'ajax-filter-search' ),
+					'fields' => array( 'afs_general_show_filters', 'afs_general_views', 'afs_general_show_sort', 'afs_general_show_chips' ),
+				),
+				'search'     => array(
+					'title'  => __( 'Search engines', 'ajax-filter-search' ),
+					'intro'  => __( 'Keep filtered views out of search results so only your main page is indexed.', 'ajax-filter-search' ),
+					'fields' => array( 'afs_general_noindex_filtered' ),
+				),
+				'appearance' => array(
+					'title'  => __( 'Appearance', 'ajax-filter-search' ),
+					'intro'  => __( 'How feeds look on your site.', 'ajax-filter-search' ),
+					'fields' => array( 'afs_appearance_design', 'afs_appearance_accent' ),
+				),
+			);
+		}
+
+		/** Small illustrations for the design picker (decorative). */
+		private static function design_preview( $slug ) {
+			if ( AFS_Design::MODERN === $slug ) {
+				return '<svg viewBox="0 0 160 104" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="160" height="104" fill="#f1f5f9"/><rect x="12" y="10" width="26" height="12" rx="6" fill="#2563eb"/><rect x="42" y="10" width="34" height="12" rx="6" fill="#fff" stroke="#e2e8f0"/><rect x="80" y="10" width="30" height="12" rx="6" fill="#fff" stroke="#e2e8f0"/><rect x="12" y="28" width="136" height="20" rx="7" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="35" width="44" height="6" rx="3" fill="#e2e8f0"/><rect x="12" y="54" width="136" height="20" rx="7" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="58" width="22" height="5" rx="2.5" fill="#dbe5fb"/><rect x="18" y="66" width="70" height="4" rx="2" fill="#94a3b8"/><rect x="12" y="78" width="136" height="20" rx="7" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="82" width="22" height="5" rx="2.5" fill="#dbe5fb"/><rect x="18" y="90" width="84" height="4" rx="2" fill="#94a3b8"/></svg>';
+			}
+			return '<svg viewBox="0 0 160 104" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="160" height="104" fill="#fff"/><rect x="12" y="12" width="16" height="5" rx="2" fill="#475569"/><rect x="12" y="20" width="16" height="2" fill="#f1b45c"/><rect x="38" y="12" width="22" height="5" rx="2" fill="#94a3b8"/><rect x="70" y="12" width="26" height="5" rx="2" fill="#94a3b8"/><rect x="12" y="23" width="136" height="1" fill="#e2e8f0"/><rect x="12" y="30" width="136" height="16" rx="3" fill="#f6f7f8"/><rect x="18" y="36" width="40" height="5" rx="2" fill="#e2e8f0"/><rect x="12" y="52" width="136" height="1" fill="#f1b45c"/><rect x="12" y="58" width="22" height="5" rx="2" fill="#475569"/><rect x="44" y="58" width="70" height="5" rx="2" fill="#475569"/><rect x="12" y="68" width="136" height="1" fill="#e2e8f0"/><rect x="12" y="74" width="22" height="5" rx="2" fill="#475569"/><rect x="44" y="74" width="84" height="5" rx="2" fill="#475569"/><rect x="12" y="84" width="136" height="1" fill="#e2e8f0"/><rect x="12" y="90" width="22" height="5" rx="2" fill="#475569"/><rect x="44" y="90" width="60" height="5" rx="2" fill="#475569"/></svg>';
 		}
 
 		public static function options_page() {
 			if ( ! current_user_can( AFS_CAPABILITIES ) ) {
 				return;
 			}
+			$fields = self::fields();
+			$icon   = AFS_PLUGIN_URL . '/admin/images/icon.svg';
 			?>
-			<div class="wrap">
-				<h1><?php echo esc_html( AFS_PAGE_TITLE ); ?></h1>
-				<form id="afs-form" action="options.php" method="post">
-					<?php
-					settings_fields( 'afs_settings_group' );
-					do_settings_sections( 'afs_settings_page' );
-					submit_button( __( 'Save Settings', 'ajax-filter-search' ) );
-					?>
+			<div class="wrap afs-admin">
+				<header class="afs-admin__header">
+					<img class="afs-admin__icon" src="<?php echo esc_url( $icon ); ?>" alt="" width="52" height="52">
+					<div class="afs-admin__title">
+						<h1><?php echo esc_html( AFS_PAGE_TITLE ); ?></h1>
+						<p><?php esc_html_e( 'Filterable, searchable posts with no page reload.', 'ajax-filter-search' ); ?></p>
+					</div>
+					<span class="afs-admin__version"><?php echo esc_html( 'v' . AFS_VERSION ); ?></span>
+				</header>
+
+				<form id="afs-form" class="afs-admin__form" action="options.php" method="post">
+					<?php settings_fields( 'afs_settings_group' ); ?>
+					<div class="afs-admin__shell">
+						<nav class="afs-admin__nav" aria-label="<?php esc_attr_e( 'Settings sections', 'ajax-filter-search' ); ?>">
+							<ul>
+								<li><a href="#afs-sec-start"><?php esc_html_e( 'Add to a page', 'ajax-filter-search' ); ?></a></li>
+								<?php foreach ( self::groups() as $group => $info ) : ?>
+									<li><a href="#afs-sec-<?php echo esc_attr( $group ); ?>"><?php echo esc_html( $info['title'] ); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+						</nav>
+
+						<div class="afs-admin__main">
+							<section class="afs-card" id="afs-sec-start" aria-labelledby="afs-h-start">
+								<h2 id="afs-h-start"><?php esc_html_e( 'Add to a page', 'ajax-filter-search' ); ?></h2>
+								<p class="afs-card__intro"><?php esc_html_e( 'Paste a shortcode into any page, or add the Ajax Filter Search block in the editor.', 'ajax-filter-search' ); ?></p>
+								<?php
+								foreach ( array(
+									'[ajax_filter_search]',
+									'[ajax_filter_search terms="news,events" posts_per_page="12" layout="grid"]',
+									'[ajax_filter_search show_sort="true" show_chips="true" design="classic"]',
+								) as $example ) {
+									printf(
+										'<div class="afs-copy"><code>%1$s</code><button type="button" class="afs-copy__btn" data-afs-copy="%1$s">%2$s</button></div>',
+										esc_attr( $example ),
+										esc_html__( 'Copy', 'ajax-filter-search' )
+									);
+								}
+								?>
+							</section>
+
+							<?php foreach ( self::groups() as $group => $info ) : ?>
+								<section class="afs-card" id="afs-sec-<?php echo esc_attr( $group ); ?>" aria-labelledby="afs-h-<?php echo esc_attr( $group ); ?>">
+									<h2 id="afs-h-<?php echo esc_attr( $group ); ?>"><?php echo esc_html( $info['title'] ); ?></h2>
+									<p class="afs-card__intro"><?php echo esc_html( $info['intro'] ); ?></p>
+									<?php
+									foreach ( $info['fields'] as $key ) {
+										if ( ! isset( $fields[ $key ] ) ) {
+											continue;
+										}
+										$field = $fields[ $key ];
+										?>
+										<div class="afs-row">
+											<div class="afs-row__label">
+												<?php if ( in_array( $field['type'], array( 'yesno', 'design' ), true ) ) : ?>
+													<?php // A fieldset is named by its legend; a label's "for" cannot point at it. ?>
+													<span class="afs-row__title"><?php echo esc_html( $field['label'] ); ?></span>
+												<?php else : ?>
+													<label for="afs-<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
+												<?php endif; ?>
+												<?php if ( ! empty( $field['help'] ) ) : ?>
+													<p class="description"><?php echo esc_html( $field['help'] ); ?></p>
+												<?php endif; ?>
+											</div>
+											<div class="afs-row__control">
+												<?php
+												self::render_field(
+													array_merge(
+														$field,
+														array(
+															'key'     => $key,
+															'no_help' => true,
+														)
+													)
+												);
+												?>
+											</div>
+										</div>
+										<?php
+									}
+									?>
+								</section>
+							<?php endforeach; ?>
+						</div>
+					</div>
+
+					<div class="afs-savebar">
+						<?php submit_button( __( 'Save Settings', 'ajax-filter-search' ), 'primary', 'submit', false ); ?>
+						<span class="afs-savebar__note" role="status" aria-live="polite"></span>
+					</div>
 				</form>
 			</div>
 			<?php
@@ -356,6 +499,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 			}
 
 			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_style( AFS_SUB . '-admin-style', AFS_PLUGIN_URL . '/admin/css/settings.css', array( 'wp-color-picker' ), AFS_VERSION );
 			wp_enqueue_script(
 				AFS_SUB . '-admin-script-js',
 				AFS_PLUGIN_URL . '/admin/js/admin.js',
@@ -374,6 +518,8 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 				array(
 					'taxonomies' => $map,
 					'none'       => __( 'None', 'ajax-filter-search' ),
+					'copied'     => __( 'Copied', 'ajax-filter-search' ),
+					'unsaved'    => __( 'You have unsaved changes.', 'ajax-filter-search' ),
 				)
 			);
 		}
