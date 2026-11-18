@@ -1,6 +1,6 @@
 # Release 2.2.0: checklist
 
-Status: **prepared, not published.** Nothing is tagged and nothing has been sent to WordPress.org. The steps below are for the person who owns the WordPress.org account; publishing is a manual, approved step (see `MAINTAINING.md`). The previous release is recorded in `RELEASE-2.1.0.md`.
+Status: **published** to WordPress.org as SVN r3809958 (trunk, `tags/2.2.0` and the banner, icons and ten screenshots in `assets/`) on 2026-11-18; Git tag `v2.2.0`. The steps below are kept as the record and as the template for the next release. The previous release is recorded in `RELEASE-2.1.0.md`.
 
 Package: `build/ajax-filter-search-2.2.0.zip` (built by `bin/build-zip.sh` from the tracked files and `.distignore`; the allowlist check passes).
 
