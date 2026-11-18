@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       Ajax Filter Search
+ * Plugin Name:       Ajax Filter Search: Filter Posts by Category, Date & Keyword
  * Plugin URI:        https://streetcarpro.com
- * Description:       Displays posts or custom post types in a friendly, filterable format using ajax.
- * Version:           2.2.0
+ * Description:       Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block, no setup code.
+ * Version:           2.2.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Thomas Dintrone
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'AFS_VERSION', '2.2.0' );
+define( 'AFS_VERSION', '2.2.1' );
 define( 'AFS_URL', 'https://streetcarpro.com' );
 
 // Options and slugs. Kept identical to 1.x so saved settings carry over.

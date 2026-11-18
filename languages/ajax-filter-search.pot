@@ -2,7 +2,7 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ajax Filter Search 2.2.0\n"
+"Project-Id-Version: Ajax Filter Search 2.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ajax-filter-search\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,9 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: ajax-filter-search.php
+msgid "Ajax Filter Search: Filter Posts by Category, Date & Keyword"
+msgstr ""
+
 #: includes/class-afs-migration.php:73
 msgid "Ajax Filter Search"
 msgstr ""
@@ -28,7 +31,7 @@ msgstr ""
 
 #. Description of the plugin
 #: ajax-filter-search.php
-msgid "Displays posts or custom post types in a friendly, filterable format using ajax."
+msgid "Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block, no setup code."
 msgstr ""
 
 #. Author of the plugin

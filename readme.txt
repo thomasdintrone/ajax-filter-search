@@ -1,15 +1,15 @@
-=== Ajax Filter Search ===
+=== Ajax Filter Search: Filter Posts by Category, Date & Keyword ===
 Contributors: longislandfreelancewebdesigner
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34C7NUYWTVYFA
-Tags: ajax filter, search posts, custom post type, pagination, shortcode
+Tags: ajax filter, filter posts, live search, category filter, custom post type
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Displays posts or custom post types in a friendly, filterable format using ajax so there's no page reload!
+Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block, no setup code.
 
 == Description ==
 
@@ -148,6 +148,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Changelog ==
 
+= 2.2.1 =
+* Improved: Clearer plugin name and description in search results and the Plugins list. No change to behavior, settings or output.
+
 = 2.2.0 =
 * New: Modern design with card-based results, pill tabs, a cleaner filter bar and a segmented layout switch. New installs get it by default. Sites that already use the plugin keep the Classic look until they choose Modern (Settings > Appearance, `design="modern"` on a feed, or the block's Design setting).
 * New: Redesigned settings screen with section navigation, a design picker, copyable example shortcodes and a sticky save bar.
@@ -208,6 +211,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Ajax Filter Search
 
 == Upgrade Notice ==
+
+= 2.2.1 =
+New plugin title, description and tags to make the plugin easier to find. No functional changes.
 
 = 2.2.0 =
 Adds an optional Modern design (the default for new installs) and a redesigned settings screen. Sites that already use the plugin keep the Classic look unless they switch. Also fixes a delayed duplicate request after submitting a search. Recommended.
