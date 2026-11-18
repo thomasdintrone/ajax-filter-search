@@ -43,7 +43,7 @@ The e2e stack uses the seeded content from `bin/seed-test-content.php` (the defa
 Test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and WordPress 6.0) and the latest stack when changing anything version-sensitive.
 
 ## Screenshots
-`docs/screenshots/seed-demo.php` builds a small fictional demo newsroom and `docs/screenshots/capture.mjs` takes the nine WordPress.org screenshots from it (needs Google Chrome, `npm ci --ignore-scripts`, and a stack on `http://localhost:8892`). Copy the results from `.cache/screenshots/` to `.wordpress-org/`, look at every image, and update the `== Screenshots ==` list in `readme.txt` to match.
+`docs/screenshots/seed-demo.php` builds a small fictional demo newsroom and `docs/screenshots/capture.mjs` takes the ten WordPress.org screenshots from it (needs Google Chrome, `npm ci --ignore-scripts`, and a stack on `http://localhost:8892`). Copy the results from `.cache/screenshots/` to `.wordpress-org/`, look at every image, and update the `== Screenshots ==` list in `readme.txt` to match.
 
 ## Release checklist
 1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and in `readme.txt` (Stable tag, Tested up to, changelog, Upgrade Notice).

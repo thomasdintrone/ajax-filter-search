@@ -5,7 +5,7 @@ Tags: ajax filter, search posts, custom post type, pagination, shortcode
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,7 @@ A visitor can filter your posts by search keyword, month, year and category to g
 * **Multiple feeds per page** - Every feed has its own post type, categories, layout and filters.
 * **Shareable links** - The first feed on a page keeps its filters and page number in the address bar, so a filtered view can be bookmarked or shared, and the back button works. It also works with JavaScript turned off.
 * **Fast, light front end** - Plain JavaScript (no jQuery), a small stylesheet, and assets that load only on pages that contain a feed. No external fonts or icon libraries.
+* **Modern and Classic designs** - A clean, card-based Modern design for new installs and the original Classic look for sites that already use the plugin. Choose one site wide or per feed.
 * **Sort and filter chips (optional)** - Let visitors sort by newest, oldest, A to Z, recently updated or most commented, and show the active filters as removable chips with a Clear all link. Both are off until you turn them on.
 * **RSS feed for any view** - Every filter state has its own RSS 2.0 feed at `/wp-json/afs/v1/feed`, built from the same query as the results and listing published posts only.
 * **Accessible** - Labeled form fields, keyboard friendly tabs and buttons, live-region updates and a current-page indicator.
@@ -49,6 +50,7 @@ All attributes are optional. Anything you leave out uses the setting from Settin
 * `orderby` - `date`, `title` or `modified`. `order` - `DESC` or `ASC`.
 * `search` - a keyword to start with. `filter_years` / `filter_months` - start on a year (for example 2025) or month (1 to 12).
 * `show_tabs`, `show_views`, `show_search`, `show_months`, `show_years` - `true` or `false`.
+* `design` - `modern` or `classic`. Overrides the Appearance setting for this feed.
 * `show_sort`, `show_chips` - `true` or `false`. The sort control and the active filter chips are off unless you turn them on here, in the block, or under Settings.
 
 = Please Rate Ajax Filter Search! =
@@ -95,6 +97,10 @@ Yes. Copy `afs-template/default.php` from the plugin folder into `your-theme/afs
 
 No. Version 1.x loaded Font Awesome from a CDN on every page. Version 2.0.0 loads nothing external.
 
+= Can I keep the old look? =
+
+Yes. The Classic design is the look of earlier versions, and sites that already use the plugin keep it. New installs start with the Modern design. Change it under Settings > Ajax Filter Search > Appearance, or for one feed with `design="classic"` or `design="modern"` (the block has a Design setting too).
+
 = How do I change the colors? =
 
 Pick the accent color under Settings > Ajax Filter Search. For more control, set CSS variables in your theme, for example `.afs { --afs-accent: #0a7; --afs-radius: 0; }`.
@@ -129,17 +135,24 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Screenshots ==
 
-1. The default feed: category tabs, search, month and year filters, list view.
+1. The default feed in the Modern design: category tabs, search, month and year filters, list view.
 2. Filtered results, with the filters kept in the address bar so the view can be shared.
 3. Grid layout.
 4. Two feeds with different settings on one page.
-5. The settings screen, including the optional sort control, filter chips and the noindex setting.
+5. The redesigned settings screen, with a design picker, copyable shortcodes and the optional sort, filter chip and noindex settings.
 6. The "Ajax Filter Search" block in the editor, with a live preview and controls, including the sort and filter chip options.
 7. The feed on a phone.
 8. The optional sort control and active filter chips, with Clear all.
 9. An empty result, with a link to clear the filters.
+10. The Classic design, the look of earlier versions.
 
 == Changelog ==
+
+= 2.2.0 =
+* New: Modern design with card-based results, pill tabs, a cleaner filter bar and a segmented layout switch. New installs get it by default. Sites that already use the plugin keep the Classic look until they choose Modern (Settings > Appearance, `design="modern"` on a feed, or the block's Design setting).
+* New: Redesigned settings screen with section navigation, a design picker, copyable example shortcodes and a sticky save bar.
+* Improved: Text on the accent color is now white or dark depending on the color you choose, so buttons stay readable with any accent, in both designs.
+* Fix: Submitting a search no longer sends a second, delayed request that could undo a click on a tab or page link made right afterwards.
 
 = 2.1.0 =
 * New: Optional sort control (newest, oldest, A to Z, recently updated, most commented). Turn it on with `show_sort="true"`, the block control or Settings.
@@ -195,6 +208,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Ajax Filter Search
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+Adds an optional Modern design (the default for new installs) and a redesigned settings screen. Sites that already use the plugin keep the Classic look unless they switch. Also fixes a delayed duplicate request after submitting a search. Recommended.
 
 = 2.1.0 =
 Adds optional sort, filter chips and an RSS feed (all off by default), cache validators for the results endpoint and noindex for filtered views. Existing feeds render as before. A site filter can no longer widen the post status beyond published. Recommended.
