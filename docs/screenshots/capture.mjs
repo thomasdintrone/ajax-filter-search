@@ -90,7 +90,7 @@ await Promise.all( [ admin.waitForURL( /wp-admin/ ), admin.click( '#wp-submit' )
 
 await admin.goto( `${ BASE }/wp-admin/options-general.php?page=ajax-filter-search` ); await settle( admin );
 await admin.addStyleTag( { content: '.afs-savebar{position:static!important;box-shadow:none!important}' } ); // A full-page capture would otherwise float it mid-page.
-await admin.screenshot( { path: path.join( OUT, 'screenshot-5.png' ), fullPage: true, clip: { x: 0, y: 0, width: 1280, height: 1700 } } );
+await admin.screenshot( { path: path.join( OUT, 'screenshot-5.png' ), fullPage: true, clip: { x: 0, y: 0, width: 1280, height: 2150 } } );
 
 await admin.goto( `${ BASE }/wp-admin/edit.php?post_type=page&post_status=draft` );
 const href = await admin.locator( 'a.row-title:has-text("Block demo")' ).first().getAttribute( 'href' );
