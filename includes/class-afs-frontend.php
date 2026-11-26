@@ -78,6 +78,10 @@ class AFS_Frontend {
 		wp_register_script( 'afs-script', AFS_PLUGIN_URL . '/public/js/afs.js', array(), AFS_VERSION, true );
 		// The Modern design's rules, loaded only for feeds that use it.
 		wp_register_style( 'afs-modern', AFS_PLUGIN_URL . '/public/css/afs-modern.css', array( 'afs-styles' ), AFS_VERSION );
+		// The Editorial Grid and Resource Library: one shared base (controls, chips, states) plus one file per design.
+		wp_register_style( 'afs-discovery', AFS_PLUGIN_URL . '/public/css/afs-discovery.css', array( 'afs-styles' ), AFS_VERSION );
+		wp_register_style( 'afs-editorial', AFS_PLUGIN_URL . '/public/css/afs-editorial.css', array( 'afs-discovery' ), AFS_VERSION );
+		wp_register_style( 'afs-library', AFS_PLUGIN_URL . '/public/css/afs-library.css', array( 'afs-discovery' ), AFS_VERSION );
 	}
 
 	/** Enqueue (once) the CSS and JS, plus the settings the script needs. */
@@ -92,6 +96,15 @@ class AFS_Frontend {
 			wp_enqueue_style( 'afs-modern' );
 			// Text on the accent colour (buttons, the active tab) is white or dark, whichever reads better on it.
 			wp_add_inline_style( 'afs-modern', '.afs-design-modern{--afs-on-accent:' . AFS_Design::on_colour( AFSAdmin::afs_retrieve( '_appearance_accent' ) ) . ';}' );
+		}
+
+		if ( AFS_Design::is_discovery( $design ) ) {
+			if ( ! wp_style_is( 'afs-discovery', 'enqueued' ) ) {
+				wp_enqueue_style( 'afs-discovery' );
+				// Text on the accent colour (the active tab, pressed buttons) is white or dark, whichever reads better on it.
+				wp_add_inline_style( 'afs-discovery', '.afs-discovery{--afs-on-accent:' . AFS_Design::on_colour( AFSAdmin::afs_retrieve( '_appearance_accent' ) ) . ';}' );
+			}
+			wp_enqueue_style( 'afs-' . $design );
 		}
 
 		if ( self::$rendered > 0 ) {
@@ -242,6 +255,6 @@ class AFS_Frontend {
 		$result = AFS_Renderer::render_results( $config, $state, AFS_Renderer::current_url() );
 		++self::$rendered;
 
-		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . esc_attr( AFS_Design::root_class( $config['design'] ) ) . '"><div class="afs-results">' . $result['html'] . '</div></div>';
+		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . esc_attr( AFS_Design::root_class( $config['design'] ) ) . '"' . ( AFS_Design::is_discovery( $config['design'] ) ? ' style="' . esc_attr( AFS_Card::css_vars( $config ) ) . '"' : '' ) . '><div class="afs-results">' . $result['html'] . '</div></div>';
 	}
 }

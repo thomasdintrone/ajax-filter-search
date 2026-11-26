@@ -1,0 +1,143 @@
+/**
+ * Ajax Filter Search: Resource Library items (compact rows). Builds on afs-discovery.css.
+ *
+ * Always a list: the Grid/List switch is hidden. A row has an optional square thumbnail, the title with a one-line
+ * excerpt, and a column with the category badge and date. The image ratio option does not apply to thumbnails.
+ */
+
+.afs-design-library .afs-Switch {
+	display: none !important;
+}
+
+.afs-design-library .afs-items {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	border: 1px solid var(--afs-border);
+	border-radius: var(--afs-radius);
+	overflow: hidden;
+}
+
+.afs-design-library .afs-items .afs-item.afs-row {
+	display: grid;
+	grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.9rem 1.1rem;
+	border: 0;
+	border-top: 1px solid var(--afs-border);
+	border-radius: 0;
+}
+
+.afs-design-library .afs-items .afs-item.afs-row:first-child {
+	border-top: 0;
+}
+
+.afs-design-library .afs-items .afs-item.afs-row.afs-row--nothumb {
+	grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.afs-design-library .afs-img {
+	display: block;
+	width: 3.5rem;
+	height: 3.5rem;
+	overflow: hidden;
+	border-radius: var(--afs-radius-sm);
+	background: var(--afs-soft);
+}
+
+.afs-design-library .afs-img__el {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.afs-design-library .afs-row__main {
+	min-width: 0;
+}
+
+.afs-design-library .afs-row h3 {
+	margin: 0;
+	font-size: 1.05em;
+	font-weight: 650;
+	letter-spacing: -0.01em;
+	line-height: 1.3;
+}
+
+.afs-design-library .afs-row h3 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.afs-design-library .afs-row h3 a:hover {
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.15em;
+}
+
+.afs-design-library .afs-excerpt {
+	margin: 0.15rem 0 0;
+	overflow: hidden;
+	color: var(--afs-muted);
+	font-size: 0.88em;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.afs-design-library .afs-row__side {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.3rem;
+	color: var(--afs-muted);
+	font-size: 0.8125em;
+	white-space: nowrap;
+}
+
+.afs-design-library .afs-badge {
+	padding: 0.15rem 0.55rem;
+	border-radius: 6px;
+	background: var(--afs-tint);
+	color: inherit;
+	font-size: 0.6875rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.afs-design-library .afs-items .afs-item.afs-row:hover,
+.afs-design-library .afs-items .afs-item.afs-row:focus-within {
+	background: var(--afs-soft);
+}
+
+@media (max-width: 640px) {
+	.afs-design-library .afs-items .afs-item.afs-row {
+		grid-template-columns: 3rem minmax(0, 1fr);
+		gap: 0.5rem 0.75rem;
+		padding: 0.85rem 1rem;
+	}
+
+	.afs-design-library .afs-items .afs-item.afs-row.afs-row--nothumb {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.afs-design-library .afs-img {
+		width: 3rem;
+		height: 3rem;
+	}
+
+	.afs-design-library .afs-excerpt {
+		display: -webkit-box;
+		white-space: normal;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+
+	.afs-design-library .afs-row__side {
+		grid-column: 1 / -1;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+}

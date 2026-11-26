@@ -346,7 +346,7 @@ class AFS_Renderer {
 
 		ob_start();
 		?>
-		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo esc_attr( AFS_Design::root_class( $config['design'] ) ); ?>" data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
+		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo esc_attr( AFS_Design::root_class( $config['design'] ) ); ?>"<?php echo AFS_Design::is_discovery( $config['design'] ) ? ' style="' . esc_attr( AFS_Card::css_vars( $config ) ) . '"' : ''; ?> data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
 			<h2 class="afs-sr-only"><?php echo esc_html( self::label( __( 'Filterable posts', 'ajax-filter-search' ), $n ) ); ?></h2>
 			<form<?php echo $legacy ? ' id="newsForm"' : ''; ?> class="afs-form" method="get" action="<?php echo esc_url( $base ); ?>" role="search" aria-label="<?php echo esc_attr( self::label( __( 'Filter posts', 'ajax-filter-search' ), $n ) ); ?>">
 				<?php
@@ -494,13 +494,37 @@ class AFS_Renderer {
 
 		ob_start();
 
-		if ( $config['show_chips'] ) {
-			echo self::chips( $config, $state, $base, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in chips().
+		$own = AFS_Design::has_own_markup( $config['design'] );
+
+		$count_html = '';
+		if ( $query->have_posts() ) {
+			$first      = ( ( $state['paged'] - 1 ) * $config['per_page'] ) + 1;
+			$last       = min( $found, $state['paged'] * $config['per_page'] );
+			$count_html = sprintf(
+				'<p class="afs-count">%s</p>',
+				sprintf(
+					/* translators: 1: first result number, 2: last result number, 3: total results. */
+					esc_html__( 'Displaying %1$s to %2$s (of %3$s)', 'ajax-filter-search' ),
+					'<span class="afs-first">' . esc_html( number_format_i18n( $first ) ) . '</span>',
+					'<span class="afs-last">' . esc_html( number_format_i18n( $last ) ) . '</span>',
+					'<span class="afs-total">' . esc_html( number_format_i18n( $found ) ) . '</span>'
+				)
+			);
+		}
+
+		$chips_html = $config['show_chips'] ? self::chips( $config, $state, $base, $instance ) : '';
+
+		if ( $own ) {
+			// A design with its own markup groups the active filters and the result count in one bar above the items.
+			if ( '' !== $chips_html || '' !== $count_html ) {
+				echo '<div class="afs-resultbar">' . $chips_html . $count_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped where built.
+			}
+		} else {
+			echo $chips_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in chips().
 		}
 
 		if ( $query->have_posts() ) {
 			// A design with its own item markup supplies its own item wrapper classes and has no table header.
-			$own     = AFS_Design::has_own_markup( $config['design'] );
 			$options = $own ? AFS_Card::template_options( $config ) : array();
 			if ( $own ) {
 				if ( ! empty( $options['show_image'] ) ) {
@@ -524,18 +548,9 @@ class AFS_Renderer {
 			echo '</div>';
 			wp_reset_postdata();
 
-			$first = ( ( $state['paged'] - 1 ) * $config['per_page'] ) + 1;
-			$last  = min( $found, $state['paged'] * $config['per_page'] );
-			printf(
-				'<p class="afs-count">%s</p>',
-				sprintf(
-					/* translators: 1: first result number, 2: last result number, 3: total results. */
-					esc_html__( 'Displaying %1$s to %2$s (of %3$s)', 'ajax-filter-search' ),
-					'<span class="afs-first">' . esc_html( number_format_i18n( $first ) ) . '</span>',
-					'<span class="afs-last">' . esc_html( number_format_i18n( $last ) ) . '</span>',
-					'<span class="afs-total">' . esc_html( number_format_i18n( $found ) ) . '</span>'
-				) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pieces are escaped above.
-			);
+			if ( ! $own ) {
+				echo $count_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped where built.
+			}
 			echo self::pagination( $pages, $state, $base, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in pagination().
 		} else {
 			echo '<p class="afs-none">' . esc_html__( 'No results found.', 'ajax-filter-search' ) . '</p>';
