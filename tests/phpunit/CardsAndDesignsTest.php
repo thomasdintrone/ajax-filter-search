@@ -53,6 +53,30 @@ class CardsAndDesignsTest extends AFS_Test_Case {
 		}
 	}
 
+	public function test_a_classic_or_modern_feed_on_a_site_with_a_new_design_sends_its_own_design() {
+		update_option( AFS_SETTINGS, array_merge( AFSAdmin::defaults(), array( 'afs_appearance_design' => 'editorial' ) ) );
+		foreach ( array( 'classic', 'modern' ) as $design ) {
+			$config = $this->client_config( '[ajax_filter_search design="' . $design . '"]' );
+			$this->assertSame( $design, $config['design'], 'Without it the results route would render the site design\'s items' );
+			$this->assertArrayNotHasKey( 'show_image', $config, 'Only the design is sent, not the card options' );
+
+			$html = $this->results( array_merge( $config, array( 'posts_per_page' => 3 ) ) )['html'];
+			$this->assertStringContainsString( 'afs-TableRowItem', $html, $design . ' results keep the default markup' );
+			$this->assertStringNotContainsString( 'afs-card__body', $html );
+		}
+		// The same feed asked without its design shows why it is sent.
+		$this->assertStringContainsString( 'afs-card__body', $this->results( array( 'posts_per_page' => 3 ) )['html'] );
+	}
+
+	public function test_on_a_classic_or_modern_site_a_feed_sends_nothing_extra() {
+		foreach ( array( 'classic', 'modern' ) as $site ) {
+			update_option( AFS_SETTINGS, array_merge( AFSAdmin::defaults(), array( 'afs_appearance_design' => $site ) ) );
+			foreach ( array( 'classic', 'modern' ) as $design ) {
+				$this->assertArrayNotHasKey( 'design', $this->client_config( '[ajax_filter_search design="' . $design . '"]' ), $site . ' site, ' . $design . ' feed' );
+			}
+		}
+	}
+
 	public function test_classic_items_keep_the_table_header_and_row_classes() {
 		$this->reset_widget_counters();
 		$html = do_shortcode( '[ajax_filter_search design="classic" show_image="true"]' );

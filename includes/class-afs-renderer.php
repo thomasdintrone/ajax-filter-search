@@ -340,9 +340,14 @@ class AFS_Renderer {
 			$client['show_chips'] = '1';
 		}
 		// A design with its own item markup must produce the same items on page load and through the REST route, so the
-		// design and its card options travel with every request. Classic and Modern send nothing extra.
+		// design and its card options travel with every request. Classic and Modern send nothing extra (see below).
 		if ( AFS_Design::has_own_markup( $config['design'] ) ) {
 			$client = array_merge( $client, array( 'design' => $config['design'] ), AFS_Card::client_options( $config ) );
+		} elseif ( AFS_Design::has_own_markup( AFS_Design::resolve( '' ) ) ) {
+			// A Classic or Modern feed on a site whose own design is one of the new ones must say so: left out, the results
+			// route would fall back to the site design and render that design's items inside this feed. On every other site
+			// nothing extra is sent, so a Classic or Modern feed's markup stays exactly as it was.
+			$client['design'] = $config['design'];
 		}
 
 		$tabs = array();

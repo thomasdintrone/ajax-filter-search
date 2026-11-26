@@ -69,12 +69,20 @@ test.describe( 'onboarding', () => {
 		expect( look.radius ).not.toBe( '0px' );
 	} );
 
-	test( 'a feed that names its design is not changed by the site design', async ( { page } ) => {
+	test( 'a feed that names its design is not changed by the site design, on first load or after an update', async ( { page } ) => {
 		await chooseDesign( page, 'editorial' );
 		await page.goto( '/afs-classic/' );
 		await settled( page );
 		await expect( feed( page ) ).not.toHaveClass( /afs-design-editorial/ );
 		await expect( feed( page ).locator( '.afs-card' ) ).toHaveCount( 0 );
+		// The same through AJAX: the results must keep this feed's own markup, not the site design's cards.
+		await feed( page ).locator( 'input[name="afs_s"]' ).fill( 'Announcement' );
+		await settled( page );
+		await expect( feed( page ).locator( '.afs-TableRowItem' ).first() ).toBeVisible();
+		await expect( feed( page ).locator( '.afs-card, .afs-card__body, .afs-img' ) ).toHaveCount( 0 );
+		await feed( page ).locator( '.afs-Tabs a[data-afs-term="news"]' ).click();
+		await settled( page );
+		await expect( feed( page ).locator( '.afs-card, .afs-card__body, .afs-img' ) ).toHaveCount( 0 );
 	} );
 } );
 

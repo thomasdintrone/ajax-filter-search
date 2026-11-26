@@ -131,8 +131,8 @@ class AFS_Announcement {
 			</div>
 
 			<div class="afs-news__shots" aria-hidden="true">
-				<div class="a"><img src="<?php echo esc_url( $img . 'whatsnew-editorial.webp' ); ?>" alt="" width="760" height="418" loading="lazy" decoding="async"></div>
-				<div class="b"><img src="<?php echo esc_url( $img . 'whatsnew-library.webp' ); ?>" alt="" width="760" height="380" loading="lazy" decoding="async"></div>
+				<div class="a"><img src="<?php echo esc_url( $img . 'whatsnew-editorial.webp' ); ?>" alt="" width="760" height="371" loading="lazy" decoding="async"></div>
+				<div class="b"><img src="<?php echo esc_url( $img . 'whatsnew-library.webp' ); ?>" alt="" width="760" height="331" loading="lazy" decoding="async"></div>
 			</div>
 		</section>
 		<?php

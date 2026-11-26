@@ -208,6 +208,11 @@
 	margin-left: 0;
 }
 
+/* The block editor's preview has no script to hide the Update button (every control applies as it changes on the front end). */
+.editor-styles-wrapper .afs-discovery .afs-update {
+	display: none;
+}
+
 /* Reset is shown only when a filter is active and the active-filter chips (with their own Clear all) are off. */
 .afs-discovery .afs-reset {
 	display: none;
