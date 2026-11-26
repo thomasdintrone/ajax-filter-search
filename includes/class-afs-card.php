@@ -149,10 +149,9 @@ class AFS_Card {
 	 *
 	 * @param string $design  Design slug.
 	 * @param array  $options Template options.
-	 * @param mixed  $post    Post, ID or null for the current post.
 	 * @return string[]
 	 */
-	public static function item_classes( $design, $options, $post = null ) {
+	public static function item_classes( $design, $options ) {
 		$classes = array( 'afs-item', AFS_Design::item_class( $design ) );
 		if ( AFS_Design::LIBRARY === $design && empty( $options['show_image'] ) ) {
 			$classes[] = 'afs-row--nothumb';

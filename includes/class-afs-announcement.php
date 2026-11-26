@@ -23,7 +23,7 @@ class AFS_Announcement {
 	/** Site option: set on a fresh install to the id of the announcement it never needs to see. */
 	const OPTION = 'afs_whatsnew_site';
 
-	/** admin-post action that records a dismissal. */
+	/** The admin-post action that records a dismissal. */
 	const ACTION = 'afs_dismiss_whatsnew';
 
 	/** Release notes: the changelog on the plugin's WordPress.org page. */
@@ -74,7 +74,7 @@ class AFS_Announcement {
 		return false;
 	}
 
-	/** admin-post handler for the two dismiss buttons (with JavaScript they are sent in the background). */
+	/** The admin-post handler for the two dismiss buttons (with JavaScript they are sent in the background). */
 	public static function handle_dismiss() {
 		if ( ! current_user_can( AFS_CAPABILITIES ) ) {
 			wp_die( esc_html__( 'You are not allowed to do that.', 'ajax-filter-search' ), '', array( 'response' => 403 ) );
