@@ -53,6 +53,18 @@
 	object-fit: cover;
 }
 
+.afs-design-library .afs-img--none {
+	display: grid;
+	place-items: center;
+	border: 1px solid var(--afs-border);
+	background: linear-gradient(135deg, var(--afs-tint), transparent 80%);
+}
+
+.afs-design-library .afs-img__mono {
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
 .afs-design-library .afs-row__main {
 	min-width: 0;
 }
@@ -109,6 +121,17 @@
 .afs-design-library .afs-items .afs-item.afs-row:hover,
 .afs-design-library .afs-items .afs-item.afs-row:focus-within {
 	background: var(--afs-soft);
+}
+
+@supports selector(:has(*)) {
+	.afs-design-library .afs-row:has(a:focus-visible) {
+		outline: 2px solid currentColor;
+		outline-offset: -2px;
+	}
+
+	.afs-design-library .afs-row a:focus-visible {
+		outline: none;
+	}
 }
 
 @media (max-width: 640px) {

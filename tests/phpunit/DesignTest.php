@@ -140,7 +140,7 @@ class DesignTest extends AFS_Test_Case {
 
 	public function test_the_settings_screen_has_a_card_for_each_group_and_every_field_once() {
 		$html = $this->settings_html();
-		$this->assertSame( 1, substr_count( $html, '<h1>' ) );
+		$this->assertSame( 1, substr_count( $html, '<h1' ) );
 		foreach ( array( 'start', 'feed', 'filters', 'search', 'appearance', 'cards' ) as $id ) {
 			$this->assertStringContainsString( 'id="afs-sec-' . $id . '"', $html );
 			$this->assertStringContainsString( 'href="#afs-sec-' . $id . '"', $html );

@@ -38,14 +38,37 @@
 	object-fit: cover;
 }
 
-/* No image: a tinted tile with the category's first letter. */
+/* No image: a soft tinted tile with a faint dot pattern and a monogram badge (the category's first letter). */
 .afs-design-editorial .afs-img--none {
+	position: relative;
 	display: grid;
 	place-items: center;
-	background: var(--afs-tint);
-	font-size: 2.25rem;
+	background: linear-gradient(135deg, var(--afs-tint), transparent 75%);
+	background-color: var(--afs-soft);
+}
+
+.afs-design-editorial .afs-img--none::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(circle, var(--afs-border) 1.2px, transparent 1.7px) 0 0 / 14px 14px;
+	-webkit-mask-image: linear-gradient(135deg, transparent 30%, #000);
+	mask-image: linear-gradient(135deg, transparent 30%, #000);
+}
+
+.afs-design-editorial .afs-img__mono {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 4.2rem;
+	height: 4.2rem;
+	border: 1px solid var(--afs-border);
+	border-radius: 18px;
+	background: var(--afs-soft);
+	font-size: 1.8rem;
 	font-weight: 700;
-	opacity: 0.9;
+	letter-spacing: -0.02em;
+	box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.35);
 }
 
 .afs-design-editorial .afs-card__body {
@@ -139,7 +162,24 @@
 	}
 }
 
-.afs-design-editorial .afs-items .afs-item.afs-card:hover,
+/* Hover: a firmer border and a soft shadow. */
+.afs-design-editorial .afs-items .afs-item.afs-card:hover {
+	border-color: var(--afs-muted);
+	box-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.4);
+}
+
+/* Keyboard focus: a clear ring around the whole card where the browser supports :has(), else around the link. */
 .afs-design-editorial .afs-items .afs-item.afs-card:focus-within {
-	border-color: currentColor;
+	border-color: var(--afs-muted);
+}
+
+@supports selector(:has(*)) {
+	.afs-design-editorial .afs-card:has(a:focus-visible) {
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
+	}
+
+	.afs-design-editorial .afs-card a:focus-visible {
+		outline: none;
+	}
 }

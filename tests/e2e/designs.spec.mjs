@@ -51,9 +51,15 @@ for ( const d of DESIGNS ) {
 			await settled( page );
 			const title = feed( page ).locator( `${ d.item } h3 a` ).first();
 			await title.focus();
+			await page.keyboard.press( 'Shift+Tab' );
+			await page.keyboard.press( 'Tab' );
 			await expect( title ).toBeFocused();
-			const outline = await title.evaluate( ( el ) => getComputedStyle( el ).outlineStyle );
-			expect( outline ).not.toBe( 'none' );
+			// A visible focus indicator: a ring around the whole card (where :has() is supported) or on the link itself.
+			const ring = await title.evaluate( ( el ) => {
+				const card = el.closest( '.afs-item' );
+				return [ getComputedStyle( el ).outlineStyle, getComputedStyle( card ).outlineStyle ];
+			} );
+			expect( ring.some( ( style ) => style !== 'none' ) ).toBe( true );
 		} );
 	} );
 }

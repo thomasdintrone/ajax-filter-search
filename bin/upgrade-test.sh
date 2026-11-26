@@ -2,7 +2,9 @@
 # Upgrade test: install a published release, seed content and settings, replace the plugin with the build from this
 # working tree (as a WordPress update would), and check nothing broke.
 #   bin/upgrade-test.sh 1.0.4      a site coming from the last 1.x release
-#   bin/upgrade-test.sh 2.0.0      a site on the current release; output must be identical after the upgrade
+#   bin/upgrade-test.sh 2.0.0      a site coming from 2.0.0 or later: pages and REST output must be identical after the upgrade
+#   bin/upgrade-test.sh 2.2.2      the same, from the latest release (2.1.0 and later on a Classic site; add AFS_TEST_MODERN=1
+#                                  to test a site that had chosen the Modern design)
 # Needs Docker and internet access (downloads the release from wordpress.org). Uses port 8895 (AFS_UPGRADE_PORT).
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -39,13 +41,14 @@ check "release $BASE is installed and active" active "$(wp plugin get ajax-filte
 wp eval-file - < bin/seed-test-content.php | tail -1
 SETTINGS='{"afs_general_post_type":"post","afs_general_post_taxonomy":"category","afs_general_posts_per_page":"7","afs_general_show_filters":"1","afs_general_views":"1"}'
 wp option update afs_settings "$SETTINGS" --format=json >/dev/null
+[ -z "${AFS_TEST_MODERN:-}" ] || wp option update afs_default_design modern >/dev/null
 before_settings="$(wp option get afs_settings --format=json)"
 
 pages=( afs-single afs-double afs-legacy )
 for p in "${pages[@]}"; do curl -s "$B/$p/" | norm > "$tmp/before-$p.txt"; done
 rest_before=""
 # 1.x has no REST route, so there is nothing to compare before the upgrade.
-[ "$BASE" != "2.0.0" ] || rest_before="$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
+[ "$BASE" == "1.0.4" ] || rest_before="$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
 echo "-- on $BASE: single page lists $(curl -s "$B/afs-single/" | items) items"
 
 # Anything the OLD release logged is its own business; only entries after the swap count.
@@ -72,8 +75,8 @@ fatals="$(printf '%s\n' "$log" | grep -ciE 'PHP (Fatal|Parse)|PHP (Warning|Notic
 [ "$fatals" == "0" ] || printf '%s\n' "$log" | grep -iE 'PHP (Fatal|Parse|Warning|Notice|Deprecated)' | head -5
 check "no PHP fatals, or warnings from the plugin, in the log" 0 "$fatals"
 
-if [ "$BASE" == "2.0.0" ]; then
-	echo "-- 2.0.0 to this build: output must be identical"
+if [ "$BASE" != "1.0.4" ]; then
+	echo "-- $BASE to this build: output must be identical"
 	for p in "${pages[@]}"; do check "$p output identical" "$(cat "$tmp/before-$p.txt")" "$(curl -s "$B/$p/" | norm)"; done
 	# afs-single page size changed? settings were identical, so the markup must be too
 	check "REST output identical (2.0.0 keys)" "$rest_before" "$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"

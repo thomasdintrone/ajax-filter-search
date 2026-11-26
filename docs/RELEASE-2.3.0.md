@@ -1,6 +1,6 @@
 # Release 2.3.0: checklist
 
-Status: **prepared, not published.** Follows the steps in `RELEASE-2.2.0.md` (the SVN commit is the owner's). The previous release is recorded in `RELEASE-2.2.0.md` to `RELEASE-2.2.2.md`; the scope this release was built from is `SCOPE-2.3.0.md`.
+Status: **being refined, not published.** The 2.3.0 visual review (`PROPOSAL-2.3.0-REFINEMENTS.md`) added refinements to the two new designs, the Cards settings and an announcement card; they are on the branch that carries this file. The screenshots, the two announcement thumbnails (`admin/images/whatsnew-*.webp`) and the translation template still have to be retaken or refreshed once the photography for the demo is decided, and the SVN copy has to be staged again. Until then do not publish from any earlier staging. Follows the steps in `RELEASE-2.2.0.md` (the SVN commit is the owner's). The previous release is recorded in `RELEASE-2.2.0.md` to `RELEASE-2.2.2.md`; the scope this release was built from is `SCOPE-2.3.0.md`.
 
 Package: `build/ajax-filter-search-2.3.0.zip` (built by `bin/build-zip.sh` from the tracked files and `.distignore`; the allowlist check passes).
 
@@ -12,6 +12,9 @@ Package: `build/ajax-filter-search-2.3.0.zip` (built by `bin/build-zip.sh` from 
 - **Block:** a Cards panel (only for designs with their own markup), a searchable term picker (stores the same comma-separated slugs as before), and two block patterns (Editorial Grid, Resource Library) in an "Ajax Filter Search" inserter category.
 - **Design and card options travel with every request** for the new designs, so the first page and the AJAX results render the same items (a contract test and a browser test cover it). Classic and Modern send nothing extra.
 - **Security:** a password-protected post never shows its image or excerpt; drafts, private and future posts stay out; the cache version also changes when a featured image or attachment changes.
+- **Refinements from the visual review (the two new designs only):** one compact toolbar with the layout switch beside the tabs as icon buttons; a search placeholder; Reset only when it is the one way to clear filters; one clear action in an empty result; aligned Resource Library rows; a refined missing-image tile; hover and keyboard focus rings; a tighter phone layout (the plugin's controls before the first result drop from 457px to about 270px; the collapsible mobile filter panel is a later milestone).
+- **Cards settings:** dependent options hide with their parent and keep their saved values; the time is part of the date; the card folds when the site's design is not one of the new ones; the block shows the current default next to "Use plugin setting".
+- **"What's new" card** on the settings screen for existing sites (admin only, dismissible per user, no outside requests, never on a fresh install).
 - **Developers:** `afs_register_design` is now read (a design can name its own item template and class; a built-in slug cannot be replaced; template names must be plain file names); `afs_register_patterns` turns the patterns off; `return_template()` takes an optional options argument.
 - **Screenshots:** all ten retaken from the demo content (`docs/screenshots/`). The capture script now waits for each feed to finish loading; the 2.2.x screenshot 2 had been taken while a request was still in flight (the dimmed 2026 results beside "2025").
 
@@ -29,7 +32,7 @@ Nothing changes on update. Classic and Modern feeds render exactly as before (th
 
 ## Files that differ from 2.2.2 (the shipping set)
 
-Added (7): `afs-template/editorial.php`, `afs-template/library.php`, `includes/class-afs-card.php`, `includes/class-afs-patterns.php`, `public/css/afs-discovery.css`, `public/css/afs-editorial.css`, `public/css/afs-library.css`.
+Added (10): `afs-template/editorial.php`, `afs-template/library.php`, `includes/class-afs-card.php`, `includes/class-afs-patterns.php`, `includes/class-afs-announcement.php`, `public/css/afs-discovery.css`, `public/css/afs-editorial.css`, `public/css/afs-library.css`, `admin/images/whatsnew-editorial.webp`, `admin/images/whatsnew-library.webp`.
 
 Modified: `ajax-filter-search.php`, `blocks/feed/block.json`, `blocks/feed/editor.asset.php`, `blocks/feed/editor.js`, `includes/class-afs-cache.php`, `includes/class-afs-design.php`, `includes/class-afs-frontend.php`, `includes/class-afs-renderer.php`, `includes/class-afs-rest.php`, `includes/class-afs-settings.php`, `includes/functions.php`, `languages/ajax-filter-search.pot`, `readme.txt`.
 

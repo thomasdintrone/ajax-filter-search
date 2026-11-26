@@ -176,7 +176,10 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * New: Cards settings for what each result shows: featured image, image shape, columns, excerpt and its length, date, time and category badge. Set them site wide under Settings > Cards or for one feed with shortcode attributes or the block.
 * New: The Editorial Grid and Resource Library take their colors from your theme, so they work on dark themes.
 * New: Block patterns for both designs, and a searchable term picker in the block instead of typing slugs.
+* New: A dismissible "What's new" card on the settings screen for sites that already use the plugin. It makes no outside requests and never appears on a fresh install.
+* Improved: The Editorial Grid and Resource Library have one compact toolbar (the layout switch sits beside the category tabs as two icon buttons), a search placeholder, a Reset button only when it is needed, a clearer empty result, aligned Resource Library rows, a refined missing-image tile and tighter spacing on phones.
 * New: Developers can register a design with its own item template (`afs_register_design`) and turn the patterns off (`afs_register_patterns`).
+* Improved: The Cards settings hide options that do not apply (image shape when images are off, excerpt length when excerpts are off, the time when the date is off) and keep their saved values. In the block, "Use plugin setting" shows the current default.
 * Improved: Cached results now refresh when a featured image or attachment changes.
 * Improved: Retaken screenshots.
 * Classic and Modern feeds, shortcodes, saved settings, bookmarked links and theme template overrides are unchanged.

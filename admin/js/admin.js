@@ -72,6 +72,62 @@
 			links.first().addClass( 'is-current' );
 		}
 
+		// A control that depends on another (the image shape on the featured image, the excerpt length on the excerpt, the
+		// time on the date) is hidden while its parent is No. It is only hidden: it stays in the form, so its saved value is
+		// submitted and applies again when the parent is turned back on.
+		var $kept = $( '.afs-kept' );
+		var syncNeeds = function () {
+			var anyHidden = false;
+			$( '[data-afs-needs]' ).each( function () {
+				var parent = $( 'input[name="' + this.getAttribute( 'data-afs-needs' ) + '"]:checked' ).val();
+				var off = '0' === parent;
+				this.hidden = off;
+				anyHidden = anyHidden || off;
+			} );
+			$kept.prop( 'hidden', ! anyHidden );
+		};
+		$( '#afs-form' ).on( 'change', 'input[type="radio"]', syncNeeds );
+		syncNeeds();
+
+		// The side navigation opens the folded Cards card on its way there.
+		$( '.afs-admin__nav a' ).on( 'click', function () {
+			$( $( this ).attr( 'href' ) ).find( 'details.afs-fold' ).prop( 'open', true );
+		} );
+
+		// The "What's new" card: "Explore" takes you to the design picker, and dismissing sends a background request (the
+		// buttons are ordinary form buttons, so without JavaScript the same dismissal is a normal page load).
+		$( '[data-afs-explore]' ).on( 'click', function () {
+			$( $( this ).attr( 'href' ) ).attr( 'tabindex', '-1' ).trigger( 'focus' );
+		} );
+		var news = document.getElementById( 'afs-news' );
+		var newsForm = document.getElementById( 'afs-news-form' );
+		if ( news && newsForm && window.fetch ) {
+			newsForm.addEventListener( 'submit', function ( event ) {
+				event.preventDefault();
+				var body = new FormData( newsForm );
+				body.append( 'afs_ajax', '1' );
+				// The form has a field named "action", which shadows form.action, so the address is read from the attribute.
+				fetch( newsForm.getAttribute( 'action' ), { method: 'POST', body: body, credentials: 'same-origin' } )
+					.then( function ( response ) {
+						if ( ! response.ok ) {
+							throw new Error( 'HTTP ' + response.status );
+						}
+						news.remove();
+						var status = document.getElementById( 'afs-news-status' );
+						if ( status ) {
+							status.textContent = data.dismissed || 'Announcement dismissed.';
+						}
+						var title = document.getElementById( 'afs-admin-title' );
+						if ( title ) {
+							title.focus();
+						}
+					} )
+					.catch( function () {
+						newsForm.submit(); // Fall back to a normal page load; the dismissal is recorded either way.
+					} );
+			} );
+		}
+
 		// Say so when there are unsaved changes.
 		var $note = $( '.afs-savebar__note' );
 		$( '#afs-form' ).on( 'input change', function () {

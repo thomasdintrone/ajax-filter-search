@@ -151,6 +151,8 @@ class AFS_Design {
 	public static function activate() {
 		if ( false === get_option( self::OPTION ) && false === get_option( AFS_SETTINGS ) ) {
 			add_option( self::OPTION, self::MODERN );
+			// A fresh install starts on the current look: it has nothing to be told is new.
+			AFS_Announcement::mark_fresh_install();
 		}
 	}
 

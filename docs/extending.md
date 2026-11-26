@@ -122,3 +122,21 @@ The design picker and the block's Design control list every design from `AFS_Des
 ## Block patterns (2.3.0)
 
 The inserter has two patterns in an "Ajax Filter Search" category: an Editorial Grid (six cards, three columns, sort and chips on) and a Resource Library (ten rows, sort and chips on). Each is just the feed block with attributes it already has, so it adds no settings, and everything in it can be changed in the block sidebar after inserting. `AFS_Patterns::definitions()` lists them.
+
+## Toolbar, state classes and the empty state (2.3.0, Editorial Grid and Resource Library only)
+
+- **One toolbar:** the category tabs and the layout switch share the first row (the switch follows the tabs in the source, so the focus order matches what you see); search, month, year and sort share the second. The search field has a placeholder taken from the post type's own `search_items` label ("Search Posts"); its `<label>` stays, visually hidden.
+- **Layout switch:** two icon buttons (inline SVG, `.afs-icon`) with the same `data-afs-layout` and `aria-pressed` as before and visually hidden text ("List View", "Grid View") as their accessible names.
+- **State classes on the feed root:** `afs-has-chips` when the active-filter chips are on, and `afs-is-filtered` while a search, category, month or year is active (a sort is not a filter). The server renders them on first load and the script keeps `afs-is-filtered` current. The stylesheet shows the **Reset** button only when a filter is active and the chips are off, because the chips carry their own Clear all.
+- **Result bar:** `.afs-resultbar` holds the chips (left) and the count (right) above the items.
+- **Empty result:** `.afs-none` has `.afs-none__title` ("No results for “…”.", "No results match these filters." or "No results found.") and, when a filter is active, `.afs-none__hint`. There is one "Clear all filters" button; the chips drop their own Clear all in this state.
+- **Missing image:** `.afs-img--none` with `.afs-img__mono` (the category's first letter). The Resource Library keeps its thumbnail column for every row while images are on, so titles line up; with images off the row gets `.afs-row--nothumb`.
+- Classic and Modern output is unchanged by all of the above.
+
+## The "What's new" card (2.3.0)
+
+`AFS_Announcement` shows a dismissible card at the top of Settings > Ajax Filter Search to users who can manage the plugin (`manage_options`). It is never shown on a fresh install, nor on a site whose own design is already Editorial Grid or Resource Library, and it makes no outside request. Dismissal is stored per user (`afs_whatsnew_dismissed` user meta, holding the announcement id) through a nonce-checked `admin-post.php` action that also works without JavaScript. The "What's new" link in the screen header shows it again (`&afs_whatsnew=1`) without changing the stored dismissal.
+
+## Card settings (2.3.0)
+
+Rows in the Cards card that depend on another (image shape on the featured image, excerpt length on the excerpt, the time on the date) are hidden, never disabled, while the parent is No, so their saved values still submit and apply again when the option is turned back on. The time is part of the date: with the date hidden no time is shown. The card folds when the site's own design is not one of the two new ones. In the block, "Use plugin setting" shows the current default (for example "Use plugin setting (Show)") and the dependent controls hide the same way.

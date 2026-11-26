@@ -212,15 +212,22 @@ class CardsAndDesignsTest extends AFS_Test_Case {
 		$this->assertStringNotContainsString( 'afs-img', $off );
 	}
 
-	public function test_the_library_drops_the_thumbnail_column_for_a_post_without_an_image() {
+	public function test_the_library_keeps_the_thumbnail_column_so_every_title_lines_up() {
+		// Images on, post without one: a small monogram tile holds the column.
 		$none = $this->results( array( 'design' => 'library', 'show_image' => '1', 'afs_year' => 2024, 'afs_month' => 1 ) )['html'];
-		$this->assertStringContainsString( 'afs-row--nothumb', $none );
-		$this->assertStringNotContainsString( 'afs-img--none', $none, 'Rows have no placeholder tile' );
+		$this->assertStringContainsString( 'afs-img--none', $none );
+		$this->assertStringContainsString( 'afs-img__mono', $none );
+		$this->assertStringNotContainsString( 'afs-row--nothumb', $none, 'The column stays reserved' );
+
+		// Images off: no column at all.
+		$off = $this->results( array( 'design' => 'library', 'show_image' => '0', 'afs_year' => 2024, 'afs_month' => 1 ) )['html'];
+		$this->assertStringContainsString( 'afs-row--nothumb', $off );
+		$this->assertStringNotContainsString( 'afs-img', $off );
 
 		$this->give_image( 1001 );
 		$with = $this->results( array( 'design' => 'library', 'show_image' => '1', 'afs_year' => 2024, 'afs_month' => 1 ) )['html'];
 		$this->assertStringContainsString( 'COVERIMG', $with );
-		$this->assertStringNotContainsString( 'afs-row--nothumb', $with );
+		$this->assertStringNotContainsString( 'afs-img--none', $with );
 		$this->assertStringContainsString( 'afs-row__side', $with );
 	}
 

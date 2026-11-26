@@ -11,8 +11,8 @@
  *   $afs_options  array     Card options: show_image, image_ratio, show_excerpt, excerpt_length, show_date, show_time,
  *                           show_category, columns.
  *
- * The wrapper <article> is printed for you. A post with no image gets a row without a thumbnail column, and image and
- * excerpt are never shown for a password-protected post.
+ * The wrapper <article> is printed for you. A post with no image gets a small monogram tile in the thumbnail column, so
+ * every title lines up, and image and excerpt are never shown for a password-protected post.
  *
  * @package ajax-filter-search
  */
@@ -25,7 +25,7 @@ $afs_options  = isset( $afs_options ) ? (array) $afs_options : array();
 
 $afs_names   = ! empty( $afs_options['show_category'] ) ? AFS_Card::term_names( $afs_taxonomy, $afs_terms ) : array();
 $afs_excerpt = ! empty( $afs_options['show_excerpt'] ) ? AFS_Card::excerpt( isset( $afs_options['excerpt_length'] ) ? $afs_options['excerpt_length'] : 25 ) : '';
-$afs_image   = ! empty( $afs_options['show_image'] ) ? AFS_Card::image( 'thumbnail', false ) : '';
+$afs_image   = ! empty( $afs_options['show_image'] ) ? AFS_Card::image( 'thumbnail', true, $afs_names ? $afs_names[0] : '' ) : '';
 ?>
 <?php echo $afs_image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in AFS_Card::image(). ?>
 <div class="afs-row__main">

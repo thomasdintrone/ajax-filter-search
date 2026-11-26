@@ -8,6 +8,7 @@
 
 	var el = wp.element.createElement;
 	var __ = wp.i18n.__;
+	var sprintf = wp.i18n.sprintf;
 	var useSelect = wp.data.useSelect;
 	var InspectorControls = wp.blockEditor.InspectorControls;
 	var useBlockProps = wp.blockEditor.useBlockProps;
@@ -30,6 +31,29 @@
 		{ value: 'classic', label: 'Classic', own: false },
 	];
 	var ratios = [ '16:10', '3:2', '4:3', '1:1', '16:9' ];
+	var cards = data.cards || {};
+
+	/** Show/hide options whose first entry says what the plugin setting currently is, for example "Use plugin setting (Show)". */
+	function showHideFor( key ) {
+		/* translators: %s: the current value of the setting, "Show" or "Hide". */
+		var label = sprintf( __( 'Use plugin setting (%s)', 'ajax-filter-search' ), cards[ key ] ? __( 'Show', 'ajax-filter-search' ) : __( 'Hide', 'ajax-filter-search' ) );
+		return [
+			{ label: label, value: '' },
+			{ label: __( 'Show', 'ajax-filter-search' ), value: 'show' },
+			{ label: __( 'Hide', 'ajax-filter-search' ), value: 'hide' },
+		];
+	}
+
+	/** What a Show/Hide attribute comes to: its own value, or the plugin setting when it is empty. */
+	function effective( value, key ) {
+		if ( 'show' === value ) {
+			return true;
+		}
+		if ( 'hide' === value ) {
+			return false;
+		}
+		return !! cards[ key ];
+	}
 
 	function ownsMarkup( design ) {
 		var effective = design || data.siteDesign || '';
@@ -328,26 +352,29 @@
 							el( SelectControl, {
 								label: __( 'Featured image', 'ajax-filter-search' ),
 								value: attributes.showImage,
-								options: showHide,
+								options: showHideFor( 'showImage' ),
 								onChange: function ( value ) {
 									set( { showImage: value } );
 								},
 							} ),
-							el( SelectControl, {
-								label: __( 'Image shape', 'ajax-filter-search' ),
-								value: attributes.imageRatio,
-								options: [ DEFAULT ].concat(
-									ratios.map( function ( ratio ) {
-										return { label: ratio, value: ratio };
-									} )
-								),
-								onChange: function ( value ) {
-									set( { imageRatio: value } );
-								},
-							} ),
+							// The image shape only matters while the featured image is shown.
+							effective( attributes.showImage, 'showImage' )
+								? el( SelectControl, {
+										label: __( 'Image shape', 'ajax-filter-search' ),
+										value: attributes.imageRatio,
+										options: [ { /* translators: %s: the current value of the setting, for example 16:10. */ label: sprintf( __( 'Use plugin setting (%s)', 'ajax-filter-search' ), cards.imageRatio || '16:10' ), value: '' } ].concat(
+											ratios.map( function ( ratio ) {
+												return { label: ratio, value: ratio };
+											} )
+										),
+										onChange: function ( value ) {
+											set( { imageRatio: value } );
+										},
+								  } )
+								: null,
 							el( RangeControl, {
 								label: __( 'Columns', 'ajax-filter-search' ),
-								help: __( 'The most columns used. 0 uses the plugin setting.', 'ajax-filter-search' ),
+								help: sprintf( /* translators: %d: the current default number of columns. */ __( 'The most columns used. 0 uses the plugin setting (%d).', 'ajax-filter-search' ), cards.columns || 3 ),
 								value: attributes.columns,
 								min: 0,
 								max: 4,
@@ -358,41 +385,47 @@
 							el( SelectControl, {
 								label: __( 'Excerpt', 'ajax-filter-search' ),
 								value: attributes.showExcerpt,
-								options: showHide,
+								options: showHideFor( 'showExcerpt' ),
 								onChange: function ( value ) {
 									set( { showExcerpt: value } );
 								},
 							} ),
-							el( RangeControl, {
-								label: __( 'Excerpt length (words)', 'ajax-filter-search' ),
-								help: __( '0 uses the plugin setting.', 'ajax-filter-search' ),
-								value: attributes.excerptLength,
-								min: 0,
-								max: 80,
-								onChange: function ( value ) {
-									set( { excerptLength: value || 0 } );
-								},
-							} ),
+							// The excerpt length only matters while the excerpt is shown.
+							effective( attributes.showExcerpt, 'showExcerpt' )
+								? el( RangeControl, {
+										label: __( 'Excerpt length (words)', 'ajax-filter-search' ),
+										help: sprintf( /* translators: %d: the current default excerpt length in words. */ __( '0 uses the plugin setting (%d).', 'ajax-filter-search' ), cards.excerptLength || 25 ),
+										value: attributes.excerptLength,
+										min: 0,
+										max: 80,
+										onChange: function ( value ) {
+											set( { excerptLength: value || 0 } );
+										},
+								  } )
+								: null,
 							el( SelectControl, {
 								label: __( 'Publication date', 'ajax-filter-search' ),
 								value: attributes.showDate,
-								options: showHide,
+								options: showHideFor( 'showDate' ),
 								onChange: function ( value ) {
 									set( { showDate: value } );
 								},
 							} ),
-							el( SelectControl, {
-								label: __( 'Publication time', 'ajax-filter-search' ),
-								value: attributes.showTime,
-								options: showHide,
-								onChange: function ( value ) {
-									set( { showTime: value } );
-								},
-							} ),
+							// The time is shown next to the date, so it only matters while the date is shown.
+							effective( attributes.showDate, 'showDate' )
+								? el( SelectControl, {
+										label: __( 'Include the time', 'ajax-filter-search' ),
+										value: attributes.showTime,
+										options: showHideFor( 'showTime' ),
+										onChange: function ( value ) {
+											set( { showTime: value } );
+										},
+								  } )
+								: null,
 							el( SelectControl, {
 								label: __( 'Category badge', 'ajax-filter-search' ),
 								value: attributes.showCategory,
-								options: showHide,
+								options: showHideFor( 'showCategory' ),
 								onChange: function ( value ) {
 									set( { showCategory: value } );
 								},
