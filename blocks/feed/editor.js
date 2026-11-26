@@ -66,12 +66,20 @@
 	 * Searchable term picker. The block stores slugs (comma separated, as the shortcode does); the picker shows names.
 	 * A slug that is not in the loaded terms stays in the list as it is, so nothing is lost when the list is long.
 	 */
+	/**
+	 * A lookup table with no inherited keys. Term names and slugs come from the site, so a term called "constructor",
+	 * "toString" or "__proto__" must be an ordinary key, not a property of Object.prototype.
+	 */
+	function dictionary() {
+		return Object.create( null );
+	}
+
 	function TermPicker( props ) {
 		var taxonomy = props.taxonomy;
 		var searchState = useState( '' );
 		var search = searchState[ 0 ];
 		var setSearch = searchState[ 1 ];
-		var seen = useRef( { taxonomy: taxonomy, terms: {} } ); // slug => { name, parent }, for every term seen in this taxonomy.
+		var seen = useRef( { taxonomy: taxonomy, terms: dictionary() } ); // slug => { name, parent }, for every term seen in this taxonomy.
 
 		var terms = useSelect(
 			function ( select ) {
@@ -96,7 +104,7 @@
 
 		// Terms of another taxonomy are never offered or labelled here: start again when the taxonomy changes.
 		if ( seen.current.taxonomy !== taxonomy ) {
-			seen.current = { taxonomy: taxonomy, terms: {} };
+			seen.current = { taxonomy: taxonomy, terms: dictionary() };
 			last.current = [];
 			list = [];
 		}
@@ -114,8 +122,8 @@
 		// A term is identified by its slug, never by its name. Each term gets one label that no other term has: its name when
 		// that is unique, otherwise the name with its slug, and if that still matches another label (a term whose name
 		// looks like one of those labels) its slug is added again, until every label is different.
-		var labels = {};
-		var entries = {};
+		var labels = dictionary();
+		var entries = dictionary();
 		Object.keys( names.current ).forEach( function ( slug ) {
 			entries[ slug ] = names.current[ slug ].name;
 		} );
@@ -128,7 +136,7 @@
 			labels[ slug ] = entries[ slug ];
 		} );
 		var groups = function () {
-			var byLabel = {};
+			var byLabel = dictionary();
 			Object.keys( labels ).forEach( function ( slug ) {
 				( byLabel[ labels[ slug ] ] = byLabel[ labels[ slug ] ] || [] ).push( slug );
 			} );

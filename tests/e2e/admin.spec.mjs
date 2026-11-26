@@ -261,6 +261,62 @@ test.describe( 'block editor, labels that could collide', () => {
 	} );
 } );
 
+test.describe( 'block editor, names that are also JavaScript property names', () => {
+	test( 'terms called constructor, toString and __proto__ can be listed and chosen', async ( { page, request } ) => {
+		const pages = await ( await request.get( '/wp-json/wp/v2/pages?slug=afs-block&_fields=id' ) ).json();
+		await login( page );
+		await page.goto( `/wp-admin/post.php?post=${ pages[ 0 ].id }&action=edit` );
+		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
+		const errors = [];
+		page.on( 'pageerror', ( e ) => errors.push( e.message ) );
+		// Two terms with one such name (different parents) also go through the duplicate-label path.
+		const ids = await page.evaluate( async () => {
+			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
+			const p = await make( { name: 'Proto Parent', slug: 'proto-parent' } );
+			const out = [ p.id ];
+			out.push( ( await make( { name: 'constructor', slug: 'construction' } ) ).id );
+			out.push( ( await make( { name: 'constructor', slug: 'constructor-child', parent: p.id } ) ).id );
+			out.push( ( await make( { name: 'toString', slug: 'tostring-cat' } ) ).id );
+			out.push( ( await make( { name: '__proto__', slug: 'proto-cat' } ) ).id );
+			return out;
+		} );
+		try {
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'welcomeGuide', false );
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { design: 'editorial', taxonomy: 'category', terms: '' } );
+				wp.data.dispatch( 'core/block-editor' ).selectBlock( block.clientId );
+				wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			} );
+			const terms = () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ].attributes.terms );
+			const input = page.locator( '.components-form-token-field__input' );
+			await input.waitFor( { timeout: 30000 } );
+			await page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( '.afs-card' ).first().waitFor( { timeout: 30000 } );
+			const options = page.locator( '.components-form-token-field__suggestion' );
+			await input.focus();
+			await page.keyboard.type( 'constructor' );
+			await expect( options ).toHaveCount( 2 ); // Two terms with that name, told apart by their slugs.
+			const labels = await options.allTextContents();
+			expect( new Set( labels ).size ).toBe( 2 );
+			await options.nth( labels.findIndex( ( t ) => t.includes( 'constructor-child' ) ) ).click();
+			await expect.poll( terms ).toBe( 'constructor-child' );
+			await page.keyboard.type( 'toString' );
+			await options.first().click();
+			await expect.poll( terms ).toBe( 'constructor-child,tostring-cat' );
+			await page.keyboard.type( '__proto__' );
+			await options.first().click();
+			await expect.poll( terms ).toBe( 'constructor-child,tostring-cat,proto-cat' );
+			expect( errors ).toEqual( [] );
+		} finally {
+			await page.evaluate( async ( list ) => {
+				for ( const id of list.slice().reverse() ) {
+					await wp.apiFetch( { path: `/wp/v2/categories/${ id }?force=true`, method: 'DELETE' } );
+				}
+			}, ids );
+		}
+	} );
+} );
+
 const SETTINGS = '/wp-admin/options-general.php?page=ajax-filter-search';
 const row = ( page, name ) => page.locator( `[data-afs-needs="afs_settings[${ name }]"]` );
 
