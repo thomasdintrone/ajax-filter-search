@@ -29,7 +29,7 @@ composer analyse                 # PHPStan level 5 on the shipping code
 npm ci --ignore-scripts && bin/e2e.sh   # Playwright + axe (WCAG 2.2 AA) + visual snapshots + interaction budget, inside the Playwright image
 npm run lint:js                  # ESLint on the shipping JavaScript
 AFS_THEME=afs-classic-min bin/e2e.sh   # behaviour, accessibility and HTTP-contract specs on a classic theme
-bin/upgrade-test.sh 1.0.4        # install a published release, swap in this build, check nothing broke (also: 2.0.0)
+bin/upgrade-test.sh 1.0.4        # install a published release, swap in this build, check nothing broke (also: 2.0.0, 2.2.2; AFS_STRICT=1 compares raw bytes, AFS_TEST_MODERN=1 starts on Modern). It builds from committed files (git archive HEAD), so commit first
 bin/plugin-check.sh              # official Plugin Check against the release package
 ```
 CI (`.github/workflows/ci.yml`) runs lint and PHPStan, the guards, PHPUnit on WordPress 6.0/PHP 7.4, 6.5/8.2, 6.5/8.3, 6.8/8.1, 6.8/8.2 and latest/8.4 (plus a latest multisite cell and a WordPress beta job that is allowed to fail; run multisite locally with `AFS_MULTISITE=1 bin/test.sh`), checks that the committed 2.0.0 snapshots equal what tag `v2.0.0` produces, builds the package, and runs the browser tests (block theme and a classic theme), Plugin Check and the two upgrade paths.
