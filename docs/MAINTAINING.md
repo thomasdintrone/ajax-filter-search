@@ -50,6 +50,9 @@ Test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and W
 3. `node docs/screenshots/capture.mjs` writes the ten images to `.cache/screenshots/`, framed from the page heading down to the bottom of the feed. It waits for each feed to finish loading (not for `networkidle`), refuses to save the filtered shot if the results do not match the filters, and refuses the two-feed shot unless the feeds show different states.
 4. Copy the images to `.wordpress-org/`, look at every one, and keep the `== Screenshots ==` list in `readme.txt` in the same order (it is documented at the top of `capture.mjs`). Re-crop the two "What's new" thumbnails (`admin/images/whatsnew-*.webp`) from screenshots 1 and 2 (`cwebp`).
 
+## Banner and icon
+The approved artwork is raster, kept in `design/approved-artwork/` (not shipped; `design/` is in `.distignore`) with `asset-manifest.json` holding each source's SHA-256 and a copy of the handoff note. `design/export-approved-artwork.sh` verifies the hashes and writes `.wordpress-org/banner-1544x500.png`, `banner-772x250.png`, `icon-256x256.png` and `icon-128x128.png` (WordPress.org's sizes; no `icon.svg` is in `.wordpress-org/`, so the PNG icons are used). The old `design/render-assets.mjs` is superseded and refuses to run. There is no vector master and the typefaces are not identified; changes to the artwork need the owner's approval. `admin/images/icon.svg` (the settings screen header) is a separate vector and is unchanged.
+
 ## Release checklist
 1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and in `readme.txt` (Stable tag, Tested up to, changelog, Upgrade Notice).
 2. Run the tests above; build the zip; list its contents; confirm no docs, design, bin or private files.

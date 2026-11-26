@@ -1,0 +1,27 @@
+AFS APPROVED ARTWORK HANDOFF
+
+Thomas selected these two source designs in the Codex review:
+
+BANNER: afs-banner-paper-and-ink-approved-source.png
+Paper & Ink, copy version 1 (New layouts).
+Exact approved text:
+A WORDPRESS SEARCH & FILTER PLUGIN
+Ajax Filter Search
+Filter posts by category, date & keyword.
+Editorial grids. Resource libraries. Customizable cards.
+
+ICON: afs-icon-outer-corners-approved-source.png
+Option B: outer square orange selection corners, warm ivory background, black bold upright AF and italic serif S. No search symbol, extra bars or additional lettering.
+
+These are selected raster source artworks, not verified production exports. The banner interface is an illustration, not an exact screenshot. Do not implement interface changes based on this artwork.
+
+Integration instructions for Claude:
+1. Read the repository instructions and inspect current branch/status. Preserve unrelated changes and coordinate with the remediation work already in progress. Do not reset or overwrite that work.
+2. Copy these exact source files into an appropriate non-shipping design-source location. Preserve originals and verify their SHA-256 values against asset-manifest.json.
+3. Verify current official WordPress.org asset requirements. Prepare the required banner and icon exports from these approved sources. Preserve aspect ratios and letterforms. Do not stretch or crop away text, selection corners, or controls. If aspect adjustment needs a visible design change, show a proposed crop/composition first.
+4. Inspect exports at actual listing sizes and small icon sizes. Check thin strokes of the italic S, orange corners, copy legibility, safe margins and image sharpness. Do not claim the font has been identified or that a vector master exists; these are raster sources.
+5. Review the repository's asset/build workflow, README, release documentation and relevant image references. Update references only where appropriate. Check for uses of the previous icon in administration without automatically replacing unrelated screenshot assets. Keep source/handoff files out of the distributable package.
+6. Use these approved designs. Do not regenerate, alter copy, add a search symbol to the icon, or redesign them without Thomas's approval.
+7. Return the changed file list, preview exports, exact dimensions, validation results and any unresolved limitations for review.
+
+This handoff authorizes preparation of repository assets and documentation on the remediation branch. It does not authorize publication, deployment, WordPress.org SVN changes, or release tagging. Follow existing repository/session authorization for Git commits and pushes; this file adds no new authorization for those actions. Never inspect or copy config.php or secret-bearing files.

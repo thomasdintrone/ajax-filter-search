@@ -67,3 +67,7 @@ Fixed on `fix/2.3.0-audit-remediation`, each with a test that failed before the 
 5. **Byte identity.** The Classic and Modern layout switch is printed from the original template again; `AFS_STRICT=1 bin/upgrade-test.sh` proves raw identity against 2.2.2 (Classic and Modern sites).
 
 Known limits: the collapsible mobile filter panel stays deferred; a site-wide cache plugin that ignores `Cache-Control` for logged-out requests can still serve a page cached before a post became protected until that cache is purged.
+
+### Listing artwork for 2.3.1
+
+The banner and icon are replaced by the owner-approved artwork (Paper & Ink banner, "New layouts" copy; outer-corners icon). Exports: `banner-1544x500.png`, `banner-772x250.png`, `icon-256x256.png`, `icon-128x128.png`, made by `design/export-approved-artwork.sh` from the sources in `design/approved-artwork/` (hashes verified). The source banner is 2172x724 (3.0:1) and WordPress.org's shape is 3.088:1, so 21 px of blank paper is trimmed from the bottom edge; nothing else is cropped. At 32 px the icon's corner marks are faint but the letters hold. Banner, icon and screenshots are copied to SVN `assets/` by the owner at release time. The settings screen header keeps its own `admin/images/icon.svg`.
