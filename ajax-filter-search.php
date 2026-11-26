@@ -39,6 +39,7 @@ require_once AFS_PLUGIN_PATH . 'includes/class-afs-settings.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-design.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-registry.php';
 require_once AFS_PLUGIN_PATH . 'includes/api.php';
+require_once AFS_PLUGIN_PATH . 'includes/class-afs-card.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-query.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-cache.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-migration.php';

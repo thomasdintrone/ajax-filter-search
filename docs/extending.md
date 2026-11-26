@@ -22,7 +22,7 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_register_admin_tab( $id, $args )` | settings screen tabs |
 | `afs_register_rest_meta( $id, $args )` | extra keys for the REST response |
 
-`afs_registered( $type )` returns the items of a type; the `afs_registry_items` filter can adjust them. `$args` is owned by the registrant. In this version the free plugin stores registrations but does not yet read them; later versions will consume them behind the same API.
+`afs_registered( $type )` returns the items of a type; the `afs_registry_items` filter can adjust them. `$args` is owned by the registrant. The free plugin reads **designs** (2.3.0): a design registered with `afs_register_design( 'acme', array( 'label' => 'Acme', 'template' => 'acme.php', 'item_class' => 'acme-card' ) )` can be used as `design="acme"` on a shortcode or block. `template` is a plain file name looked up like `default.php` (your theme's `afs-template/` first, then the plugin's); without it the design uses the default item markup and is only a class on the feed (`afs-design-acme`). A built-in slug (`classic`, `modern`, `editorial`, `library`) cannot be replaced. The other registries are stored but not yet read; later versions will consume them behind the same API.
 
 ## Filters
 
@@ -97,3 +97,11 @@ Every output goes through `AFS_Query::args()` / `AFS_Query::run()` so the visibi
 ## 1.x constant
 
 The global `FILTER_TYPE` constant that 1.x theme overrides read is now defined by the compatibility layer (`AFS_Compat::define_filter_type()`), so it exists only while the layer is on. New templates should use the `$afs_terms` and `$afs_taxonomy` variables passed to them.
+
+## Item templates and card options (2.3.0)
+
+Each design renders its items with a template: Classic and Modern use `default.php`, Editorial Grid `editorial.php`, Resource Library `library.php`. Copy one to `your-theme/afs-template/` to override it (a child theme is checked first). Inside the loop a template gets `$afs_terms`, `$afs_taxonomy` and `$afs_options` (`show_image`, `image_ratio`, `columns`, `show_excerpt`, `excerpt_length`, `show_date`, `show_time`, `show_category`). `return_template( $template, $terms, $taxonomy, $options )` takes the options as an optional fourth argument, so 1.x calls with three arguments keep working.
+
+`AFS_Card` has the helpers the built-in templates use: `image()` (a lazy-loaded featured image, or a placeholder tile, hidden from assistive technology), `excerpt()` (cut by words), `term_names()` and `has_image()`. Image and excerpt are never returned for a password-protected post; do the same in your own template.
+
+A design with its own markup sends its name and options with every request so the first page and the results route render identical items. Classic and Modern send nothing extra.

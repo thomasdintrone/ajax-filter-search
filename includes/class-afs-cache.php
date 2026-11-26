@@ -22,6 +22,14 @@ class AFS_Cache {
 		foreach ( array( 'save_post', 'deleted_post', 'trashed_post', 'untrashed_post', 'transition_post_status', 'set_object_terms', 'created_term', 'edited_term', 'delete_term' ) as $hook ) {
 			add_action( $hook, array( __CLASS__, 'mark' ) );
 		}
+		// A card shows the featured image, so changing one (even without saving the post) or editing or removing an
+		// attachment must refresh cached results.
+		foreach ( array( 'edit_attachment', 'delete_attachment' ) as $hook ) {
+			add_action( $hook, array( __CLASS__, 'mark' ) );
+		}
+		foreach ( array( 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ) as $hook ) {
+			add_action( $hook, array( __CLASS__, 'mark_thumbnail' ), 10, 3 );
+		}
 		add_action( 'update_option_' . AFS_SETTINGS, array( __CLASS__, 'mark' ) );
 		add_action( 'switched_theme', array( __CLASS__, 'mark' ) );
 		add_action( 'shutdown', array( __CLASS__, 'flush' ), 0 );
@@ -30,6 +38,19 @@ class AFS_Cache {
 	/** Note that something changed; the option is written once, at shutdown. */
 	public static function mark() {
 		self::$dirty = true;
+	}
+
+	/**
+	 * Mark a change when the post meta that holds a featured image changes.
+	 *
+	 * @param int    $meta_id    Meta ID (unused).
+	 * @param int    $object_id  Post ID (unused).
+	 * @param string $meta_key   Meta key.
+	 */
+	public static function mark_thumbnail( $meta_id, $object_id, $meta_key ) {
+		if ( '_thumbnail_id' === $meta_key ) {
+			self::mark();
+		}
 	}
 
 	public static function flush() {
