@@ -5,11 +5,11 @@ Tags: ajax filter, filter posts, live search, category filter, custom post type
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block, no setup code.
+Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block included.
 
 == Description ==
 
@@ -148,6 +148,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Changelog ==
 
+= 2.2.2 =
+* Fixed: The short description was 2 characters over the WordPress.org limit and was cut off in search results. Shortened it. No change to behavior, settings or output.
+
 = 2.2.1 =
 * Improved: Clearer plugin name and description in search results and the Plugins list. No change to behavior, settings or output.
 
@@ -211,6 +214,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Ajax Filter Search
 
 == Upgrade Notice ==
+
+= 2.2.2 =
+Shortens the plugin description so it is no longer cut off in search results. No functional changes.
 
 = 2.2.1 =
 New plugin title, description and tags to make the plugin easier to find. No functional changes.

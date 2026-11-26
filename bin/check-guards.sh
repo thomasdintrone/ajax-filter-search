@@ -40,5 +40,11 @@ pattern='is_pro[a-z_]*\(|license[_ -]?(key|server|check)|edd_sl|freemius|fs_dyna
 hits="$(grep -rniE "$pattern" $shipped 2>/dev/null | grep -v '^includes/compat.php.*Pro' || true)"
 [ -n "$hits" ] && { bad "Pro/license/outbound-HTTP pattern in shipped code:"; echo "$hits" | sed 's/^/        /'; }
 
+# --- 3. WordPress.org limits: short description at most 150 characters, in readme.txt and the plugin header ---
+short_readme="$(awk '/^License URI:/{f=1;next} f&&NF{print;exit}' readme.txt)"
+short_header="$(sed -n 's/^ \* Description: *//p' ajax-filter-search.php | head -1)"
+[ "${#short_readme}" -gt 150 ] && bad "readme.txt short description is ${#short_readme} characters (WordPress.org limit 150)"
+[ "${#short_header}" -gt 150 ] && bad "plugin header Description is ${#short_header} characters (keep at most 150)"
+
 [ $fail -eq 0 ] && echo "check-guards: OK (base $base)"
 exit $fail

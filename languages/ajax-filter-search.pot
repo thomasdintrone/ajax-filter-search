@@ -2,7 +2,7 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ajax Filter Search 2.2.1\n"
+"Project-Id-Version: Ajax Filter Search 2.2.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ajax-filter-search\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgstr ""
 
 #. Description of the plugin
 #: ajax-filter-search.php
-msgid "Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block, no setup code."
+msgid "Let visitors filter and search posts or custom post types by category, month, year and keyword, with no page reload. Shortcode and block included."
 msgstr ""
 
 #. Author of the plugin
