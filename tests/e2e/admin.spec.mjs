@@ -269,6 +269,13 @@ test.describe( 'block editor, names that are also JavaScript property names', ()
 		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
 		const errors = [];
 		page.on( 'pageerror', ( e ) => errors.push( e.message ) );
+		// Remove anything an interrupted earlier run left behind, so the test can be run again.
+		await page.evaluate( async () => {
+			const old = await wp.apiFetch( { path: '/wp/v2/categories?per_page=100&slug=proto-parent,construction,constructor-child,tostring-cat,proto-cat' } );
+			for ( const term of old.reverse() ) {
+				await wp.apiFetch( { path: `/wp/v2/categories/${ term.id }?force=true`, method: 'DELETE' } );
+			}
+		} );
 		// Two terms with one such name (different parents) also go through the duplicate-label path.
 		const ids = await page.evaluate( async () => {
 			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
