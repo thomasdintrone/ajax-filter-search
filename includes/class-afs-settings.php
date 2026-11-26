@@ -554,7 +554,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 									);
 								};
 								$copy( '[ajax_filter_search]' );
-								?>
+			?>
 								<details class="afs-more">
 									<summary><?php esc_html_e( 'More examples', 'ajax-filter-search' ); ?></summary>
 									<?php
