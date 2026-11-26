@@ -127,7 +127,7 @@ class AFS_Feed {
 	 * @return bool
 	 */
 	public static function lock_protected( $required, $post = null ) {
-		return $required || AFS_Card::is_protected( $post );
+		return $required || AFS_Card::is_password_locked( $post );
 	}
 
 	/**

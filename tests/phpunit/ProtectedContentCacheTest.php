@@ -133,12 +133,12 @@ class ProtectedContentCacheTest extends AFS_Test_Case {
 		$this->assertSame( '', get_the_selected_excerpt( 200 ) );
 		$this->assertSame( '', AFS_Card::excerpt( 25 ) );
 		$this->assertFalse( AFS_Card::has_image( 2005 ) );
-		$this->assertTrue( AFS_Card::is_protected( 2005 ) );
+		$this->assertTrue( AFS_Card::is_password_locked( 2005 ) );
 		wp_reset_postdata();
 
 		$this->leave();
-		$this->assertTrue( AFS_Card::is_protected( 2005 ) );
-		$this->assertFalse( AFS_Card::is_protected( 1001 ), 'An ordinary post is not protected' );
+		$this->assertTrue( AFS_Card::is_password_locked( 2005 ) );
+		$this->assertFalse( AFS_Card::is_password_locked( 1001 ), 'An ordinary post is not protected' );
 	}
 
 	public function test_the_rss_feed_never_carries_a_protected_body_or_a_cacheable_unlocked_copy() {

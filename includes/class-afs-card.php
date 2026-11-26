@@ -137,7 +137,7 @@ class AFS_Card {
 	 * @param mixed $post Post, ID or null for the current post.
 	 * @return bool
 	 */
-	public static function is_protected( $post = null ) {
+	public static function is_password_locked( $post = null ) {
 		$post = get_post( $post );
 		return $post instanceof WP_Post && '' !== (string) $post->post_password;
 	}
@@ -145,7 +145,7 @@ class AFS_Card {
 	/** True when the post's image can be shown: a featured image exists and the post is not password protected. */
 	public static function has_image( $post = null ) {
 		$post = get_post( $post );
-		return $post && ! self::is_protected( $post ) && has_post_thumbnail( $post );
+		return $post && ! self::is_password_locked( $post ) && has_post_thumbnail( $post );
 	}
 
 	/**
@@ -224,7 +224,7 @@ class AFS_Card {
 	 */
 	public static function excerpt( $words = 25 ) {
 		$post = get_post();
-		if ( ! $post || self::is_protected( $post ) ) {
+		if ( ! $post || self::is_password_locked( $post ) ) {
 			return '';
 		}
 		$text = has_excerpt( $post ) ? $post->post_excerpt : $post->post_content;
