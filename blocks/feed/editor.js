@@ -13,13 +13,108 @@
 	var useBlockProps = wp.blockEditor.useBlockProps;
 	var PanelBody = wp.components.PanelBody;
 	var SelectControl = wp.components.SelectControl;
-	var TextControl = wp.components.TextControl;
 	var ToggleControl = wp.components.ToggleControl;
+	var FormTokenField = wp.components.FormTokenField;
+	var useState = wp.element.useState;
+	var useRef = wp.element.useRef;
 	var RangeControl = wp.components.RangeControl;
 	var Disabled = wp.components.Disabled;
 	var ServerSideRender = wp.serverSideRender;
 
 	var DEFAULT = { label: __( 'Use plugin setting', 'ajax-filter-search' ), value: '' };
+
+	// Set by the plugin (AFS_Frontend::editor_assets): the designs, the site's default design and the site's default taxonomy.
+	var data = window.afsEditor || {};
+	var designs = data.designs || [
+		{ value: 'modern', label: 'Modern', own: false },
+		{ value: 'classic', label: 'Classic', own: false },
+	];
+	var ratios = [ '16:10', '3:2', '4:3', '1:1', '16:9' ];
+
+	function ownsMarkup( design ) {
+		var effective = design || data.siteDesign || '';
+		return designs.some( function ( item ) {
+			return item.value === effective && item.own;
+		} );
+	}
+
+	/**
+	 * Searchable term picker. The block stores slugs (comma separated, as the shortcode does); the picker shows names.
+	 * A slug that is not in the loaded terms stays in the list as it is, so nothing is lost when the list is long.
+	 */
+	function TermPicker( props ) {
+		var taxonomy = props.taxonomy;
+		var searchState = useState( '' );
+		var search = searchState[ 0 ];
+		var setSearch = searchState[ 1 ];
+		var names = useRef( {} ); // slug => name, for every term seen so far.
+
+		var terms = useSelect(
+			function ( select ) {
+				if ( ! taxonomy || taxonomy === 'none' ) {
+					return null;
+				}
+				var query = { per_page: 100, orderby: 'name', order: 'asc', _fields: 'id,slug,name' };
+				if ( search ) {
+					query.search = search;
+				}
+				return select( 'core' ).getEntityRecords( 'taxonomy', taxonomy, query );
+			},
+			[ taxonomy, search ]
+		);
+
+		( terms || [] ).forEach( function ( term ) {
+			names.current[ term.slug ] = term.name;
+		} );
+
+		var selected = ( props.value || '' )
+			.split( ',' )
+			.map( function ( slug ) {
+				return slug.trim();
+			} )
+			.filter( Boolean );
+		var label = function ( slug ) {
+			return names.current[ slug ] || slug;
+		};
+		var slugFor = function ( token ) {
+			var found = Object.keys( names.current ).filter( function ( slug ) {
+				return names.current[ slug ] === token;
+			} )[ 0 ];
+			return found || token;
+		};
+
+		return el( FormTokenField, {
+			label: __( 'Limit to these terms', 'ajax-filter-search' ),
+			value: selected.map( label ),
+			suggestions: ( terms || [] )
+				.filter( function ( term ) {
+					return selected.indexOf( term.slug ) === -1;
+				} )
+				.map( function ( term ) {
+					return term.name;
+				} ),
+			onChange: function ( tokens ) {
+				props.onChange(
+					tokens
+						.map( function ( token ) {
+							return slugFor( typeof token === 'string' ? token : token.value );
+						} )
+						.join( ',' )
+				);
+			},
+			onInputChange: function ( input ) {
+				setSearch( input.length > 1 ? input : '' );
+			},
+			__experimentalExpandOnFocus: true,
+			__experimentalShowHowTo: false,
+			// Only terms that exist can be added; a typed name that matches none is dropped.
+			__experimentalValidateInput: function ( token ) {
+				return Object.keys( names.current ).some( function ( slug ) {
+					return names.current[ slug ] === token;
+				} );
+			},
+		} );
+	}
 
 	var showHide = [
 		DEFAULT,
@@ -63,6 +158,8 @@
 				} )
 		);
 
+		var effectiveTaxonomy = attributes.taxonomy || data.siteTaxonomy || '';
+		var ownMarkup = ownsMarkup( attributes.design );
 		var blockProps = useBlockProps();
 
 		return el(
@@ -90,14 +187,15 @@
 							set( { taxonomy: value, terms: '' } );
 						},
 					} ),
-					el( TextControl, {
-						label: __( 'Limit to term slugs', 'ajax-filter-search' ),
-						help: __( 'Comma separated, for example news,press. Leave empty for all.', 'ajax-filter-search' ),
-						value: attributes.terms,
-						onChange: function ( value ) {
-							set( { terms: value } );
-						},
-					} ),
+					effectiveTaxonomy && effectiveTaxonomy !== 'none'
+						? el( TermPicker, {
+								taxonomy: effectiveTaxonomy,
+								value: attributes.terms,
+								onChange: function ( value ) {
+									set( { terms: value } );
+								},
+						  } )
+						: null,
 					el( RangeControl, {
 						label: __( 'Posts per page', 'ajax-filter-search' ),
 						help: __( '0 uses the plugin setting.', 'ajax-filter-search' ),
@@ -160,11 +258,11 @@
 					el( SelectControl, {
 						label: __( 'Design', 'ajax-filter-search' ),
 						value: attributes.design,
-						options: [
-							DEFAULT,
-							{ label: __( 'Modern', 'ajax-filter-search' ), value: 'modern' },
-							{ label: __( 'Classic', 'ajax-filter-search' ), value: 'classic' },
-						],
+						options: [ DEFAULT ].concat(
+							designs.map( function ( item ) {
+								return { label: item.label, value: item.value };
+							} )
+						),
 						onChange: function ( value ) {
 							set( { design: value } );
 						},
@@ -214,7 +312,85 @@
 							set( { showYears: value } );
 						},
 					} )
-				)
+				),
+				ownMarkup
+					? el(
+							PanelBody,
+							{ title: __( 'Cards', 'ajax-filter-search' ), initialOpen: true },
+							el( SelectControl, {
+								label: __( 'Featured image', 'ajax-filter-search' ),
+								value: attributes.showImage,
+								options: showHide,
+								onChange: function ( value ) {
+									set( { showImage: value } );
+								},
+							} ),
+							el( SelectControl, {
+								label: __( 'Image shape', 'ajax-filter-search' ),
+								value: attributes.imageRatio,
+								options: [ DEFAULT ].concat(
+									ratios.map( function ( ratio ) {
+										return { label: ratio, value: ratio };
+									} )
+								),
+								onChange: function ( value ) {
+									set( { imageRatio: value } );
+								},
+							} ),
+							el( RangeControl, {
+								label: __( 'Columns', 'ajax-filter-search' ),
+								help: __( 'The most columns used. 0 uses the plugin setting.', 'ajax-filter-search' ),
+								value: attributes.columns,
+								min: 0,
+								max: 4,
+								onChange: function ( value ) {
+									set( { columns: value || 0 } );
+								},
+							} ),
+							el( SelectControl, {
+								label: __( 'Excerpt', 'ajax-filter-search' ),
+								value: attributes.showExcerpt,
+								options: showHide,
+								onChange: function ( value ) {
+									set( { showExcerpt: value } );
+								},
+							} ),
+							el( RangeControl, {
+								label: __( 'Excerpt length (words)', 'ajax-filter-search' ),
+								help: __( '0 uses the plugin setting.', 'ajax-filter-search' ),
+								value: attributes.excerptLength,
+								min: 0,
+								max: 80,
+								onChange: function ( value ) {
+									set( { excerptLength: value || 0 } );
+								},
+							} ),
+							el( SelectControl, {
+								label: __( 'Publication date', 'ajax-filter-search' ),
+								value: attributes.showDate,
+								options: showHide,
+								onChange: function ( value ) {
+									set( { showDate: value } );
+								},
+							} ),
+							el( SelectControl, {
+								label: __( 'Publication time', 'ajax-filter-search' ),
+								value: attributes.showTime,
+								options: showHide,
+								onChange: function ( value ) {
+									set( { showTime: value } );
+								},
+							} ),
+							el( SelectControl, {
+								label: __( 'Category badge', 'ajax-filter-search' ),
+								value: attributes.showCategory,
+								options: showHide,
+								onChange: function ( value ) {
+									set( { showCategory: value } );
+								},
+							} )
+					  )
+					: null
 			),
 			// The preview is server-rendered markup with real links (tabs, pagination). Disabled makes it inert in the editor,
 			// so clicking it selects the block instead of navigating the canvas to the block-renderer URL.

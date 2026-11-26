@@ -26,17 +26,18 @@ class AFS_Design {
 	/** Accent of the Modern design on a new install (white text on it passes WCAG AA). */
 	const MODERN_ACCENT = '#2563eb';
 
-	/** @return array<string,string> Slug => label. */
+	/** @return array<string,string> Slug => label: the designs offered in the settings picker and the block. */
 	public static function all() {
 		return array(
-			self::MODERN  => __( 'Modern', 'ajax-filter-search' ),
-			self::CLASSIC => __( 'Classic', 'ajax-filter-search' ),
+			self::MODERN    => __( 'Modern', 'ajax-filter-search' ),
+			self::CLASSIC   => __( 'Classic', 'ajax-filter-search' ),
+			self::EDITORIAL => __( 'Editorial Grid', 'ajax-filter-search' ),
+			self::LIBRARY   => __( 'Resource Library', 'ajax-filter-search' ),
 		);
 	}
 
 	/**
-	 * Designs with their own item markup (a template per design) that are built in. They are valid for a feed (shortcode
-	 * attribute or block setting) but are not offered in the settings screen's picker yet. Slug => template file.
+	 * Built-in designs with their own item markup (a template per design). Slug => template file.
 	 *
 	 * @return array<string,string>
 	 */
@@ -48,16 +49,13 @@ class AFS_Design {
 	}
 
 	/**
-	 * Every design a feed may use: the ones in the picker, the built-in image and row designs, and designs add-ons register
-	 * with afs_register_design(). Built-in slugs always win over a registration with the same id.
+	 * Every design a feed may use: the built-in ones and designs add-ons register with afs_register_design(). Built-in
+	 * slugs always win over a registration with the same id.
 	 *
 	 * @return array<string,string> Slug => label.
 	 */
 	public static function known() {
 		$known = self::all();
-		foreach ( array_keys( self::built_in_templates() ) as $slug ) {
-			$known[ $slug ] = self::EDITORIAL === $slug ? __( 'Editorial Grid', 'ajax-filter-search' ) : __( 'Resource Library', 'ajax-filter-search' );
-		}
 		foreach ( afs_registered( 'designs' ) as $slug => $args ) {
 			$slug = sanitize_key( $slug );
 			if ( '' !== $slug && ! isset( $known[ $slug ] ) ) {

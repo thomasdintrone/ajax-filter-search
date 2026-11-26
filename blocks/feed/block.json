@@ -23,7 +23,15 @@
 		"showYears": { "type": "boolean", "default": true },
 		"showSort": { "type": "string", "default": "" },
 		"showChips": { "type": "string", "default": "" },
-		"design": { "type": "string", "default": "" }
+		"design": { "type": "string", "default": "" },
+		"showImage": { "type": "string", "default": "" },
+		"imageRatio": { "type": "string", "default": "" },
+		"columns": { "type": "number", "default": 0 },
+		"showExcerpt": { "type": "string", "default": "" },
+		"excerptLength": { "type": "number", "default": 0 },
+		"showDate": { "type": "string", "default": "" },
+		"showTime": { "type": "string", "default": "" },
+		"showCategory": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"html": false,
@@ -31,5 +39,5 @@
 	},
 	"editorScript": "file:./editor.js",
 	"style": "afs-styles",
-	"editorStyle": "afs-modern"
+	"editorStyle": [ "afs-modern", "afs-discovery", "afs-editorial", "afs-library" ]
 }

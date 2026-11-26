@@ -141,16 +141,16 @@ class DesignTest extends AFS_Test_Case {
 	public function test_the_settings_screen_has_a_card_for_each_group_and_every_field_once() {
 		$html = $this->settings_html();
 		$this->assertSame( 1, substr_count( $html, '<h1>' ) );
-		foreach ( array( 'start', 'feed', 'filters', 'search', 'appearance' ) as $id ) {
+		foreach ( array( 'start', 'feed', 'filters', 'search', 'appearance', 'cards' ) as $id ) {
 			$this->assertStringContainsString( 'id="afs-sec-' . $id . '"', $html );
 			$this->assertStringContainsString( 'href="#afs-sec-' . $id . '"', $html );
 		}
 		foreach ( array_keys( AFSAdmin::fields() ) as $key ) {
 			$this->assertSame( 1, substr_count( $html, 'name="afs_settings[' . $key . ']"' ) > 0 ? 1 : 0, 'Field missing from the screen: ' . $key );
 		}
-		$this->assertSame( 2, substr_count( $html, 'name="afs_settings[afs_appearance_design]"' ), 'One radio per design' );
+		$this->assertSame( 4, substr_count( $html, 'name="afs_settings[afs_appearance_design]"' ), 'One radio per design' );
 		$this->assertStringContainsString( 'Save Settings', $html );
-		$this->assertSame( 3, substr_count( $html, 'data-afs-copy=' ), 'Three copyable example shortcodes' );
+		$this->assertSame( 5, substr_count( $html, 'data-afs-copy=' ), 'Five copyable example shortcodes' );
 	}
 
 	public function test_labels_only_point_at_things_a_label_can_name() {
