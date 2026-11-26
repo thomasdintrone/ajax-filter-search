@@ -417,13 +417,7 @@ class AFS_Renderer {
 					</nav>
 				<?php endif; ?>
 
-				<?php
-				if ( $discovery ) {
-					echo self::layout_switch( $config, $state, $legacy, $n ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch().
-				}
-				?>
-
-				<div class="afs-Filters">
+				<?php echo $discovery ? self::layout_switch( $config, $state, $legacy, $n ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch(). Nothing is printed for Classic and Modern, so their markup is unchanged. ?><div class="afs-Filters">
 					<?php if ( $config['show_search'] ) : ?>
 						<div class="afs-field afs-field-search">
 							<label for="<?php echo esc_attr( $id ); ?>-s"><?php esc_html_e( 'Search', 'ajax-filter-search' ); ?></label>
