@@ -5,7 +5,7 @@ Tags: ajax filter, filter posts, live search, category filter, custom post type
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.2
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,13 +17,19 @@ Ajax Filter Search is a small but powerful plugin that displays your posts or cu
 
 A visitor can filter your posts by search keyword, month, year and category to get the exact content they're looking for. It's a great tool for anyone looking to show a reel of press releases, blog posts, upcoming events, whatever you can think of.
 
+Choose from four designs: an **Editorial Grid** of image cards with category badges, excerpts and dates, a compact **Resource Library** of searchable rows with thumbnails, the clean Modern design, or the original Classic look. The two newest designs take their colors from your theme, so they work on dark themes too.
+
 = Features =
 
 * **Gutenberg block and shortcode** - Add the "Ajax Filter Search" block, or use the `[ajax_filter_search]` shortcode anywhere.
 * **Multiple feeds per page** - Every feed has its own post type, categories, layout and filters.
 * **Shareable links** - The first feed on a page keeps its filters and page number in the address bar, so a filtered view can be bookmarked or shared, and the back button works. It also works with JavaScript turned off.
 * **Fast, light front end** - Plain JavaScript (no jQuery), a small stylesheet, and assets that load only on pages that contain a feed. No external fonts or icon libraries.
+* **Editorial Grid and Resource Library designs** - Image cards with category badges, excerpts and dates, or compact rows with optional thumbnails. Choose what each one shows (featured image, image shape, columns, excerpt length, date, time, category badge) under Settings > Cards, or per feed.
 * **Modern and Classic designs** - A clean, card-based Modern design for new installs and the original Classic look for sites that already use the plugin. Choose one site wide or per feed.
+* **Works with dark themes** - The Editorial Grid and Resource Library take their borders, surfaces and text from your theme's colors, with no extra setting.
+* **Block patterns** - Add a ready-made Editorial Grid or Resource Library from the block inserter in one click, then change anything in the block sidebar.
+* **Pick terms by name** - In the block, choose the categories to limit a feed to from a searchable list instead of typing slugs.
 * **Sort and filter chips (optional)** - Let visitors sort by newest, oldest, A to Z, recently updated or most commented, and show the active filters as removable chips with a Clear all link. Both are off until you turn them on.
 * **RSS feed for any view** - Every filter state has its own RSS 2.0 feed at `/wp-json/afs/v1/feed`, built from the same query as the results and listing published posts only.
 * **Accessible** - Labeled form fields, keyboard friendly tabs and buttons, live-region updates and a current-page indicator.
@@ -38,6 +44,10 @@ A visitor can filter your posts by search keyword, month, year and category to g
 
     [ajax_filter_search post_type="event" post_tax="event_type" orderby="title" order="ASC" show_views="false"]
 
+    [ajax_filter_search design="editorial" columns="3" image_ratio="16:10" excerpt_length="25"]
+
+    [ajax_filter_search design="library" show_sort="true" show_chips="true"]
+
 = Shortcode attributes =
 
 All attributes are optional. Anything you leave out uses the setting from Settings > Ajax Filter Search.
@@ -50,7 +60,8 @@ All attributes are optional. Anything you leave out uses the setting from Settin
 * `orderby` - `date`, `title` or `modified`. `order` - `DESC` or `ASC`.
 * `search` - a keyword to start with. `filter_years` / `filter_months` - start on a year (for example 2025) or month (1 to 12).
 * `show_tabs`, `show_views`, `show_search`, `show_months`, `show_years` - `true` or `false`.
-* `design` - `modern` or `classic`. Overrides the Appearance setting for this feed.
+* `design` - `modern`, `classic`, `editorial` or `library`. Overrides the Appearance setting for this feed.
+* Card options for `editorial` and `library` (Classic and Modern ignore them; anything you leave out uses Settings > Cards): `show_image`, `show_excerpt`, `show_date`, `show_time`, `show_category` - `true` or `false`. `image_ratio` - `16:10`, `3:2`, `4:3`, `1:1` or `16:9` (Editorial Grid only; Resource Library thumbnails are square). `columns` - 1 to 4, the most columns the Editorial Grid uses (it shows fewer on narrow screens). `excerpt_length` - 10 to 80 words.
 * `show_sort`, `show_chips` - `true` or `false`. The sort control and the active filter chips are off unless you turn them on here, in the block, or under Settings.
 
 = Please Rate Ajax Filter Search! =
@@ -73,6 +84,18 @@ Yes. Add the `terms` attribute with the term *slugs* you want, separated by comm
 
 Yes, both are optional. Add `show_sort="true"` for a sort control and `show_chips="true"` for removable filter chips with a Clear all link (they also offer a way out when nothing matches). You can also use the matching block controls, or turn them on for every feed under Settings > Ajax Filter Search. They are off by default, so existing feeds look exactly as before.
 
+= How do I show featured images, or change what each card shows? =
+
+Use the Editorial Grid or Resource Library design (Settings > Ajax Filter Search > Appearance, `design="editorial"` or `design="library"` on a feed, or the block's Design setting). Then set what each card shows under Settings > Cards, or for one feed with `show_image`, `image_ratio`, `columns`, `show_excerpt`, `excerpt_length`, `show_date`, `show_time` and `show_category` (the block has the same controls). A post with no featured image gets a tinted tile in the Editorial Grid and no thumbnail in the Resource Library. The image and excerpt of a password-protected post are never shown.
+
+= Will it work on a dark theme? =
+
+Yes for the Editorial Grid and Resource Library: their borders, surfaces and muted text are derived from your theme's text color, so a dark theme gives a dark feed. Modern and Classic use their own light colors.
+
+= Can I add a feed in one click? =
+
+Yes. In the block inserter, open Patterns and look for the "Ajax Filter Search" category: an Editorial Grid and a Resource Library, each already set up. Developers can turn the patterns off with `add_filter( 'afs_register_patterns', '__return_false' );`.
+
 = Is there an RSS feed for a filtered view? =
 
 Yes. `/wp-json/afs/v1/feed` accepts the same parameters as the results endpoint (for example `afs_term=news&afs_year=2025`) and returns RSS 2.0 with published posts only. Developers can build the address with `afs_feed_url()` or remove the feed with `add_filter( 'afs_enable_feed', '__return_false' );`.
@@ -91,7 +114,7 @@ Version 2.0.0 is a major update. Please back up your site and try it on a stagin
 
 = Can I change how each result looks? =
 
-Yes. Copy `afs-template/default.php` from the plugin folder into `your-theme/afs-template/default.php` (a child theme is checked first) and edit it. Templates written for version 1.x keep working. You can also use the `afs_query_args` and `afs_template_file` filters.
+Yes. Copy `afs-template/default.php` (Classic and Modern), `editorial.php` or `library.php` from the plugin folder into `your-theme/afs-template/` (a child theme is checked first) and edit it. Templates written for version 1.x keep working. You can also use the `afs_query_args` and `afs_template_file` filters.
 
 = Does it load anything from third-party servers? =
 
@@ -135,18 +158,28 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Screenshots ==
 
-1. The default feed in the Modern design: category tabs, search, month and year filters, list view.
-2. Filtered results, with the filters kept in the address bar so the view can be shared.
-3. Grid layout.
-4. Two feeds with different settings on one page.
-5. The redesigned settings screen, with a design picker, copyable shortcodes and the optional sort, filter chip and noindex settings.
-6. The "Ajax Filter Search" block in the editor, with a live preview and controls, including the sort and filter chip options.
-7. The feed on a phone.
-8. The optional sort control and active filter chips, with Clear all.
-9. An empty result, with a link to clear the filters.
+1. The Editorial Grid design: image cards with category badges, search, sorting and filters.
+2. The Resource Library design: compact, searchable rows with optional thumbnails.
+3. A filtered Editorial Grid, with active filter chips and a sort order. The filters are kept in the address bar so the view can be shared.
+4. The Editorial Grid on a phone.
+5. The new designs take their colors from the theme, so they work on dark themes.
+6. The Modern design: category tabs, search, month and year filters, list view.
+7. Two feeds with different settings on one page.
+8. The settings screen: choose a design and what each card shows.
+9. The "Ajax Filter Search" block in the editor, with the Cards controls and the searchable term picker.
 10. The Classic design, the look of earlier versions.
 
 == Changelog ==
+
+= 2.3.0 =
+* New: Editorial Grid design (image cards with category badges, excerpts and dates) and Resource Library design (compact searchable rows with optional thumbnails). Choose them under Settings > Appearance, with `design="editorial"` or `design="library"`, or in the block. Existing sites keep their current design.
+* New: Cards settings for what each result shows: featured image, image shape, columns, excerpt and its length, date, time and category badge. Set them site wide under Settings > Cards or for one feed with shortcode attributes or the block.
+* New: The Editorial Grid and Resource Library take their colors from your theme, so they work on dark themes.
+* New: Block patterns for both designs, and a searchable term picker in the block instead of typing slugs.
+* New: Developers can register a design with its own item template (`afs_register_design`) and turn the patterns off (`afs_register_patterns`).
+* Improved: Cached results now refresh when a featured image or attachment changes.
+* Improved: Retaken screenshots.
+* Classic and Modern feeds, shortcodes, saved settings, bookmarked links and theme template overrides are unchanged.
 
 = 2.2.2 =
 * Fixed: The short description was 2 characters over the WordPress.org limit and was cut off in search results. Shortened it. No change to behavior, settings or output.
@@ -214,6 +247,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Ajax Filter Search
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+Adds two optional designs (Editorial Grid and Resource Library) with featured images, excerpts, card settings, block patterns and dark-theme support. Existing feeds look exactly as before until you choose a new design. Recommended.
 
 = 2.2.2 =
 Shortens the plugin description so it is no longer cut off in search results. No functional changes.

@@ -22,7 +22,7 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_register_admin_tab( $id, $args )` | settings screen tabs |
 | `afs_register_rest_meta( $id, $args )` | extra keys for the REST response |
 
-`afs_registered( $type )` returns the items of a type; the `afs_registry_items` filter can adjust them. `$args` is owned by the registrant. In this version the free plugin stores registrations but does not yet read them; later versions will consume them behind the same API.
+`afs_registered( $type )` returns the items of a type; the `afs_registry_items` filter can adjust them. `$args` is owned by the registrant. The free plugin reads **designs** (2.3.0): a design registered with `afs_register_design( 'acme', array( 'label' => 'Acme', 'template' => 'acme.php', 'item_class' => 'acme-card' ) )` can be used as `design="acme"` on a shortcode or block. `template` is a plain file name looked up like `default.php` (your theme's `afs-template/` first, then the plugin's); without it the design uses the default item markup and is only a class on the feed (`afs-design-acme`). A built-in slug (`classic`, `modern`, `editorial`, `library`) cannot be replaced. The other registries are stored but not yet read; later versions will consume them behind the same API.
 
 ## Filters
 
@@ -35,6 +35,7 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_rest_cache_control` | The `Cache-Control` value of an anonymous results response (default `public, max-age=60, stale-while-revalidate=300`); return `''` to send none. |
 | `afs_cache_version` | The counter behind the `ETag` and the cached results. It changes when posts, terms, the plugin's settings or the theme change; append to it to invalidate everything. A change to a template override or to your own filter is not detected, so give those a new value here. |
 | `afs_noindex_filtered_states` | Return `false` to stop filtered views of a feed page from being marked `noindex, follow`. The setting "Hide filtered views from search engines" (default on) does the same for the whole site. The unfiltered page stays indexable and WordPress already sets its canonical link to the permalink without query arguments. |
+| `afs_register_patterns` | Return `false` to leave out the two block patterns (Editorial Grid and Resource Library) that the plugin adds to the inserter under "Ajax Filter Search". |
 | `afs_enable_feed` | Return `false` to remove the RSS route. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
 
@@ -97,3 +98,27 @@ Every output goes through `AFS_Query::args()` / `AFS_Query::run()` so the visibi
 ## 1.x constant
 
 The global `FILTER_TYPE` constant that 1.x theme overrides read is now defined by the compatibility layer (`AFS_Compat::define_filter_type()`), so it exists only while the layer is on. New templates should use the `$afs_terms` and `$afs_taxonomy` variables passed to them.
+
+## Item templates and card options (2.3.0)
+
+Each design renders its items with a template: Classic and Modern use `default.php`, Editorial Grid `editorial.php`, Resource Library `library.php`. Copy one to `your-theme/afs-template/` to override it (a child theme is checked first). Inside the loop a template gets `$afs_terms`, `$afs_taxonomy` and `$afs_options` (`show_image`, `image_ratio`, `columns`, `show_excerpt`, `excerpt_length`, `show_date`, `show_time`, `show_category`). `return_template( $template, $terms, $taxonomy, $options )` takes the options as an optional fourth argument, so 1.x calls with three arguments keep working.
+
+`AFS_Card` has the helpers the built-in templates use: `image()` (a lazy-loaded featured image, or a placeholder tile, hidden from assistive technology), `excerpt()` (cut by words), `term_names()` and `has_image()`. Image and excerpt are never returned for a password-protected post; do the same in your own template.
+
+A design with its own markup sends its name and options with every request so the first page and the results route render identical items. Classic and Modern send nothing extra.
+
+## Styling the new designs (2.3.0)
+
+Editorial Grid and Resource Library feeds carry `afs-design-editorial` or `afs-design-library` and `afs-discovery` on the root element, and load `afs-discovery.css` plus one file per design (never loaded for Classic or Modern). Colours come from the theme: borders, surfaces and muted text are mixed from the text colour, so a dark theme gives a dark feed. Tokens you can set from a theme: `--afs-accent`, `--afs-radius`, `--afs-radius-sm`, `--afs-gap`, `--afs-control` (control height). The plugin sets `--afs-cols` and `--afs-ratio` per feed from the validated `columns` and `image_ratio` options; the grid never goes below 15rem per card, so `columns` is a maximum that drops on narrow screens.
+
+For these designs the active-filter chips and the result count are grouped in a `.afs-resultbar` above the items (Classic and Modern keep the count below).
+
+## Settings and block (2.3.0)
+
+The settings screen has a Cards group with site-wide defaults for the card options (`afs_cards_show_image`, `afs_cards_image_ratio`, `afs_cards_columns`, `afs_cards_show_excerpt`, `afs_cards_excerpt_length`, `afs_cards_show_date`, `afs_cards_show_time`, `afs_cards_show_category`, all inside the `afs_settings` option). A shortcode attribute or block setting overrides the default for one feed; an unset block control (empty or 0) falls back to it. Sites that saved settings before 2.3.0 get the defaults with no migration, because missing keys read as their defaults. Classic and Modern ignore the card settings.
+
+The design picker and the block's Design control list every design from `AFS_Design::all()`. In the editor the block gets `window.afsEditor` (the designs and whether each has its own markup, the site's default design and taxonomy) and shows the Cards controls only when the effective design has its own markup. The Limit-to-terms control is a searchable picker over the feed's taxonomy; the block still stores the slugs, comma separated, exactly as the shortcode's `terms` attribute does.
+
+## Block patterns (2.3.0)
+
+The inserter has two patterns in an "Ajax Filter Search" category: an Editorial Grid (six cards, three columns, sort and chips on) and a Resource Library (ten rows, sort and chips on). Each is just the feed block with attributes it already has, so it adds no settings, and everything in it can be changed in the block sidebar after inserting. `AFS_Patterns::definitions()` lists them.

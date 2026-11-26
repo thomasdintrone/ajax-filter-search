@@ -68,6 +68,23 @@ class AFS_REST {
 			'afs_term'       => $text,
 			'afs_sort'       => $text,
 			'show_chips'     => $text,
+			'design'         => $text,
+			'show_image'     => $text,
+			'image_ratio'    => $text,
+			'columns'        => array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 4,
+			),
+			'show_excerpt'   => $text,
+			'excerpt_length' => array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 200,
+			),
+			'show_date'      => $text,
+			'show_time'      => $text,
+			'show_category'  => $text,
 			'afs_month'      => array(
 				'type'    => 'integer',
 				'minimum' => 0,
@@ -106,6 +123,15 @@ class AFS_REST {
 				'orderby'        => $request->get_param( 'orderby' ),
 				'order'          => $request->get_param( 'order' ),
 				'show_chips'     => $request->get_param( 'show_chips' ),
+				'design'         => $request->get_param( 'design' ),
+				'show_image'     => $request->get_param( 'show_image' ),
+				'image_ratio'    => $request->get_param( 'image_ratio' ),
+				'columns'        => $request->get_param( 'columns' ),
+				'show_excerpt'   => $request->get_param( 'show_excerpt' ),
+				'excerpt_length' => $request->get_param( 'excerpt_length' ),
+				'show_date'      => $request->get_param( 'show_date' ),
+				'show_time'      => $request->get_param( 'show_time' ),
+				'show_category'  => $request->get_param( 'show_category' ),
 			)
 		);
 

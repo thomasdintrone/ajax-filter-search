@@ -82,36 +82,50 @@ class AFS_Renderer {
 		$orderby = in_array( $orderby, array( 'date', 'title', 'modified' ), true ) ? $orderby : 'date';
 		$order   = ( isset( $raw['order'] ) && 'ASC' === strtoupper( (string) $raw['order'] ) ) ? 'ASC' : 'DESC';
 
-		$layout = isset( $raw['layout'] ) ? sanitize_key( $raw['layout'] ) : AFSAdmin::afs_retrieve( '_general_layout' );
+		$design = AFS_Design::resolve( isset( $raw['design'] ) ? $raw['design'] : '' );
+
+		if ( isset( $raw['layout'] ) ) {
+			$layout = sanitize_key( $raw['layout'] );
+		} elseif ( AFS_Design::has_own_markup( $design ) ) {
+			// A design with its own item markup starts in the layout it was drawn for unless the feed says otherwise.
+			$layout = AFS_Design::default_layout( $design );
+		} else {
+			$layout = AFSAdmin::afs_retrieve( '_general_layout' );
+		}
 		$layout = 'grid' === $layout ? 'grid' : 'list';
 
 		$bool = static function ( $key, $default ) use ( $raw ) {
 			return isset( $raw[ $key ] ) && '' !== $raw[ $key ] ? wp_validate_boolean( $raw[ $key ] ) : $default;
 		};
 
-		return array(
-			'post_type'   => $post_type,
-			'taxonomy'    => $taxonomy,
-			'terms'       => $terms,
-			'per_page'    => $per_page,
-			'orderby'     => $orderby,
-			'order'       => $order,
-			'layout'      => $layout,
-			'show_tabs'   => $bool( 'show_tabs', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_filters' ) ),
-			'show_views'  => $bool( 'show_views', 1 === (int) AFSAdmin::afs_retrieve( '_general_views' ) ),
-			'show_search' => $bool( 'show_search', true ),
-			'show_months' => $bool( 'show_months', true ),
-			'show_years'  => $bool( 'show_years', true ),
-			// Opt-in helpers (off unless the shortcode, block or setting turns them on, so existing output is unchanged).
-			'show_sort'   => $bool( 'show_sort', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_sort' ) ),
-			'show_chips'  => $bool( 'show_chips', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_chips' ) ),
-			// classic (the 2.0 look) or modern; the markup is the same, only a class and a stylesheet differ.
-			'design'      => AFS_Design::resolve( isset( $raw['design'] ) ? $raw['design'] : '' ),
-			// Starting values for the filters.
-			'search'      => isset( $raw['search'] ) ? sanitize_text_field( $raw['search'] ) : '',
-			'month'       => isset( $raw['filter_months'] ) ? self::clean_month( $raw['filter_months'] ) : 0,
-			'year'        => isset( $raw['filter_years'] ) ? self::clean_year( $raw['filter_years'] ) : 0,
-			'page'        => isset( $raw['offset'] ) ? max( 1, absint( $raw['offset'] ) ) : 1,
+		$cards = AFS_Card::normalize_options( $raw, $design );
+
+		return array_merge(
+			$cards,
+			array(
+				'post_type'   => $post_type,
+				'taxonomy'    => $taxonomy,
+				'terms'       => $terms,
+				'per_page'    => $per_page,
+				'orderby'     => $orderby,
+				'order'       => $order,
+				'layout'      => $layout,
+				'show_tabs'   => $bool( 'show_tabs', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_filters' ) ),
+				'show_views'  => $bool( 'show_views', 1 === (int) AFSAdmin::afs_retrieve( '_general_views' ) ),
+				'show_search' => $bool( 'show_search', true ),
+				'show_months' => $bool( 'show_months', true ),
+				'show_years'  => $bool( 'show_years', true ),
+				// Opt-in helpers (off unless the shortcode, block or setting turns them on, so existing output is unchanged).
+				'show_sort'   => $bool( 'show_sort', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_sort' ) ),
+				'show_chips'  => $bool( 'show_chips', 1 === (int) AFSAdmin::afs_retrieve( '_general_show_chips' ) ),
+				// classic (the 2.0 look) or modern; the markup is the same, only a class and a stylesheet differ.
+				'design'      => $design,
+				// Starting values for the filters.
+				'search'      => isset( $raw['search'] ) ? sanitize_text_field( $raw['search'] ) : '',
+				'month'       => isset( $raw['filter_months'] ) ? self::clean_month( $raw['filter_months'] ) : 0,
+				'year'        => isset( $raw['filter_years'] ) ? self::clean_year( $raw['filter_years'] ) : 0,
+				'page'        => isset( $raw['offset'] ) ? max( 1, absint( $raw['offset'] ) ) : 1,
+			)
 		);
 	}
 
@@ -316,6 +330,11 @@ class AFS_Renderer {
 		if ( $config['show_chips'] ) {
 			$client['show_chips'] = '1';
 		}
+		// A design with its own item markup must produce the same items on page load and through the REST route, so the
+		// design and its card options travel with every request. Classic and Modern send nothing extra.
+		if ( AFS_Design::has_own_markup( $config['design'] ) ) {
+			$client = array_merge( $client, array( 'design' => $config['design'] ), AFS_Card::client_options( $config ) );
+		}
 
 		$tabs = array();
 		if ( $config['show_tabs'] ) {
@@ -327,7 +346,7 @@ class AFS_Renderer {
 
 		ob_start();
 		?>
-		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo AFS_Design::MODERN === $config['design'] ? ' afs-design-modern' : ''; ?>" data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
+		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo esc_attr( AFS_Design::root_class( $config['design'] ) ); ?>"<?php echo AFS_Design::is_discovery( $config['design'] ) ? ' style="' . esc_attr( AFS_Card::css_vars( $config ) ) . '"' : ''; ?> data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
 			<h2 class="afs-sr-only"><?php echo esc_html( self::label( __( 'Filterable posts', 'ajax-filter-search' ), $n ) ); ?></h2>
 			<form<?php echo $legacy ? ' id="newsForm"' : ''; ?> class="afs-form" method="get" action="<?php echo esc_url( $base ); ?>" role="search" aria-label="<?php echo esc_attr( self::label( __( 'Filter posts', 'ajax-filter-search' ), $n ) ); ?>">
 				<?php
@@ -475,29 +494,13 @@ class AFS_Renderer {
 
 		ob_start();
 
-		if ( $config['show_chips'] ) {
-			echo self::chips( $config, $state, $base, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in chips().
-		}
+		$own = AFS_Design::has_own_markup( $config['design'] );
 
+		$count_html = '';
 		if ( $query->have_posts() ) {
-			echo '<div class="afs-TableHeader" aria-hidden="true"><div class="afs-col-date">' . esc_html__( 'Date', 'ajax-filter-search' ) . '</div><div class="afs-col-title">' . esc_html__( 'Headline', 'ajax-filter-search' ) . '</div></div>';
-			echo '<div class="afs-items">';
-			$i = 1;
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				printf(
-					'<article class="%1$s" itemscope itemtype="https://schema.org/BlogPosting">%2$s</article>',
-					esc_attr( implode( ' ', array_diff( get_post_class( 'afs-TableRowItem afs-item gridPR' . $i ), array( 'hentry' ) ) ) ), // 'hentry' makes many themes style each result as a full post.
-					return_template( 'default.php', $config['terms'], $config['taxonomy'] ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Template output is trusted theme/plugin markup.
-				);
-				++$i;
-			}
-			echo '</div>';
-			wp_reset_postdata();
-
-			$first = ( ( $state['paged'] - 1 ) * $config['per_page'] ) + 1;
-			$last  = min( $found, $state['paged'] * $config['per_page'] );
-			printf(
+			$first      = ( ( $state['paged'] - 1 ) * $config['per_page'] ) + 1;
+			$last       = min( $found, $state['paged'] * $config['per_page'] );
+			$count_html = sprintf(
 				'<p class="afs-count">%s</p>',
 				sprintf(
 					/* translators: 1: first result number, 2: last result number, 3: total results. */
@@ -505,8 +508,49 @@ class AFS_Renderer {
 					'<span class="afs-first">' . esc_html( number_format_i18n( $first ) ) . '</span>',
 					'<span class="afs-last">' . esc_html( number_format_i18n( $last ) ) . '</span>',
 					'<span class="afs-total">' . esc_html( number_format_i18n( $found ) ) . '</span>'
-				) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pieces are escaped above.
+				)
 			);
+		}
+
+		$chips_html = $config['show_chips'] ? self::chips( $config, $state, $base, $instance ) : '';
+
+		if ( $own ) {
+			// A design with its own markup groups the active filters and the result count in one bar above the items.
+			if ( '' !== $chips_html || '' !== $count_html ) {
+				echo '<div class="afs-resultbar">' . $chips_html . $count_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped where built.
+			}
+		} else {
+			echo $chips_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in chips().
+		}
+
+		if ( $query->have_posts() ) {
+			// A design with its own item markup supplies its own item wrapper classes and has no table header.
+			$options = $own ? AFS_Card::template_options( $config ) : array();
+			if ( $own ) {
+				if ( ! empty( $options['show_image'] ) ) {
+					AFS_Card::prime( $query );
+				}
+			} else {
+				echo '<div class="afs-TableHeader" aria-hidden="true"><div class="afs-col-date">' . esc_html__( 'Date', 'ajax-filter-search' ) . '</div><div class="afs-col-title">' . esc_html__( 'Headline', 'ajax-filter-search' ) . '</div></div>';
+			}
+			echo '<div class="afs-items">';
+			$i = 1;
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$base_classes = $own ? AFS_Card::item_classes( $config['design'], $options ) : array( 'afs-TableRowItem', 'afs-item', 'gridPR' . $i );
+				printf(
+					'<article class="%1$s" itemscope itemtype="https://schema.org/BlogPosting">%2$s</article>',
+					esc_attr( implode( ' ', array_diff( get_post_class( $base_classes ), array( 'hentry' ) ) ) ), // 'hentry' makes many themes style each result as a full post.
+					return_template( AFS_Design::template_for( $config['design'] ), $config['terms'], $config['taxonomy'], $options ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Template output is trusted theme/plugin markup.
+				);
+				++$i;
+			}
+			echo '</div>';
+			wp_reset_postdata();
+
+			if ( ! $own ) {
+				echo $count_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped where built.
+			}
 			echo self::pagination( $pages, $state, $base, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in pagination().
 		} else {
 			echo '<p class="afs-none">' . esc_html__( 'No results found.', 'ajax-filter-search' ) . '</p>';

@@ -60,7 +60,42 @@ class AFS_Frontend {
 		return $robots;
 	}
 
+	/**
+	 * Data the block editor needs: the designs (and which have their own markup), the site's default design and taxonomy,
+	 * and the accent colours, so the editor preview looks like the front end.
+	 */
+	public static function editor_assets() {
+		$handle = generate_block_asset_handle( 'ajax-filter-search/feed', 'editorScript' );
+		$items  = array();
+		foreach ( AFS_Design::known() as $slug => $label ) {
+			$items[] = array(
+				'value' => $slug,
+				'label' => $label,
+				'own'   => AFS_Design::has_own_markup( $slug ),
+			);
+		}
+		$taxonomy = (string) AFSAdmin::afs_retrieve( '_general_post_taxonomy' );
+		wp_add_inline_script(
+			$handle,
+			'window.afsEditor = ' . wp_json_encode(
+				array(
+					'designs'      => $items,
+					'siteDesign'   => AFS_Design::resolve( '' ),
+					'siteTaxonomy' => $taxonomy,
+				)
+			) . ';',
+			'before'
+		);
+
+		$accent = sanitize_hex_color( AFSAdmin::afs_retrieve( '_appearance_accent' ) );
+		if ( $accent ) {
+			$on = AFS_Design::on_colour( $accent );
+			wp_add_inline_style( 'afs-styles', '.afs{--afs-accent:' . $accent . ';}.afs-design-modern,.afs-discovery{--afs-on-accent:' . $on . ';}' );
+		}
+	}
+
 	public static function register() {
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'editor_assets' ) );
 		// Registered on init so the block (editor preview and front end) can reference the stylesheet handle.
 		self::register_assets();
 		add_shortcode( 'ajax_filter_search', array( __CLASS__, 'shortcode' ) );
@@ -78,6 +113,10 @@ class AFS_Frontend {
 		wp_register_script( 'afs-script', AFS_PLUGIN_URL . '/public/js/afs.js', array(), AFS_VERSION, true );
 		// The Modern design's rules, loaded only for feeds that use it.
 		wp_register_style( 'afs-modern', AFS_PLUGIN_URL . '/public/css/afs-modern.css', array( 'afs-styles' ), AFS_VERSION );
+		// The Editorial Grid and Resource Library: one shared base (controls, chips, states) plus one file per design.
+		wp_register_style( 'afs-discovery', AFS_PLUGIN_URL . '/public/css/afs-discovery.css', array( 'afs-styles' ), AFS_VERSION );
+		wp_register_style( 'afs-editorial', AFS_PLUGIN_URL . '/public/css/afs-editorial.css', array( 'afs-discovery' ), AFS_VERSION );
+		wp_register_style( 'afs-library', AFS_PLUGIN_URL . '/public/css/afs-library.css', array( 'afs-discovery' ), AFS_VERSION );
 	}
 
 	/** Enqueue (once) the CSS and JS, plus the settings the script needs. */
@@ -92,6 +131,15 @@ class AFS_Frontend {
 			wp_enqueue_style( 'afs-modern' );
 			// Text on the accent colour (buttons, the active tab) is white or dark, whichever reads better on it.
 			wp_add_inline_style( 'afs-modern', '.afs-design-modern{--afs-on-accent:' . AFS_Design::on_colour( AFSAdmin::afs_retrieve( '_appearance_accent' ) ) . ';}' );
+		}
+
+		if ( AFS_Design::is_discovery( $design ) ) {
+			if ( ! wp_style_is( 'afs-discovery', 'enqueued' ) ) {
+				wp_enqueue_style( 'afs-discovery' );
+				// Text on the accent colour (the active tab, pressed buttons) is white or dark, whichever reads better on it.
+				wp_add_inline_style( 'afs-discovery', '.afs-discovery{--afs-on-accent:' . AFS_Design::on_colour( AFSAdmin::afs_retrieve( '_appearance_accent' ) ) . ';}' );
+			}
+			wp_enqueue_style( 'afs-' . $design );
 		}
 
 		if ( self::$rendered > 0 ) {
@@ -145,6 +193,15 @@ class AFS_Frontend {
 			'show_sort'      => '',
 			'show_chips'     => '',
 			'design'         => '',
+			// Card options of the designs that have their own item markup (ignored by Classic and Modern).
+			'show_image'     => '',
+			'image_ratio'    => '',
+			'columns'        => '',
+			'show_excerpt'   => '',
+			'excerpt_length' => '',
+			'show_date'      => '',
+			'show_time'      => '',
+			'show_category'  => '',
 		);
 	}
 
@@ -167,21 +224,29 @@ class AFS_Frontend {
 	 */
 	public static function render_block( $attributes ) {
 		$map  = array(
-			'postType'   => 'post_type',
-			'taxonomy'   => 'post_tax',
-			'perPage'    => 'posts_per_page',
-			'terms'      => 'terms',
-			'layout'     => 'layout',
-			'orderby'    => 'orderby',
-			'order'      => 'order',
-			'showTabs'   => 'show_tabs',
-			'showViews'  => 'show_views',
-			'showSearch' => 'show_search',
-			'showMonths' => 'show_months',
-			'showYears'  => 'show_years',
-			'showSort'   => 'show_sort',
-			'showChips'  => 'show_chips',
-			'design'     => 'design',
+			'postType'      => 'post_type',
+			'taxonomy'      => 'post_tax',
+			'perPage'       => 'posts_per_page',
+			'terms'         => 'terms',
+			'layout'        => 'layout',
+			'orderby'       => 'orderby',
+			'order'         => 'order',
+			'showTabs'      => 'show_tabs',
+			'showViews'     => 'show_views',
+			'showSearch'    => 'show_search',
+			'showMonths'    => 'show_months',
+			'showYears'     => 'show_years',
+			'showSort'      => 'show_sort',
+			'showChips'     => 'show_chips',
+			'design'        => 'design',
+			'showImage'     => 'show_image',
+			'imageRatio'    => 'image_ratio',
+			'columns'       => 'columns',
+			'showExcerpt'   => 'show_excerpt',
+			'excerptLength' => 'excerpt_length',
+			'showDate'      => 'show_date',
+			'showTime'      => 'show_time',
+			'showCategory'  => 'show_category',
 		);
 		$atts = array();
 		foreach ( $map as $from => $to ) {
@@ -225,6 +290,6 @@ class AFS_Frontend {
 		$result = AFS_Renderer::render_results( $config, $state, AFS_Renderer::current_url() );
 		++self::$rendered;
 
-		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . ( AFS_Design::MODERN === $config['design'] ? ' afs-design-modern' : '' ) . '"><div class="afs-results">' . $result['html'] . '</div></div>';
+		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . esc_attr( AFS_Design::root_class( $config['design'] ) ) . '"' . ( AFS_Design::is_discovery( $config['design'] ) ? ' style="' . esc_attr( AFS_Card::css_vars( $config ) ) . '"' : '' ) . '><div class="afs-results">' . $result['html'] . '</div></div>';
 	}
 }

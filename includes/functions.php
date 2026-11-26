@@ -52,12 +52,15 @@ if ( ! function_exists( 'return_template' ) ) {
 	 * @param string $template Template file name.
 	 * @param array  $terms    Term slugs the feed is limited to (may be empty).
 	 * @param string $taxonomy Taxonomy the feed's tabs use ('' for none).
+	 * @param array  $options  Card options of the feed (show_image, image_ratio, excerpt_length and so on). Optional: only
+	 *                         the templates of the designs with their own markup use it, and 1.x calls leave it out.
 	 * @return string
 	 */
-	function return_template( $template = 'default.php', $terms = array(), $taxonomy = '' ) {
+	function return_template( $template = 'default.php', $terms = array(), $taxonomy = '', $options = array() ) {
 		$template     = basename( $template );
 		$afs_terms    = (array) $terms;
 		$afs_taxonomy = (string) $taxonomy;
+		$afs_options  = (array) $options;
 
 		$file = AFS_PLUGIN_PATH . 'afs-template/' . $template;
 		foreach ( array( get_stylesheet_directory(), get_template_directory() ) as $dir ) {

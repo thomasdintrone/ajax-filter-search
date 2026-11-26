@@ -15,6 +15,10 @@ class AFS_Design {
 
 	const CLASSIC = 'classic';
 	const MODERN  = 'modern';
+	/** Magazine-style image cards. A working name. */
+	const EDITORIAL = 'editorial';
+	/** Compact searchable rows. A working name. */
+	const LIBRARY = 'library';
 
 	/** Site-wide default, written once when the plugin is activated on a site that has never saved its settings. */
 	const OPTION = 'afs_default_design';
@@ -22,16 +26,100 @@ class AFS_Design {
 	/** Accent of the Modern design on a new install (white text on it passes WCAG AA). */
 	const MODERN_ACCENT = '#2563eb';
 
-	/** @return array<string,string> Slug => label. */
+	/** @return array<string,string> Slug => label: the designs offered in the settings picker and the block. */
 	public static function all() {
 		return array(
-			self::MODERN  => __( 'Modern', 'ajax-filter-search' ),
-			self::CLASSIC => __( 'Classic', 'ajax-filter-search' ),
+			self::MODERN    => __( 'Modern', 'ajax-filter-search' ),
+			self::CLASSIC   => __( 'Classic', 'ajax-filter-search' ),
+			self::EDITORIAL => __( 'Editorial Grid', 'ajax-filter-search' ),
+			self::LIBRARY   => __( 'Resource Library', 'ajax-filter-search' ),
 		);
 	}
 
+	/**
+	 * Built-in designs with their own item markup (a template per design). Slug => template file.
+	 *
+	 * @return array<string,string>
+	 */
+	private static function built_in_templates() {
+		return array(
+			self::EDITORIAL => 'editorial.php',
+			self::LIBRARY   => 'library.php',
+		);
+	}
+
+	/**
+	 * Every design a feed may use: the built-in ones and designs add-ons register with afs_register_design(). Built-in
+	 * slugs always win over a registration with the same id.
+	 *
+	 * @return array<string,string> Slug => label.
+	 */
+	public static function known() {
+		$known = self::all();
+		foreach ( afs_registered( 'designs' ) as $slug => $args ) {
+			$slug = sanitize_key( $slug );
+			if ( '' !== $slug && ! isset( $known[ $slug ] ) ) {
+				$known[ $slug ] = isset( $args['label'] ) && is_string( $args['label'] ) ? $args['label'] : $slug;
+			}
+		}
+		return $known;
+	}
+
 	public static function is_valid( $slug ) {
-		return is_string( $slug ) && isset( self::all()[ $slug ] );
+		return is_string( $slug ) && isset( self::known()[ $slug ] );
+	}
+
+	/** Template file for a design's items. Classic and Modern (and a registered design with no template) use default.php. */
+	public static function template_for( $design ) {
+		$built_in = self::built_in_templates();
+		if ( isset( $built_in[ $design ] ) ) {
+			return $built_in[ $design ];
+		}
+		$args = afs_registered( 'designs' );
+		if ( isset( $args[ $design ]['template'] ) && is_string( $args[ $design ]['template'] ) && preg_match( '/^[a-z0-9_-]+\.php$/i', $args[ $design ]['template'] ) ) {
+			return $args[ $design ]['template'];
+		}
+		return 'default.php';
+	}
+
+	/** True when a design renders its items with a template of its own (so it needs its options sent with every request). */
+	public static function has_own_markup( $design ) {
+		return 'default.php' !== self::template_for( $design );
+	}
+
+	/** The layout a design with its own markup starts in when the feed does not choose one. */
+	public static function default_layout( $design ) {
+		return self::LIBRARY === $design ? 'list' : 'grid';
+	}
+
+	/** Class for each result item of a design with its own markup. */
+	public static function item_class( $design ) {
+		if ( self::EDITORIAL === $design ) {
+			return 'afs-card';
+		}
+		if ( self::LIBRARY === $design ) {
+			return 'afs-row';
+		}
+		$args = afs_registered( 'designs' );
+		return isset( $args[ $design ]['item_class'] ) && is_string( $args[ $design ]['item_class'] ) ? sanitize_html_class( $args[ $design ]['item_class'] ) : 'afs-item';
+	}
+
+	/** Extra class on the feed's root element: only Modern and the designs with their own markup add one. */
+	public static function root_class( $design ) {
+		if ( self::CLASSIC === $design ) {
+			return '';
+		}
+		$class = ' afs-design-' . sanitize_html_class( $design );
+		// The two built-in designs with their own markup share one base stylesheet (controls, chips, states) under this class.
+		if ( self::is_discovery( $design ) ) {
+			$class .= ' afs-discovery';
+		}
+		return $class;
+	}
+
+	/** True for the built-in Editorial Grid and Resource Library, which share the discovery stylesheet. */
+	public static function is_discovery( $design ) {
+		return in_array( $design, array( self::EDITORIAL, self::LIBRARY ), true );
 	}
 
 	/** The design a site gets when nothing else says otherwise: Classic unless this install chose Modern when it was set up. */
