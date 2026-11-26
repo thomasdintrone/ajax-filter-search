@@ -35,6 +35,7 @@ Register on the `afs_register` action (fires on `init`, priority 5). Each call r
 | `afs_rest_cache_control` | The `Cache-Control` value of an anonymous results response (default `public, max-age=60, stale-while-revalidate=300`); return `''` to send none. |
 | `afs_cache_version` | The counter behind the `ETag` and the cached results. It changes when posts, terms, the plugin's settings or the theme change; append to it to invalidate everything. A change to a template override or to your own filter is not detected, so give those a new value here. |
 | `afs_noindex_filtered_states` | Return `false` to stop filtered views of a feed page from being marked `noindex, follow`. The setting "Hide filtered views from search engines" (default on) does the same for the whole site. The unfiltered page stays indexable and WordPress already sets its canonical link to the permalink without query arguments. |
+| `afs_register_patterns` | Return `false` to leave out the two block patterns (Editorial Grid and Resource Library) that the plugin adds to the inserter under "Ajax Filter Search". |
 | `afs_enable_feed` | Return `false` to remove the RSS route. |
 | `afs_enable_legacy_compat` | Turn the 1.x compatibility layer off. |
 
@@ -117,3 +118,7 @@ For these designs the active-filter chips and the result count are grouped in a 
 The settings screen has a Cards group with site-wide defaults for the card options (`afs_cards_show_image`, `afs_cards_image_ratio`, `afs_cards_columns`, `afs_cards_show_excerpt`, `afs_cards_excerpt_length`, `afs_cards_show_date`, `afs_cards_show_time`, `afs_cards_show_category`, all inside the `afs_settings` option). A shortcode attribute or block setting overrides the default for one feed; an unset block control (empty or 0) falls back to it. Sites that saved settings before 2.3.0 get the defaults with no migration, because missing keys read as their defaults. Classic and Modern ignore the card settings.
 
 The design picker and the block's Design control list every design from `AFS_Design::all()`. In the editor the block gets `window.afsEditor` (the designs and whether each has its own markup, the site's default design and taxonomy) and shows the Cards controls only when the effective design has its own markup. The Limit-to-terms control is a searchable picker over the feed's taxonomy; the block still stores the slugs, comma separated, exactly as the shortcode's `terms` attribute does.
+
+## Block patterns (2.3.0)
+
+The inserter has two patterns in an "Ajax Filter Search" category: an Editorial Grid (six cards, three columns, sort and chips on) and a Resource Library (ten rows, sort and chips on). Each is just the feed block with attributes it already has, so it adds no settings, and everything in it can be changed in the block sidebar after inserting. `AFS_Patterns::definitions()` lists them.

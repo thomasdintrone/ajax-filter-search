@@ -9,7 +9,7 @@ WordPress plugin: a filterable, searchable, paginated list of posts or custom po
 | Path | What |
 |---|---|
 | `ajax-filter-search.php` | Bootstrap and constants |
-| `includes/` | Settings, designs, card helpers (image, excerpt, metadata), renderer (HTML and queries), REST endpoint, shortcode/block/assets |
+| `includes/` | Settings, designs, card helpers (image, excerpt, metadata), block patterns, renderer (HTML and queries), REST endpoint, shortcode/block/assets |
 | `afs-template/` | Per-item templates: `default.php` (Classic, Modern), `editorial.php` and `library.php` (the Editorial Grid and Resource Library designs, 2.3.0 work in progress). Themes override any of them at `your-theme/afs-template/` |
 | `blocks/feed/` | Gutenberg block (no build step; `editor.js` uses the `wp.*` globals) |
 | `public/` | Front-end CSS and JS (no dependencies) |

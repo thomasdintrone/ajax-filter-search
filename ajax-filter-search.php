@@ -47,12 +47,14 @@ require_once AFS_PLUGIN_PATH . 'includes/class-afs-renderer.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-rest.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-feed.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-frontend.php';
+require_once AFS_PLUGIN_PATH . 'includes/class-afs-patterns.php';
 require_once AFS_PLUGIN_PATH . 'includes/compat.php';
 
 register_activation_hook( __FILE__, array( 'AFS_Design', 'activate' ) );
 
 AFSAdmin::init();
 AFS_Frontend::init();
+AFS_Patterns::init();
 AFS_REST::init();
 AFS_Feed::init();
 AFS_Compat::init();
