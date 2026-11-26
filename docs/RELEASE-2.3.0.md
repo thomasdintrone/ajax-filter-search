@@ -29,7 +29,7 @@ Nothing changes on update. Classic and Modern feeds render exactly as before (th
 
 ## Files that differ from 2.2.2 (the shipping set)
 
-Added (8): `afs-template/editorial.php`, `afs-template/library.php`, `includes/class-afs-card.php`, `includes/class-afs-patterns.php`, `public/css/afs-discovery.css`, `public/css/afs-editorial.css`, `public/css/afs-library.css` and the new strings in `languages/ajax-filter-search.pot`.
+Added (7): `afs-template/editorial.php`, `afs-template/library.php`, `includes/class-afs-card.php`, `includes/class-afs-patterns.php`, `public/css/afs-discovery.css`, `public/css/afs-editorial.css`, `public/css/afs-library.css`.
 
 Modified: `ajax-filter-search.php`, `blocks/feed/block.json`, `blocks/feed/editor.asset.php`, `blocks/feed/editor.js`, `includes/class-afs-cache.php`, `includes/class-afs-design.php`, `includes/class-afs-frontend.php`, `includes/class-afs-renderer.php`, `includes/class-afs-rest.php`, `includes/class-afs-settings.php`, `includes/functions.php`, `languages/ajax-filter-search.pot`, `readme.txt`.
 
@@ -43,8 +43,9 @@ Listing assets (`.wordpress-org/`, copied to SVN `assets/`): screenshots 1 to 10
 
 - PHP coding standards, PHPStan, ESLint.
 - PHPUnit (234 tests), including the frozen 2.0.0 snapshots, the security regression suite, the new design, card, settings, block and pattern tests.
-- Browser tests (137): behavior, accessibility (axe, light and dark, 390 and 1200 px, both new designs), HTTP contract, extension points, visual baselines (including a dark-themed page), the onboarding path and the keyboard-only term picker.
-- Upgrade from 2.2.2 and from 2.0.0 onto this build, and the official Plugin Check on the release package (see the results recorded in the pull request).
+- Browser tests (135 pass, 1 skipped): behavior, accessibility (axe, light and dark, 390 and 1200 px, both new designs), HTTP contract, extension points, visual baselines (including a dark-themed page), the onboarding path and the keyboard-only term picker.
+- Upgrade from 2.2.2, 2.0.0 and 1.0.4 onto this build (`bin/upgrade-test.sh`): every check passes, and from 2.0.0 the pages and REST output are identical after the upgrade.
+- The official Plugin Check on the release package (`bin/plugin-check.sh`): 0 errors, 0 warnings.
 
 ## Publish (WordPress.org SVN)
 
