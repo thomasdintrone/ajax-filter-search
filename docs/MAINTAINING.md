@@ -5,10 +5,11 @@ GitHub is the source of truth for development. WordPress.org SVN is a release ta
 ## Current state
 | Item | Value |
 |---|---|
-| Production version | **2.0.0** (WordPress.org SVN revision r3775464, published 2026-10-30) |
-| Previous releases | 1.0.4 security release (r3774078); 1.0.3 original |
+| Production version | **2.3.0** (WordPress.org SVN r3828281, published 2026-11-26; Git tag `v2.3.0` = `3e2bc45`). Whether WordPress.org is offering the update to sites is checked with `bin/verify-live-release.sh 2.3.0 2.2.2`; do not assume it |
+| Release history | 2.3.0 r3828281; 2.2.2 r3827794; 2.2.1 r3827748 (all three 2026-11-26); 2.2.0 r3809958 (2026-11-18); 2.1.0 r3803994; 2.0.0 r3775464 (2026-10-30, `36c8469`); 1.0.4 security release r3774078; 1.0.3 original. Each has a Git tag `v<version>`. Per-release notes: `docs/RELEASE-*.md` |
+| In progress | `fix/2.3.0-audit-remediation` (PR 31): fixes from the independent audit of 2.3.0, intended as 2.3.1. Not versioned, tagged or published; see the "Audit remediation" section of `docs/RELEASE-2.3.0.md` |
 | Supported | WordPress 6.0 and up (tested to 7.1.4), PHP 7.4 and up (tested on 7.4 and 8.4) |
-| Git release commits | 2.0.0 = `36c8469` (tag `v2.0.0`); 1.0.4 = `d39cb21` (tag `v1.0.4`); 1.0.3 = `a510c2b` (tag `v1.0.3`). `master` contains all three (merge commit `40e44bd`) and equals the 2.0.0 source |
+| Git | `master` is the integration branch (2.3.0 and its docs, `d679789`, when this was written). Historical: until the 2.0.0 release `master` equalled the 2.0.0 source (merge commit `40e44bd`) |
 | Source layout | see `README.md` |
 
 ## Build and package
@@ -16,7 +17,7 @@ GitHub is the source of truth for development. WordPress.org SVN is a release ta
 composer install
 bin/build-zip.sh        # builds build/ajax-filter-search-<version>.zip
 ```
-The script starts from `git archive HEAD` (tracked files only), then removes everything in `.distignore`. The zip contains only production files (currently 18). Keep private notes in `docs-private/` (git-ignored, never packaged) and design sources in `design/` (not packaged).
+The script starts from `git archive HEAD` (tracked files only), then removes everything in `.distignore`. The zip contains only production files; `bin/check-package.sh` prints the count (38 files in the 2.3.0 build; it grows with the new designs, templates, block and admin assets, so use the script's number, not a number written here). Keep private notes in `docs-private/` (git-ignored, never packaged) and design sources in `design/` (not packaged).
 
 ## Test
 ```bash
@@ -36,7 +37,7 @@ CI (`.github/workflows/ci.yml`) runs lint and PHPStan, the guards, PHPUnit on Wo
 
 A nightly workflow (`.github/workflows/nightly.yml`) runs the behaviour, accessibility and contract specs in Firefox and WebKit (`PW_BROWSER=firefox bin/e2e.sh feed.spec.mjs`), and a latency check on about 10,000 posts (`AFS_PERF_10K=1 bin/e2e.sh`, budget REST p95 under 300 ms). `tests/e2e/contract.spec.mjs` holds the HTTP checks that used to exist only in `bin/smoke-test.sh` and `bin/compat-test.sh`; those scripts stay for manual use against a running site.
 
-**Visual baselines** (`tests/e2e/__screenshots__`) are only valid inside the Playwright image that `bin/e2e.sh` uses. When a change is meant to alter the look, run `bin/e2e.sh --update-snapshots`, look at every changed image, and commit them with the change. The comparison tolerance is 0.2% of pixels, tight enough to notice a button appearing or disappearing. The dark-mode baseline equals the light one today because neither the plugin nor the default theme has dark styling; it exists to catch a future dark design.
+**Visual baselines** (`tests/e2e/__screenshots__`) are only valid inside the Playwright image that `bin/e2e.sh` uses. When a change is meant to alter the look, run `bin/e2e.sh --update-snapshots`, look at every changed image, and commit them with the change. The comparison tolerance is 0.2% of pixels, tight enough to notice a button appearing or disappearing. The Classic `list-dark-desktop` baseline is still byte-identical to `list-light-desktop` because Classic has no dark styling; it exists to catch a future dark Classic. The Editorial Grid and Resource Library have their own dark baselines (`designs.spec.mjs`: `editorial-dark-desktop`, `library-dark-desktop`), which do differ from light.
 
 The e2e stack uses the seeded content from `bin/seed-test-content.php` (the default "Hello world!" post is deleted so dates stay fixed). Browser tests scan only the plugin's own region (`.afs`) with axe; theme markup is out of scope.
 

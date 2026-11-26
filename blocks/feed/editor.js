@@ -71,7 +71,7 @@
 		var searchState = useState( '' );
 		var search = searchState[ 0 ];
 		var setSearch = searchState[ 1 ];
-		var names = useRef( {} ); // slug => { name, parent }, for every term seen so far.
+		var seen = useRef( { taxonomy: taxonomy, terms: {} } ); // slug => { name, parent }, for every term seen in this taxonomy.
 
 		var terms = useSelect(
 			function ( select ) {
@@ -94,6 +94,13 @@
 		}
 		var list = terms || last.current;
 
+		// Terms of another taxonomy are never offered or labelled here: start again when the taxonomy changes.
+		if ( seen.current.taxonomy !== taxonomy ) {
+			seen.current = { taxonomy: taxonomy, terms: {} };
+			last.current = [];
+			list = [];
+		}
+		var names = { current: seen.current.terms };
 		list.forEach( function ( term ) {
 			names.current[ term.slug ] = { name: term.name, parent: term.parent || 0 };
 		} );
@@ -104,21 +111,48 @@
 				return slug.trim();
 			} )
 			.filter( Boolean );
-		// A term is identified by its slug, never by its name: two terms can share a name (in different branches of a
-		// hierarchy), so a name that is not unique is shown with the slug after it, which is unique within a taxonomy.
-		var label = function ( slug ) {
-			var known = names.current[ slug ];
-			if ( ! known ) {
-				return slug;
+		// A term is identified by its slug, never by its name. Each term gets one label that no other term has: its name when
+		// that is unique, otherwise the name with its slug, and if that still matches another label (a term whose name
+		// looks like one of those labels) its slug is added again, until every label is different.
+		var labels = {};
+		var entries = {};
+		Object.keys( names.current ).forEach( function ( slug ) {
+			entries[ slug ] = names.current[ slug ].name;
+		} );
+		selected.forEach( function ( slug ) {
+			if ( ! entries[ slug ] ) {
+				entries[ slug ] = slug; // Not loaded yet: shown by its slug.
 			}
-			var same = Object.keys( names.current ).filter( function ( other ) {
-				return names.current[ other ].name === known.name;
+		} );
+		Object.keys( entries ).forEach( function ( slug ) {
+			labels[ slug ] = entries[ slug ];
+		} );
+		var groups = function () {
+			var byLabel = {};
+			Object.keys( labels ).forEach( function ( slug ) {
+				( byLabel[ labels[ slug ] ] = byLabel[ labels[ slug ] ] || [] ).push( slug );
 			} );
-			return same.length > 1 ? known.name + ' (' + slug + ')' : known.name;
+			return Object.keys( byLabel )
+				.map( function ( key ) {
+					return byLabel[ key ];
+				} )
+				.filter( function ( group ) {
+					return group.length > 1;
+				} );
+		};
+		for ( var round = 0, clash = groups(); clash.length && round < 10; round++, clash = groups() ) {
+			clash.forEach( function ( group ) {
+				group.forEach( function ( slug ) {
+					labels[ slug ] = labels[ slug ] + ' (' + slug + ')';
+				} );
+			} );
+		}
+		var label = function ( slug ) {
+			return labels[ slug ] || slug;
 		};
 		var slugFor = function ( token ) {
-			var found = Object.keys( names.current ).filter( function ( slug ) {
-				return label( slug ) === token;
+			var found = Object.keys( labels ).filter( function ( slug ) {
+				return labels[ slug ] === token;
 			} )[ 0 ];
 			return found || token;
 		};
@@ -150,8 +184,8 @@
 			__experimentalShowHowTo: false,
 			// Only terms that exist can be added; a typed name that matches none is dropped.
 			__experimentalValidateInput: function ( token ) {
-				return Object.keys( names.current ).some( function ( slug ) {
-					return label( slug ) === token;
+				return Object.keys( labels ).some( function ( slug ) {
+					return names.current[ slug ] && labels[ slug ] === token;
 				} );
 			},
 		} ) );

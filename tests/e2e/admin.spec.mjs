@@ -185,6 +185,82 @@ test.describe( 'block editor, terms that share a name', () => {
 	} );
 } );
 
+test.describe( 'block editor, labels that could collide', () => {
+	test( 'a term whose name looks like another term\'s label keeps its own slug, and a taxonomy switch drops old labels', async ( { page, request } ) => {
+		const pages = await ( await request.get( '/wp-json/wp/v2/pages?slug=afs-block&_fields=id' ) ).json();
+		await login( page );
+		await page.goto( `/wp-admin/post.php?post=${ pages[ 0 ].id }&action=edit` );
+		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
+		// Two "News" categories under different parents, and a third whose NAME is the label the first would get.
+		const ids = await page.evaluate( async () => {
+			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
+			const a = await make( { name: 'Clash Parent A', slug: 'clash-parent-a' } );
+			const b = await make( { name: 'Clash Parent B', slug: 'clash-parent-b' } );
+			const x = await make( { name: 'Clashnews', slug: 'clashnews-a', parent: a.id } );
+			const y = await make( { name: 'Clashnews', slug: 'clashnews-b', parent: b.id } );
+			const z = await make( { name: 'Clashnews (clashnews-a)', slug: 'special-clashnews' } );
+			return [ a.id, b.id, x.id, y.id, z.id ];
+		} );
+		try {
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'welcomeGuide', false );
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { design: 'editorial', taxonomy: 'category', terms: '' } );
+				wp.data.dispatch( 'core/block-editor' ).selectBlock( block.clientId );
+				wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			} );
+			const attrs = () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ].attributes );
+			const input = page.locator( '.components-form-token-field__input' );
+			await input.waitFor( { timeout: 30000 } );
+			await page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( '.afs-card' ).first().waitFor( { timeout: 30000 } );
+			await input.focus();
+			await page.keyboard.type( 'Clashnews' );
+			const options = page.locator( '.components-form-token-field__suggestion' );
+			await expect( options ).toHaveCount( 3 );
+			const texts = await options.allTextContents();
+			expect( new Set( texts ).size ).toBe( 3 ); // Every label is different.
+			// Choose the one whose slug is special-clashnews, by its label.
+			const special = texts.findIndex( ( t ) => t.includes( 'special-clashnews' ) );
+			expect( special ).toBeGreaterThan( -1 );
+			await options.nth( special ).click();
+			await expect.poll( async () => ( await attrs() ).terms ).toBe( 'special-clashnews' );
+			// Then the first of the pair: both are kept, in order.
+			await page.keyboard.type( 'Clashnews' );
+			const rest = await options.allTextContents();
+			expect( new Set( rest ).size ).toBe( rest.length );
+			const first = rest.findIndex( ( t ) => /clashnews-a\)$/.test( t ) && ! t.includes( 'special' ) );
+			expect( first ).toBeGreaterThan( -1 );
+			await options.nth( first ).click();
+			await expect.poll( async () => ( await attrs() ).terms ).toBe( 'special-clashnews,clashnews-a' );
+
+			// Another taxonomy shows none of the categories' labels.
+			await page.evaluate( () => {
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { taxonomy: 'post_tag', terms: '' } );
+			} );
+			await page.locator( '.components-form-token-field__input' ).focus();
+			await page.keyboard.type( 'Clashnews' );
+			await expect( page.locator( '.components-form-token-field__suggestion' ).filter( { hasText: 'Clashnews' } ) ).toHaveCount( 0 );
+			// Back to categories: the labels are the same as before, with nothing left over.
+			await page.evaluate( () => {
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { taxonomy: 'category', terms: '' } );
+			} );
+			await page.locator( '.components-form-token-field__input' ).focus();
+			await page.keyboard.press( 'Control+a' );
+			await page.keyboard.type( 'Clashnews' );
+			await expect( options ).toHaveCount( 3 );
+			expect( new Set( await options.allTextContents() ).size ).toBe( 3 );
+		} finally {
+			await page.evaluate( async ( list ) => {
+				for ( const id of list.slice().reverse() ) {
+					await wp.apiFetch( { path: `/wp/v2/categories/${ id }?force=true`, method: 'DELETE' } );
+				}
+			}, ids );
+		}
+	} );
+} );
+
 const SETTINGS = '/wp-admin/options-general.php?page=ajax-filter-search';
 const row = ( page, name ) => page.locator( `[data-afs-needs="afs_settings[${ name }]"]` );
 
