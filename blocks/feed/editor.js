@@ -63,7 +63,14 @@
 			[ taxonomy, search ]
 		);
 
-		( terms || [] ).forEach( function ( term ) {
+		// While a new search loads, keep offering the last results instead of an empty list.
+		var last = useRef( [] );
+		if ( terms ) {
+			last.current = terms;
+		}
+		var list = terms || last.current;
+
+		list.forEach( function ( term ) {
 			names.current[ term.slug ] = term.name;
 		} );
 
@@ -86,7 +93,7 @@
 		return el( FormTokenField, {
 			label: __( 'Limit to these terms', 'ajax-filter-search' ),
 			value: selected.map( label ),
-			suggestions: ( terms || [] )
+			suggestions: list
 				.filter( function ( term ) {
 					return selected.indexOf( term.slug ) === -1;
 				} )
