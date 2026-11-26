@@ -102,4 +102,80 @@ class RefinementsTest extends AFS_Test_Case {
 		$html = $this->results( array( 'design' => 'editorial', 'show_image' => '1', 'afs_year' => 2024, 'afs_month' => 1 ) )['html'];
 		$this->assertMatchesRegularExpression( '/<span class="afs-img afs-img--none" aria-hidden="true"><span class="afs-img__mono">[A-Z]<\/span><\/span>/', $html );
 	}
+
+	// --- A feed's own chips choice survives an AJAX update (audit finding 3) ---
+
+	private function client_config_of( $html ) {
+		$this->assertSame( 1, preg_match( '/data-afs-config="([^"]*)"/', $html, $m ) );
+		return json_decode( html_entity_decode( $m[1] ), true );
+	}
+
+	/**
+	 * @return array<string,array<int,string>>
+	 */
+	public function every_design() {
+		return array( 'classic' => array( 'classic' ), 'modern' => array( 'modern' ), 'editorial' => array( 'editorial' ), 'library' => array( 'library' ) );
+	}
+
+	/**
+	 * @dataProvider every_design
+	 */
+	public function test_a_feed_with_chips_off_keeps_them_off_through_ajax_when_the_site_setting_turns_them_on( $design ) {
+		update_option( AFS_SETTINGS, array_merge( AFSAdmin::defaults(), array( 'afs_general_show_chips' => 1 ) ) );
+
+		$html   = $this->feed( '[ajax_filter_search design="' . $design . '" show_chips="false"]' );
+		$config = $this->client_config_of( $html );
+		$this->assertSame( '0', $config['show_chips'], 'The effective choice, off, must be sent' );
+		$this->assertStringNotContainsString( 'afs-has-chips', $html );
+
+		$_GET = array( 'afs_term' => 'news' );
+		$page = $this->feed( '[ajax_filter_search design="' . $design . '" show_chips="false"]' );
+		$_GET = array();
+		$this->assertStringNotContainsString( 'class="afs-chips"', $page, 'First load shows no chips' );
+
+		$ajax = $this->results( array_merge( $config, array( 'afs_term' => 'news', 'posts_per_page' => 3 ) ) )['html'];
+		$this->assertStringNotContainsString( 'afs-chips', $ajax, 'The update must not switch the chips on' );
+		$this->assertStringNotContainsString( 'afs-chip-clear', $ajax );
+		$this->assertStringNotContainsString( 'data-afs-clear', $ajax );
+	}
+
+	/**
+	 * @dataProvider every_design
+	 */
+	public function test_a_feed_with_chips_on_keeps_them_on_when_the_site_setting_is_off( $design ) {
+		$html   = $this->feed( '[ajax_filter_search design="' . $design . '" show_chips="true"]' );
+		$config = $this->client_config_of( $html );
+		$this->assertSame( '1', $config['show_chips'] );
+		$ajax = $this->results( array_merge( $config, array( 'afs_term' => 'news', 'posts_per_page' => 3 ) ) )['html'];
+		$this->assertStringContainsString( 'afs-chips', $ajax );
+	}
+
+	public function test_the_block_override_is_kept_too() {
+		update_option( AFS_SETTINGS, array_merge( AFSAdmin::defaults(), array( 'afs_general_show_chips' => 1 ) ) );
+		$this->reset_widget_counters();
+		$html = render_block( array( 'blockName' => 'ajax-filter-search/feed', 'attrs' => array( 'design' => 'editorial', 'showChips' => 'hide' ) ) );
+		$this->assertSame( '0', $this->client_config_of( $html )['show_chips'] );
+		$this->assertStringNotContainsString( 'afs-has-chips', $html );
+	}
+
+	public function test_nothing_extra_is_sent_when_the_feed_and_the_site_agree() {
+		// Site setting off (the default) and a feed that does not mention chips: the client config is exactly what it was.
+		foreach ( array( 'classic', 'modern', 'editorial', 'library' ) as $design ) {
+			$this->assertArrayNotHasKey( 'show_chips', $this->client_config_of( $this->feed( '[ajax_filter_search design="' . $design . '"]' ) ), $design );
+		}
+		// Site setting on and a feed that does not mention chips: on, sent as before.
+		update_option( AFS_SETTINGS, array_merge( AFSAdmin::defaults(), array( 'afs_general_show_chips' => 1 ) ) );
+		$this->assertSame( '1', $this->client_config_of( $this->feed( '[ajax_filter_search design="classic"]' ) )['show_chips'] );
+	}
+
+	public function test_reset_is_shown_in_the_stylesheet_only_for_a_feed_without_chips() {
+		update_option( AFS_SETTINGS, array_merge( AFSAdmin::defaults(), array( 'afs_general_show_chips' => 1 ) ) );
+		$_GET = array( 'afs_term' => 'news' );
+		$off  = $this->feed( '[ajax_filter_search design="editorial" show_chips="false"]' );
+		$on   = $this->feed( '[ajax_filter_search design="editorial"]' );
+		$_GET = array();
+		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper [^"]*afs-is-filtered"/', $off );
+		$this->assertDoesNotMatchRegularExpression( '/class="afs afs-wrapper [^"]*afs-has-chips/', $off, 'No chips, so Reset is the way out' );
+		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper [^"]*afs-has-chips afs-is-filtered"/', $on, 'Chips on, so Reset stays hidden' );
+	}
 }

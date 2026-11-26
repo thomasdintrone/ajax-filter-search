@@ -71,14 +71,14 @@
 		var searchState = useState( '' );
 		var search = searchState[ 0 ];
 		var setSearch = searchState[ 1 ];
-		var names = useRef( {} ); // slug => name, for every term seen so far.
+		var names = useRef( {} ); // slug => { name, parent }, for every term seen so far.
 
 		var terms = useSelect(
 			function ( select ) {
 				if ( ! taxonomy || taxonomy === 'none' ) {
 					return null;
 				}
-				var query = { per_page: 100, orderby: 'name', order: 'asc', _fields: 'id,slug,name' };
+				var query = { per_page: 100, orderby: 'name', order: 'asc', _fields: 'id,slug,name,parent' };
 				if ( search ) {
 					query.search = search;
 				}
@@ -95,7 +95,7 @@
 		var list = terms || last.current;
 
 		list.forEach( function ( term ) {
-			names.current[ term.slug ] = term.name;
+			names.current[ term.slug ] = { name: term.name, parent: term.parent || 0 };
 		} );
 
 		var selected = ( props.value || '' )
@@ -104,12 +104,21 @@
 				return slug.trim();
 			} )
 			.filter( Boolean );
+		// A term is identified by its slug, never by its name: two terms can share a name (in different branches of a
+		// hierarchy), so a name that is not unique is shown with the slug after it, which is unique within a taxonomy.
 		var label = function ( slug ) {
-			return names.current[ slug ] || slug;
+			var known = names.current[ slug ];
+			if ( ! known ) {
+				return slug;
+			}
+			var same = Object.keys( names.current ).filter( function ( other ) {
+				return names.current[ other ].name === known.name;
+			} );
+			return same.length > 1 ? known.name + ' (' + slug + ')' : known.name;
 		};
 		var slugFor = function ( token ) {
 			var found = Object.keys( names.current ).filter( function ( slug ) {
-				return names.current[ slug ] === token;
+				return label( slug ) === token;
 			} )[ 0 ];
 			return found || token;
 		};
@@ -123,7 +132,7 @@
 					return selected.indexOf( term.slug ) === -1;
 				} )
 				.map( function ( term ) {
-					return term.name;
+					return label( term.slug );
 				} ),
 			onChange: function ( tokens ) {
 				props.onChange(
@@ -142,7 +151,7 @@
 			// Only terms that exist can be added; a typed name that matches none is dropped.
 			__experimentalValidateInput: function ( token ) {
 				return Object.keys( names.current ).some( function ( slug ) {
-					return names.current[ slug ] === token;
+					return label( slug ) === token;
 				} );
 			},
 		} ) );

@@ -17,7 +17,8 @@ if ( ! function_exists( 'get_the_selected_excerpt' ) ) {
 	 */
 	function get_the_selected_excerpt( $length = 40 ) {
 		$post = get_post();
-		if ( ! $post || post_password_required( $post ) ) {
+		// Read from the post, not the visitor's cookie: the output of a feed is shared (cached), so it must not vary with who asks.
+		if ( ! $post || '' !== (string) $post->post_password ) {
 			return '';
 		}
 

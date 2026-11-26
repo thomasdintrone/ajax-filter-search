@@ -338,6 +338,10 @@ class AFS_Renderer {
 		// Only when on, so the markup of every existing feed is unchanged. The script passes it on to the REST route.
 		if ( $config['show_chips'] ) {
 			$client['show_chips'] = '1';
+		} elseif ( 1 === (int) AFSAdmin::afs_retrieve( '_general_show_chips' ) ) {
+			// The feed turned the chips off while the site setting has them on. The results route falls back to the setting
+			// for anything it is not told, so "off" has to be sent or the first update would switch them on.
+			$client['show_chips'] = '0';
 		}
 		// A design with its own item markup must produce the same items on page load and through the REST route, so the
 		// design and its card options travel with every request. Classic and Modern send nothing extra (see below).
@@ -469,11 +473,12 @@ class AFS_Renderer {
 					</div>
 				</div>
 
-				<?php
-				if ( ! $discovery ) {
-					echo self::layout_switch( $config, $state, $legacy, $n ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch().
-				}
-				?>
+				<?php if ( ! $discovery && $config['show_views'] ) : ?>
+					<div<?php echo $legacy ? ' id="newsViewOptionsPanel"' : ''; ?> class="afs-Switch" role="group" aria-label="<?php echo esc_attr( self::label( __( 'Layout', 'ajax-filter-search' ), $n ) ); ?>">
+						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="list" aria-pressed="<?php echo 'list' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'List View', 'ajax-filter-search' ); ?></button>
+						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="grid" aria-pressed="<?php echo 'grid' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'Grid View', 'ajax-filter-search' ); ?></button>
+					</div>
+				<?php endif; ?>
 			</form>
 
 			<div<?php echo $legacy ? ' id="newsPanelResults"' : ''; ?> class="afs-results" aria-live="polite" aria-busy="false">

@@ -132,6 +132,59 @@ test.describe( 'block editor', () => {
 	} );
 } );
 
+test.describe( 'block editor, terms that share a name', () => {
+	test( 'the picker keeps each term apart by its slug', async ( { page, request } ) => {
+		const pages = await ( await request.get( '/wp-json/wp/v2/pages?slug=afs-block&_fields=id' ) ).json();
+		await login( page );
+		await page.goto( `/wp-admin/post.php?post=${ pages[ 0 ].id }&action=edit` );
+		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
+		// Two categories with one name, under different parents. They are created for this test and removed at the end.
+		const ids = await page.evaluate( async () => {
+			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
+			const a = await make( { name: 'Dup Parent A', slug: 'dup-parent-a' } );
+			const b = await make( { name: 'Dup Parent B', slug: 'dup-parent-b' } );
+			const x = await make( { name: 'Twin', slug: 'twin-a', parent: a.id } );
+			const y = await make( { name: 'Twin', slug: 'twin-b', parent: b.id } );
+			return [ a.id, b.id, x.id, y.id ];
+		} );
+		try {
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'welcomeGuide', false );
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { design: 'editorial', terms: 'news' } );
+				wp.data.dispatch( 'core/block-editor' ).selectBlock( block.clientId );
+				wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			} );
+			const terms = () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ].attributes.terms );
+			const input = page.locator( '.components-form-token-field__input' );
+			await input.waitFor( { timeout: 30000 } );
+			await page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( '.afs-card' ).first().waitFor( { timeout: 30000 } );
+			await input.focus();
+			await page.keyboard.type( 'Twin' );
+			const options = page.locator( '.components-form-token-field__suggestion' );
+			await expect( options ).toHaveCount( 2 );
+			await expect( options.nth( 0 ) ).toHaveText( 'Twin (twin-a)' );
+			await expect( options.nth( 1 ) ).toHaveText( 'Twin (twin-b)' );
+			// Choosing the second one stores the second slug, and keeps the term that was already chosen.
+			await options.nth( 1 ).click();
+			await expect.poll( terms ).toBe( 'news,twin-b' );
+			// Adding the first as well, then removing the second, leaves the first and the original.
+			await page.keyboard.type( 'Twin' );
+			await expect( options ).toHaveCount( 1 );
+			await options.first().click();
+			await expect.poll( terms ).toBe( 'news,twin-b,twin-a' );
+			await page.locator( '.components-form-token-field__token' ).filter( { hasText: 'twin-b' } ).locator( 'button' ).click();
+			await expect.poll( terms ).toBe( 'news,twin-a' );
+		} finally {
+			await page.evaluate( async ( list ) => {
+				for ( const id of list.slice().reverse() ) {
+					await wp.apiFetch( { path: `/wp/v2/categories/${ id }?force=true`, method: 'DELETE' } );
+				}
+			}, ids );
+		}
+	} );
+} );
+
 const SETTINGS = '/wp-admin/options-general.php?page=ajax-filter-search';
 const row = ( page, name ) => page.locator( `[data-afs-needs="afs_settings[${ name }]"]` );
 
@@ -288,5 +341,40 @@ test.describe( "What's new", () => {
 		await Promise.all( [ page.waitForURL( /options-general\.php\?page=ajax-filter-search$/ ), page.getByRole( 'button', { name: 'Maybe later' } ).click() ] );
 		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
 		await context.close();
+	} );
+} );
+
+test.describe( 'a feed with chips off, on a site with chips on', () => {
+	const CHIPS = 'input[name="afs_settings[afs_general_show_chips]"]';
+
+	test.beforeEach( async ( { page } ) => {
+		await login( page );
+		await page.goto( SETTINGS );
+		await page.locator( `${ CHIPS }[value="1"]` ).check( { force: true } );
+		await Promise.all( [ page.waitForURL( /options-general\.php/ ), page.locator( '#submit' ).click() ] );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.goto( SETTINGS );
+		await page.locator( `${ CHIPS }[value="0"]` ).check( { force: true } );
+		await Promise.all( [ page.waitForURL( /options-general\.php/ ), page.locator( '#submit' ).click() ] );
+	} );
+
+	test( 'keeps the chips off after an update, so Reset stays the way out', async ( { page } ) => {
+		// The second feed on the Editorial page says show_chips="false"; the first one follows the site setting (on).
+		await page.goto( '/afs-editorial/' );
+		await settled( page, 2 );
+		const plain = feed( page, 2 );
+		await expect( plain.locator( '.afs-chips' ) ).toHaveCount( 0 );
+		await plain.locator( 'input[name="afs_s"]' ).fill( 'Announcement' );
+		await settled( page, 2 );
+		await expect( plain.locator( '.afs-chips' ) ).toHaveCount( 0 );
+		await expect( plain.locator( '.afs-chip' ) ).toHaveCount( 0 );
+		await expect( plain.locator( '.afs-reset' ) ).toBeVisible();
+		// And the feed that follows the setting does show them.
+		await feed( page, 1 ).locator( '.afs-Tabs a[data-afs-term="news"]' ).click();
+		await settled( page, 1 );
+		await expect( feed( page, 1 ).locator( '.afs-chip' ).first() ).toBeVisible();
+		await expect( feed( page, 1 ).locator( '.afs-reset' ) ).toBeHidden();
 	} );
 } );

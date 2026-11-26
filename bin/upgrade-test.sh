@@ -3,6 +3,7 @@
 # working tree (as a WordPress update would), and check nothing broke.
 #   bin/upgrade-test.sh 1.0.4      a site coming from the last 1.x release
 #   bin/upgrade-test.sh 2.0.0      a site coming from 2.0.0 or later: pages and REST output must be identical after the upgrade
+#   AFS_STRICT=1 bin/upgrade-test.sh 2.2.2   also compares whitespace: raw identical output
 #   bin/upgrade-test.sh 2.2.2      the same, from the latest release (2.1.0 and later on a Classic site; add AFS_TEST_MODERN=1
 #                                  to test a site that had chosen the Modern design)
 # Needs Docker and internet access (downloads the release from wordpress.org). Uses port 8895 (AFS_UPGRADE_PORT).
@@ -23,7 +24,13 @@ rest_core() { python3 -c 'import sys,json; d=json.load(sys.stdin); print(json.du
 rest_items() { python3 -c 'import sys,json; print(json.load(sys.stdin)["html"])' | items; }
 # Asset URLs carry the plugin version (?ver=), which changes on every release by design.
 # The inline script that carries the UI strings may gain keys in newer versions (for example a retry label); that is additive.
-norm() { sed -E 's/ver=[0-9][0-9.]*/ver=V/g; s/window\.afsSettings = \{[^;]*\};/window.afsSettings = {...};/g; s/afs-summary-[0-9]+/afs-summary-N/g; s/Post excerpt [0-9]+/Post excerpt N/g' | tr -s '\n\t ' ' ' | sed 's/> </></g'; }
+# AFS_STRICT=1 keeps the whitespace too, so Classic and Modern output must match the old release byte for byte
+# (apart from the version in asset URLs, the UI-strings script and per-request ids).
+norm() {
+	local out
+	out="$(sed -E 's/ver=[0-9][0-9.]*/ver=V/g; s/window\.afsSettings = \{[^;]*\};/window.afsSettings = {...};/g; s/afs-summary-[0-9]+/afs-summary-N/g; s/Post excerpt [0-9]+/Post excerpt N/g')"
+	if [ -n "${AFS_STRICT:-}" ]; then printf '%s\n' "$out"; else printf '%s' "$out" | tr -s '\n\t ' ' ' | sed 's/> </></g'; fi
+}
 
 bin/build-zip.sh >/dev/null
 zip="$(ls build/ajax-filter-search-*.zip | head -1)"
@@ -77,7 +84,13 @@ check "no PHP fatals, or warnings from the plugin, in the log" 0 "$fatals"
 
 if [ "$BASE" != "1.0.4" ]; then
 	echo "-- $BASE to this build: output must be identical"
-	for p in "${pages[@]}"; do check "$p output identical" "$(cat "$tmp/before-$p.txt")" "$(curl -s "$B/$p/" | norm)"; done
+	for p in "${pages[@]}"; do
+		curl -s "$B/$p/" | norm > "$tmp/after-$p.txt"
+		if cmp -s "$tmp/before-$p.txt" "$tmp/after-$p.txt"; then echo "ok    $p output identical"; else
+			echo "FAIL  $p output identical"; fail=1
+			[ -z "${AFS_STRICT:-}" ] || diff "$tmp/before-$p.txt" "$tmp/after-$p.txt" | head -20 | cut -c1-300
+		fi
+	done
 	# afs-single page size changed? settings were identical, so the markup must be too
 	check "REST output identical (2.0.0 keys)" "$rest_before" "$(curl -s "$B/wp-json/afs/v1/results?afs_term=news&posts_per_page=5" | rest_core)"
 fi
