@@ -106,7 +106,7 @@ class CardsAndDesignsTest extends AFS_Test_Case {
 		$this->assertTrue( AFS_Design::is_valid( 'library' ) );
 		$this->assertFalse( AFS_Design::is_valid( 'nonsense' ) );
 		$this->assertSame( 'classic', AFS_Renderer::normalize_config( array( 'design' => 'nonsense' ) )['design'] );
-		$this->assertArrayNotHasKey( 'editorial', AFS_Design::all(), 'Not offered in the settings picker yet' );
+		$this->assertSame( array( 'modern', 'classic', 'editorial', 'library' ), array_keys( AFS_Design::all() ), 'The picker and the block offer all four' );
 	}
 
 	public function test_a_design_with_its_own_markup_starts_in_its_own_layout_unless_the_feed_chooses() {

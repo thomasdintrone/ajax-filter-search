@@ -33,31 +33,54 @@ class AFS_Card {
 	 * @return array
 	 */
 	public static function normalize_options( $raw, $design ) {
-		$bool = static function ( $key, $default ) use ( $raw ) {
+		$own   = AFS_Design::has_own_markup( $design );
+		$bool  = static function ( $key, $default ) use ( $raw ) {
 			return isset( $raw[ $key ] ) && '' !== $raw[ $key ] ? wp_validate_boolean( $raw[ $key ] ) : $default;
 		};
+		$saved = static function ( $key ) {
+			return AFSAdmin::afs_retrieve( '_cards_' . $key );
+		};
 
-		$ratio = isset( $raw['image_ratio'] ) ? str_replace( array( '/', ' ', '-' ), array( ':', '', ':' ), sanitize_text_field( $raw['image_ratio'] ) ) : '';
-		if ( ! isset( self::RATIOS[ $ratio ] ) ) {
-			$ratio = '16:10';
+		$ratio = isset( $raw['image_ratio'] ) ? self::clean_ratio( $raw['image_ratio'] ) : '';
+		if ( '' === $ratio ) {
+			$ratio = self::clean_ratio( $saved( 'image_ratio' ) );
 		}
+		$ratio = '' === $ratio ? '16:10' : $ratio;
 
-		$columns = isset( $raw['columns'] ) ? absint( $raw['columns'] ) : 3;
+		$columns = isset( $raw['columns'] ) ? absint( $raw['columns'] ) : 0;
+		if ( ! $columns ) {
+			$columns = absint( $saved( 'columns' ) );
+		}
 		$columns = min( 4, max( 1, $columns ? $columns : 3 ) );
 
-		$length = isset( $raw['excerpt_length'] ) ? absint( $raw['excerpt_length'] ) : 25;
+		$length = isset( $raw['excerpt_length'] ) ? absint( $raw['excerpt_length'] ) : 0;
+		if ( ! $length ) {
+			$length = absint( $saved( 'excerpt_length' ) );
+		}
 		$length = min( 80, max( 10, $length ? $length : 25 ) );
 
 		return array(
-			'show_image'     => $bool( 'show_image', AFS_Design::has_own_markup( $design ) ),
+			// Images belong to the designs with their own markup; Classic and Modern never show them.
+			'show_image'     => $bool( 'show_image', $own && 1 === (int) $saved( 'show_image' ) ),
 			'image_ratio'    => $ratio,
 			'columns'        => $columns,
-			'show_excerpt'   => $bool( 'show_excerpt', true ),
+			'show_excerpt'   => $bool( 'show_excerpt', 1 === (int) $saved( 'show_excerpt' ) ),
 			'excerpt_length' => $length,
-			'show_date'      => $bool( 'show_date', true ),
-			'show_time'      => $bool( 'show_time', false ),
-			'show_category'  => $bool( 'show_category', true ),
+			'show_date'      => $bool( 'show_date', 1 === (int) $saved( 'show_date' ) ),
+			'show_time'      => $bool( 'show_time', 1 === (int) $saved( 'show_time' ) ),
+			'show_category'  => $bool( 'show_category', 1 === (int) $saved( 'show_category' ) ),
 		);
+	}
+
+	/**
+	 * A ratio as a key of self::RATIOS ("16:10"), or '' when it is not one. A slash or dash is accepted for the colon.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function clean_ratio( $value ) {
+		$value = str_replace( array( '/', ' ', '-' ), array( ':', '', ':' ), sanitize_text_field( (string) $value ) );
+		return isset( self::RATIOS[ $value ] ) ? $value : '';
 	}
 
 	/**

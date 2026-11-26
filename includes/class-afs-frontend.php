@@ -60,7 +60,42 @@ class AFS_Frontend {
 		return $robots;
 	}
 
+	/**
+	 * Data the block editor needs: the designs (and which have their own markup), the site's default design and taxonomy,
+	 * and the accent colours, so the editor preview looks like the front end.
+	 */
+	public static function editor_assets() {
+		$handle = generate_block_asset_handle( 'ajax-filter-search/feed', 'editorScript' );
+		$items  = array();
+		foreach ( AFS_Design::known() as $slug => $label ) {
+			$items[] = array(
+				'value' => $slug,
+				'label' => $label,
+				'own'   => AFS_Design::has_own_markup( $slug ),
+			);
+		}
+		$taxonomy = (string) AFSAdmin::afs_retrieve( '_general_post_taxonomy' );
+		wp_add_inline_script(
+			$handle,
+			'window.afsEditor = ' . wp_json_encode(
+				array(
+					'designs'      => $items,
+					'siteDesign'   => AFS_Design::resolve( '' ),
+					'siteTaxonomy' => $taxonomy,
+				)
+			) . ';',
+			'before'
+		);
+
+		$accent = sanitize_hex_color( AFSAdmin::afs_retrieve( '_appearance_accent' ) );
+		if ( $accent ) {
+			$on = AFS_Design::on_colour( $accent );
+			wp_add_inline_style( 'afs-styles', '.afs{--afs-accent:' . $accent . ';}.afs-design-modern,.afs-discovery{--afs-on-accent:' . $on . ';}' );
+		}
+	}
+
 	public static function register() {
+		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'editor_assets' ) );
 		// Registered on init so the block (editor preview and front end) can reference the stylesheet handle.
 		self::register_assets();
 		add_shortcode( 'ajax_filter_search', array( __CLASS__, 'shortcode' ) );

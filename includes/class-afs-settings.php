@@ -16,6 +16,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 
 		const SECTION_GENERAL    = 'afs_general';
 		const SECTION_APPEARANCE = 'afs_appearance';
+		const SECTION_CARDS      = 'afs_cards';
 		const DEFAULT_ACCENT     = '#f1b45c';
 
 		/**
@@ -92,8 +93,64 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'section' => self::SECTION_APPEARANCE,
 					'type'    => 'design',
 					'label'   => __( 'Design', 'ajax-filter-search' ),
-					'help'    => __( 'How feeds look. You can also choose a design for a single feed with the design attribute or the block setting.', 'ajax-filter-search' ),
+					'help'    => __( 'How feeds look. Editorial Grid and Resource Library show image cards or compact rows; what they show is set under Cards. You can also choose a design for a single feed with the design attribute or the block setting.', 'ajax-filter-search' ),
 					'default' => AFS_Design::site_default(),
+				),
+				'afs_cards_show_image'         => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'yesno',
+					'label'   => __( 'Featured image', 'ajax-filter-search' ),
+					'help'    => __( 'Show each post\'s featured image. Posts without one get a tinted tile in the Editorial Grid and no thumbnail in the Resource Library.', 'ajax-filter-search' ),
+					'default' => 1,
+				),
+				'afs_cards_image_ratio'        => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'ratio',
+					'label'   => __( 'Image shape', 'ajax-filter-search' ),
+					'help'    => __( 'The proportions of the Editorial Grid images. Resource Library thumbnails are always square.', 'ajax-filter-search' ),
+					'default' => '16:10',
+				),
+				'afs_cards_columns'            => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'columns',
+					'label'   => __( 'Columns', 'ajax-filter-search' ),
+					'help'    => __( 'The most columns the Editorial Grid uses. It shows fewer on narrow screens.', 'ajax-filter-search' ),
+					'default' => 3,
+				),
+				'afs_cards_show_excerpt'       => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'yesno',
+					'label'   => __( 'Excerpt', 'ajax-filter-search' ),
+					'help'    => __( 'Show a short excerpt under each title.', 'ajax-filter-search' ),
+					'default' => 1,
+				),
+				'afs_cards_excerpt_length'     => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'words',
+					'label'   => __( 'Excerpt length', 'ajax-filter-search' ),
+					'help'    => __( 'How many words of the excerpt to show (10 to 80).', 'ajax-filter-search' ),
+					'default' => 25,
+				),
+				'afs_cards_show_date'          => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'yesno',
+					'label'   => __( 'Publication date', 'ajax-filter-search' ),
+					'help'    => __( 'Show the date each post was published.', 'ajax-filter-search' ),
+					'default' => 1,
+				),
+				'afs_cards_show_time'          => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'yesno',
+					'label'   => __( 'Publication time', 'ajax-filter-search' ),
+					'help'    => __( 'Show the time of day next to the date.', 'ajax-filter-search' ),
+					'default' => 0,
+				),
+				'afs_cards_show_category'      => array(
+					'section' => self::SECTION_CARDS,
+					'type'    => 'yesno',
+					'label'   => __( 'Category badge', 'ajax-filter-search' ),
+					'help'    => __( 'Show the post\'s category as a badge, using the taxonomy chosen above.', 'ajax-filter-search' ),
+					'default' => 1,
 				),
 				'afs_appearance_accent'        => array(
 					'section' => self::SECTION_APPEARANCE,
@@ -179,6 +236,12 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 				'__return_null',
 				'afs_settings_page'
 			);
+			add_settings_section(
+				self::SECTION_CARDS,
+				__( 'Cards', 'ajax-filter-search' ),
+				'__return_null',
+				'afs_settings_page'
+			);
 
 			foreach ( self::fields() as $key => $field ) {
 				add_settings_field(
@@ -240,6 +303,16 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 
 			$design                       = isset( $input['afs_appearance_design'] ) ? sanitize_key( $input['afs_appearance_design'] ) : '';
 			$out['afs_appearance_design'] = AFS_Design::is_valid( $design ) ? $design : AFS_Design::site_default();
+
+			foreach ( array( 'afs_cards_show_image', 'afs_cards_show_excerpt', 'afs_cards_show_date', 'afs_cards_show_time', 'afs_cards_show_category' ) as $key ) {
+				$out[ $key ] = ( isset( $input[ $key ] ) && '0' !== (string) $input[ $key ] ) ? 1 : 0;
+			}
+			$ratio                           = isset( $input['afs_cards_image_ratio'] ) ? AFS_Card::clean_ratio( $input['afs_cards_image_ratio'] ) : '';
+			$out['afs_cards_image_ratio']    = '' === $ratio ? '16:10' : $ratio;
+			$columns                         = isset( $input['afs_cards_columns'] ) ? absint( $input['afs_cards_columns'] ) : 3;
+			$out['afs_cards_columns']        = min( 4, max( 1, $columns ? $columns : 3 ) );
+			$words                           = isset( $input['afs_cards_excerpt_length'] ) ? absint( $input['afs_cards_excerpt_length'] ) : 25;
+			$out['afs_cards_excerpt_length'] = min( 80, max( 10, $words ? $words : 25 ) );
 
 			$color                        = isset( $input['afs_appearance_accent'] ) ? sanitize_hex_color( $input['afs_appearance_accent'] ) : '';
 			$out['afs_appearance_accent'] = $color ? $color : AFS_Design::default_accent();
@@ -305,6 +378,31 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 				case 'number':
 					printf(
 						'<input type="number" id="%s" name="%s" value="%d" min="1" max="100" step="1" class="small-text">',
+						esc_attr( $id ),
+						esc_attr( $name ),
+						(int) $value
+					);
+					break;
+
+				case 'ratio':
+					echo '<select id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '">';
+					foreach ( array_keys( AFS_Card::RATIOS ) as $ratio ) {
+						printf( '<option value="%1$s"%2$s>%1$s</option>', esc_attr( $ratio ), selected( $value, $ratio, false ) );
+					}
+					echo '</select>';
+					break;
+
+				case 'columns':
+					echo '<select id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '">';
+					for ( $c = 1; $c <= 4; $c++ ) {
+						printf( '<option value="%1$d"%2$s>%1$d</option>', (int) $c, selected( (int) $value, $c, false ) );
+					}
+					echo '</select>';
+					break;
+
+				case 'words':
+					printf(
+						'<input type="number" id="%s" name="%s" value="%d" min="10" max="80" step="1" class="small-text">',
 						esc_attr( $id ),
 						esc_attr( $name ),
 						(int) $value
@@ -379,11 +477,22 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'intro'  => __( 'How feeds look on your site.', 'ajax-filter-search' ),
 					'fields' => array( 'afs_appearance_design', 'afs_appearance_accent' ),
 				),
+				'cards'      => array(
+					'title'  => __( 'Cards', 'ajax-filter-search' ),
+					'intro'  => __( 'What each result shows in the Editorial Grid and Resource Library designs. Classic and Modern are not affected, and any feed can override these with shortcode attributes or the block settings.', 'ajax-filter-search' ),
+					'fields' => array( 'afs_cards_show_image', 'afs_cards_image_ratio', 'afs_cards_columns', 'afs_cards_show_excerpt', 'afs_cards_excerpt_length', 'afs_cards_show_date', 'afs_cards_show_time', 'afs_cards_show_category' ),
+				),
 			);
 		}
 
 		/** Small illustrations for the design picker (decorative). */
 		private static function design_preview( $slug ) {
+			if ( AFS_Design::EDITORIAL === $slug ) {
+				return '<svg viewBox="0 0 160 104" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="160" height="104" fill="#f1f5f9"/><rect x="12" y="9" width="22" height="10" rx="5" fill="#2563eb"/><rect x="38" y="9" width="28" height="10" rx="5" fill="#fff" stroke="#e2e8f0"/><rect x="70" y="9" width="26" height="10" rx="5" fill="#fff" stroke="#e2e8f0"/><g><rect x="12" y="25" width="42" height="70" rx="5" fill="#fff" stroke="#e2e8f0"/><rect x="12" y="25" width="42" height="26" rx="5" fill="#f59e0b"/><rect x="17" y="56" width="14" height="4" rx="2" fill="#dbe5fb"/><rect x="17" y="64" width="30" height="4" rx="2" fill="#475569"/><rect x="17" y="72" width="26" height="3" rx="1.5" fill="#94a3b8"/><rect x="17" y="79" width="22" height="3" rx="1.5" fill="#94a3b8"/></g><g><rect x="59" y="25" width="42" height="70" rx="5" fill="#fff" stroke="#e2e8f0"/><rect x="59" y="25" width="42" height="26" rx="5" fill="#10b981"/><rect x="64" y="56" width="14" height="4" rx="2" fill="#dbe5fb"/><rect x="64" y="64" width="30" height="4" rx="2" fill="#475569"/><rect x="64" y="72" width="26" height="3" rx="1.5" fill="#94a3b8"/><rect x="64" y="79" width="22" height="3" rx="1.5" fill="#94a3b8"/></g><g><rect x="106" y="25" width="42" height="70" rx="5" fill="#fff" stroke="#e2e8f0"/><rect x="106" y="25" width="42" height="26" rx="5" fill="#6366f1"/><rect x="111" y="56" width="14" height="4" rx="2" fill="#dbe5fb"/><rect x="111" y="64" width="30" height="4" rx="2" fill="#475569"/><rect x="111" y="72" width="26" height="3" rx="1.5" fill="#94a3b8"/><rect x="111" y="79" width="22" height="3" rx="1.5" fill="#94a3b8"/></g></svg>';
+			}
+			if ( AFS_Design::LIBRARY === $slug ) {
+				return '<svg viewBox="0 0 160 104" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="160" height="104" fill="#f1f5f9"/><rect x="12" y="9" width="92" height="14" rx="5" fill="#fff" stroke="#e2e8f0"/><rect x="108" y="9" width="40" height="14" rx="5" fill="#fff" stroke="#e2e8f0"/><rect x="12" y="29" width="136" height="68" rx="6" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="35" width="14" height="14" rx="4" fill="#0ea5e9"/><rect x="38" y="36" width="56" height="4" rx="2" fill="#475569"/><rect x="38" y="44" width="76" height="3" rx="1.5" fill="#94a3b8"/><rect x="124" y="37" width="18" height="5" rx="2.5" fill="#dbe5fb"/><rect x="12" y="53" width="136" height="1" fill="#e2e8f0"/><rect x="18" y="58" width="14" height="14" rx="4" fill="#10b981"/><rect x="38" y="59" width="64" height="4" rx="2" fill="#475569"/><rect x="38" y="67" width="70" height="3" rx="1.5" fill="#94a3b8"/><rect x="124" y="60" width="18" height="5" rx="2.5" fill="#dbe5fb"/><rect x="12" y="76" width="136" height="1" fill="#e2e8f0"/><rect x="18" y="82" width="60" height="4" rx="2" fill="#475569"/><rect x="18" y="89" width="80" height="3" rx="1.5" fill="#94a3b8"/><rect x="124" y="83" width="18" height="5" rx="2.5" fill="#dbe5fb"/></svg>';
+			}
 			if ( AFS_Design::MODERN === $slug ) {
 				return '<svg viewBox="0 0 160 104" xmlns="http://www.w3.org/2000/svg" focusable="false"><rect width="160" height="104" fill="#f1f5f9"/><rect x="12" y="10" width="26" height="12" rx="6" fill="#2563eb"/><rect x="42" y="10" width="34" height="12" rx="6" fill="#fff" stroke="#e2e8f0"/><rect x="80" y="10" width="30" height="12" rx="6" fill="#fff" stroke="#e2e8f0"/><rect x="12" y="28" width="136" height="20" rx="7" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="35" width="44" height="6" rx="3" fill="#e2e8f0"/><rect x="12" y="54" width="136" height="20" rx="7" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="58" width="22" height="5" rx="2.5" fill="#dbe5fb"/><rect x="18" y="66" width="70" height="4" rx="2" fill="#94a3b8"/><rect x="12" y="78" width="136" height="20" rx="7" fill="#fff" stroke="#e2e8f0"/><rect x="18" y="82" width="22" height="5" rx="2.5" fill="#dbe5fb"/><rect x="18" y="90" width="84" height="4" rx="2" fill="#94a3b8"/></svg>';
 			}
@@ -428,6 +537,8 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 									'[ajax_filter_search]',
 									'[ajax_filter_search terms="news,events" posts_per_page="12" layout="grid"]',
 									'[ajax_filter_search show_sort="true" show_chips="true" design="classic"]',
+									'[ajax_filter_search design="editorial" columns="3" image_ratio="16:10" excerpt_length="25"]',
+									'[ajax_filter_search design="library" show_sort="true" show_chips="true"]',
 								) as $example ) {
 									printf(
 										'<div class="afs-copy"><code>%1$s</code><button type="button" class="afs-copy__btn" data-afs-copy="%1$s">%2$s</button></div>',
