@@ -245,6 +245,68 @@ class CardsAndDesignsTest extends AFS_Test_Case {
 		$this->assertSame( $mid, AFS_Cache::version(), 'Other meta must not invalidate the cache' );
 	}
 
+	// --- Result bar, root element and stylesheets ---
+
+	public function test_the_new_designs_group_chips_and_count_in_a_bar_above_the_items() {
+		$html = $this->results( array( 'design' => 'editorial', 'show_chips' => '1', 'afs_term' => 'news', 'afs_year' => 2024, 'posts_per_page' => 5 ) )['html'];
+		$this->assertStringContainsString( '<div class="afs-resultbar">', $html );
+		$bar   = strpos( $html, 'afs-resultbar' );
+		$chips = strpos( $html, 'afs-chips' );
+		$count = strpos( $html, 'afs-count' );
+		$items = strpos( $html, 'afs-items' );
+		$this->assertTrue( $bar < $chips && $chips < $count && $count < $items, 'Chips, then the count, then the items' );
+		$this->assertSame( 1, substr_count( $html, 'afs-count' ), 'The count is not repeated below the items' );
+	}
+
+	public function test_classic_and_modern_results_keep_the_count_after_the_items_and_have_no_result_bar() {
+		foreach ( array( 'classic', 'modern' ) as $design ) {
+			$html = $this->results( array( 'design' => $design, 'afs_year' => 2024, 'posts_per_page' => 5 ) )['html'];
+			$this->assertStringNotContainsString( 'afs-resultbar', $html );
+			$this->assertGreaterThan( strpos( $html, 'afs-items' ), strpos( $html, 'afs-count' ) );
+		}
+	}
+
+	public function test_the_root_of_a_new_design_carries_its_classes_and_validated_css_variables() {
+		$this->reset_widget_counters();
+		$html = do_shortcode( '[ajax_filter_search design="editorial" columns="2" image_ratio="1:1"]' );
+		$this->assertSame( 1, preg_match( '/<div id="afs-wrapper[^"]*" class="([^"]*)" style="([^"]*)"/', $html, $m ) );
+		$this->assertStringContainsString( 'afs-design-editorial', $m[1] );
+		$this->assertStringContainsString( 'afs-discovery', $m[1] );
+		$this->assertSame( '--afs-cols:2;--afs-ratio:1 / 1;', $m[2] );
+
+		$this->reset_widget_counters();
+		$bad = do_shortcode( '[ajax_filter_search design="editorial" columns="9" image_ratio="red;background:url(x)"]' );
+		$this->assertStringContainsString( 'style="--afs-cols:4;--afs-ratio:16 / 10;"', $bad, 'Hostile values never reach the style attribute' );
+
+		foreach ( array( 'classic', 'modern' ) as $design ) {
+			$this->reset_widget_counters();
+			$this->assertStringNotContainsString( 'afs-discovery', do_shortcode( '[ajax_filter_search design="' . $design . '"]' ) );
+			$this->reset_widget_counters();
+			$this->assertDoesNotMatchRegularExpression( '/<div id="afs-wrapper[^"]*" class="[^"]*" style=/', do_shortcode( '[ajax_filter_search design="' . $design . '"]' ) );
+		}
+	}
+
+	public function test_only_the_stylesheets_a_design_needs_are_loaded() {
+		foreach ( array( 'afs-discovery', 'afs-editorial', 'afs-library', 'afs-modern' ) as $handle ) {
+			wp_dequeue_style( $handle );
+		}
+		$this->reset_widget_counters();
+		do_shortcode( '[ajax_filter_search design="editorial"]' );
+		$this->assertTrue( wp_style_is( 'afs-editorial', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'afs-discovery', 'enqueued' ) );
+		$this->assertFalse( wp_style_is( 'afs-library', 'enqueued' ) );
+		$this->assertFalse( wp_style_is( 'afs-modern', 'enqueued' ) );
+
+		foreach ( array( 'afs-discovery', 'afs-editorial', 'afs-library', 'afs-modern' ) as $handle ) {
+			wp_dequeue_style( $handle );
+		}
+		$this->reset_widget_counters();
+		do_shortcode( '[ajax_filter_search design="classic"]' );
+		foreach ( array( 'afs-discovery', 'afs-editorial', 'afs-library' ) as $handle ) {
+			$this->assertFalse( wp_style_is( $handle, 'enqueued' ), 'Classic must not load ' . $handle );
+		}
+	}
+
 	// --- Protected and unpublished content ---
 
 	public function test_a_password_protected_post_shows_neither_image_nor_excerpt() {

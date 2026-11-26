@@ -111,7 +111,17 @@ class AFS_Design {
 		if ( self::CLASSIC === $design ) {
 			return '';
 		}
-		return ' afs-design-' . sanitize_html_class( $design );
+		$class = ' afs-design-' . sanitize_html_class( $design );
+		// The two built-in designs with their own markup share one base stylesheet (controls, chips, states) under this class.
+		if ( self::is_discovery( $design ) ) {
+			$class .= ' afs-discovery';
+		}
+		return $class;
+	}
+
+	/** True for the built-in Editorial Grid and Resource Library, which share the discovery stylesheet. */
+	public static function is_discovery( $design ) {
+		return in_array( $design, array( self::EDITORIAL, self::LIBRARY ), true );
 	}
 
 	/** The design a site gets when nothing else says otherwise: Classic unless this install chose Modern when it was set up. */

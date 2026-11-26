@@ -105,3 +105,9 @@ Each design renders its items with a template: Classic and Modern use `default.p
 `AFS_Card` has the helpers the built-in templates use: `image()` (a lazy-loaded featured image, or a placeholder tile, hidden from assistive technology), `excerpt()` (cut by words), `term_names()` and `has_image()`. Image and excerpt are never returned for a password-protected post; do the same in your own template.
 
 A design with its own markup sends its name and options with every request so the first page and the results route render identical items. Classic and Modern send nothing extra.
+
+## Styling the new designs (2.3.0)
+
+Editorial Grid and Resource Library feeds carry `afs-design-editorial` or `afs-design-library` and `afs-discovery` on the root element, and load `afs-discovery.css` plus one file per design (never loaded for Classic or Modern). Colours come from the theme: borders, surfaces and muted text are mixed from the text colour, so a dark theme gives a dark feed. Tokens you can set from a theme: `--afs-accent`, `--afs-radius`, `--afs-radius-sm`, `--afs-gap`, `--afs-control` (control height). The plugin sets `--afs-cols` and `--afs-ratio` per feed from the validated `columns` and `image_ratio` options; the grid never goes below 15rem per card, so `columns` is a maximum that drops on narrow screens.
+
+For these designs the active-filter chips and the result count are grouped in a `.afs-resultbar` above the items (Classic and Modern keep the count below).

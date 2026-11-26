@@ -78,6 +78,18 @@ class AFS_Card {
 	}
 
 	/**
+	 * Per-feed CSS custom properties for the card grid, for the root element's style attribute. Built only from the
+	 * validated column count and ratio, so nothing from a request reaches a stylesheet.
+	 *
+	 * @param array $config Normalized config.
+	 * @return string
+	 */
+	public static function css_vars( $config ) {
+		$ratio = isset( self::RATIOS[ $config['image_ratio'] ] ) ? self::RATIOS[ $config['image_ratio'] ] : self::RATIOS['16:10'];
+		return '--afs-cols:' . (int) $config['columns'] . ';--afs-ratio:' . $ratio . ';';
+	}
+
+	/**
 	 * The options a template needs.
 	 *
 	 * @param array $config Normalized config.
