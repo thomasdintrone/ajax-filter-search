@@ -317,6 +317,15 @@ class AFS_Renderer {
 		$legacy = 1 === $n && AFS_Compat::enabled();
 		$base   = self::current_url();
 
+		// The two designs with their own markup mark the feed root when filters are active and when chips are on, so the
+		// stylesheet can show a Reset button only when it is the one way to clear the filters. The script keeps it current.
+		$discovery  = AFS_Design::is_discovery( $config['design'] );
+		$root_extra = '';
+		if ( $discovery ) {
+			$root_extra .= $config['show_chips'] ? ' afs-has-chips' : '';
+			$root_extra .= self::has_active_filters( $state ) ? ' afs-is-filtered' : '';
+		}
+
 		$client = array(
 			'post_type'      => $config['post_type'],
 			'post_tax'       => $config['taxonomy'],
@@ -331,9 +340,14 @@ class AFS_Renderer {
 			$client['show_chips'] = '1';
 		}
 		// A design with its own item markup must produce the same items on page load and through the REST route, so the
-		// design and its card options travel with every request. Classic and Modern send nothing extra.
+		// design and its card options travel with every request. Classic and Modern send nothing extra (see below).
 		if ( AFS_Design::has_own_markup( $config['design'] ) ) {
 			$client = array_merge( $client, array( 'design' => $config['design'] ), AFS_Card::client_options( $config ) );
+		} elseif ( AFS_Design::has_own_markup( AFS_Design::resolve( '' ) ) ) {
+			// A Classic or Modern feed on a site whose own design is one of the new ones must say so: left out, the results
+			// route would fall back to the site design and render that design's items inside this feed. On every other site
+			// nothing extra is sent, so a Classic or Modern feed's markup stays exactly as it was.
+			$client['design'] = $config['design'];
 		}
 
 		$tabs = array();
@@ -346,7 +360,7 @@ class AFS_Renderer {
 
 		ob_start();
 		?>
-		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo esc_attr( AFS_Design::root_class( $config['design'] ) ); ?>"<?php echo AFS_Design::is_discovery( $config['design'] ) ? ' style="' . esc_attr( AFS_Card::css_vars( $config ) ) . '"' : ''; ?> data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
+		<div id="<?php echo esc_attr( $id ); ?>" class="afs afs-wrapper afs-layout-<?php echo esc_attr( $state['layout'] ); ?><?php echo esc_attr( AFS_Design::root_class( $config['design'] ) . $root_extra ); ?>"<?php echo $discovery ? ' style="' . esc_attr( AFS_Card::css_vars( $config ) ) . '"' : ''; ?> data-afs-config="<?php echo esc_attr( wp_json_encode( $client ) ); ?>" data-afs-instance="<?php echo (int) $n; ?>" data-afs-url="<?php echo $syncs_url ? '1' : '0'; ?>">
 			<h2 class="afs-sr-only"><?php echo esc_html( self::label( __( 'Filterable posts', 'ajax-filter-search' ), $n ) ); ?></h2>
 			<form<?php echo $legacy ? ' id="newsForm"' : ''; ?> class="afs-form" method="get" action="<?php echo esc_url( $base ); ?>" role="search" aria-label="<?php echo esc_attr( self::label( __( 'Filter posts', 'ajax-filter-search' ), $n ) ); ?>">
 				<?php
@@ -399,11 +413,17 @@ class AFS_Renderer {
 					</nav>
 				<?php endif; ?>
 
+				<?php
+				if ( $discovery ) {
+					echo self::layout_switch( $config, $state, $legacy, $n ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch().
+				}
+				?>
+
 				<div class="afs-Filters">
 					<?php if ( $config['show_search'] ) : ?>
 						<div class="afs-field afs-field-search">
 							<label for="<?php echo esc_attr( $id ); ?>-s"><?php esc_html_e( 'Search', 'ajax-filter-search' ); ?></label>
-							<input type="search" id="<?php echo esc_attr( $id ); ?>-s" name="afs_s" value="<?php echo esc_attr( $state['s'] ); ?>" autocomplete="off">
+							<input type="search" id="<?php echo esc_attr( $id ); ?>-s" name="afs_s" value="<?php echo esc_attr( $state['s'] ); ?>" autocomplete="off"<?php echo $discovery ? ' placeholder="' . esc_attr( self::search_placeholder( $config ) ) . '"' : ''; ?>>
 						</div>
 					<?php endif; ?>
 
@@ -449,12 +469,11 @@ class AFS_Renderer {
 					</div>
 				</div>
 
-				<?php if ( $config['show_views'] ) : ?>
-					<div<?php echo $legacy ? ' id="newsViewOptionsPanel"' : ''; ?> class="afs-Switch" role="group" aria-label="<?php echo esc_attr( self::label( __( 'Layout', 'ajax-filter-search' ), $n ) ); ?>">
-						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="list" aria-pressed="<?php echo 'list' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'List View', 'ajax-filter-search' ); ?></button>
-						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="grid" aria-pressed="<?php echo 'grid' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'Grid View', 'ajax-filter-search' ); ?></button>
-					</div>
-				<?php endif; ?>
+				<?php
+				if ( ! $discovery ) {
+					echo self::layout_switch( $config, $state, $legacy, $n ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch().
+				}
+				?>
 			</form>
 
 			<div<?php echo $legacy ? ' id="newsPanelResults"' : ''; ?> class="afs-results" aria-live="polite" aria-busy="false">
@@ -463,6 +482,53 @@ class AFS_Renderer {
 		</div>
 		<?php
 		return ob_get_clean();
+	}
+
+	/** Placeholder of the search field in the new designs: the post type's own "Search ..." label, translated by WordPress. */
+	private static function search_placeholder( $config ) {
+		$type = get_post_type_object( $config['post_type'] );
+		return $type && ! empty( $type->labels->search_items ) ? $type->labels->search_items : __( 'Search', 'ajax-filter-search' );
+	}
+
+	/**
+	 * The List/Grid switch. Classic and Modern keep their text buttons exactly as they were; the new designs use two icon
+	 * buttons whose accessible names are the same words (visually hidden) and whose selected state is aria-pressed.
+	 *
+	 * @param array $config Normalized config.
+	 * @param array $state  Normalized state.
+	 * @param bool  $legacy Whether the 1.x element ids are printed.
+	 * @param int   $n      1-based feed number.
+	 * @return string HTML, escaped.
+	 */
+	private static function layout_switch( $config, $state, $legacy, $n ) {
+		if ( ! $config['show_views'] ) {
+			return '';
+		}
+		$icons  = AFS_Design::is_discovery( $config['design'] );
+		$button = static function ( $layout, $label ) use ( $state, $icons ) {
+			$inner = $icons ? self::layout_icon( $layout ) . '<span class="afs-sr-only">' . esc_html( $label ) . '</span>' : esc_html( $label );
+			return sprintf(
+				'<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="%1$s" aria-pressed="%2$s">%3$s</button>',
+				esc_attr( $layout ),
+				$layout === $state['layout'] ? 'true' : 'false',
+				$inner
+			);
+		};
+		return sprintf(
+			'<div%1$s class="afs-Switch" role="group" aria-label="%2$s">%3$s%4$s</div>',
+			$legacy ? ' id="newsViewOptionsPanel"' : '',
+			esc_attr( self::label( __( 'Layout', 'ajax-filter-search' ), $n ) ),
+			$button( 'list', __( 'List View', 'ajax-filter-search' ) ),
+			$button( 'grid', __( 'Grid View', 'ajax-filter-search' ) )
+		);
+	}
+
+	/** Inline SVG for the layout switch (no icon library). */
+	private static function layout_icon( $layout ) {
+		$paths = 'grid' === $layout
+			? '<rect x="3" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="3" y="11.5" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="11.5" width="5.5" height="5.5" rx="1.2"/>'
+			: '<path d="M7 5h10M7 10h10M7 15h10"/><circle cx="3.6" cy="5" r=".6"/><circle cx="3.6" cy="10" r=".6"/><circle cx="3.6" cy="15" r=".6"/>';
+		return '<svg class="afs-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">' . $paths . '</svg>';
 	}
 
 	private static function tab_item( $slug, $label, $active, $href ) {
@@ -512,7 +578,8 @@ class AFS_Renderer {
 			);
 		}
 
-		$chips_html = $config['show_chips'] ? self::chips( $config, $state, $base, $instance ) : '';
+		// An empty result in the new designs has one clear action below the message, so its chips drop their own Clear all.
+		$chips_html = $config['show_chips'] ? self::chips( $config, $state, $base, $instance, ! ( $own && ! $query->have_posts() ) ) : '';
 
 		if ( $own ) {
 			// A design with its own markup groups the active filters and the result count in one bar above the items.
@@ -553,7 +620,7 @@ class AFS_Renderer {
 			}
 			echo self::pagination( $pages, $state, $base, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in pagination().
 		} else {
-			echo '<p class="afs-none">' . esc_html__( 'No results found.', 'ajax-filter-search' ) . '</p>';
+			echo $own ? self::empty_message( $state ) : '<p class="afs-none">' . esc_html__( 'No results found.', 'ajax-filter-search' ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in empty_message().
 			if ( $config['show_chips'] && self::has_active_filters( $state ) ) {
 				printf(
 					'<p class="afs-recover"><a class="afs-btn" href="%1$s" data-afs-clear="all">%2$s</a></p>',
@@ -568,6 +635,25 @@ class AFS_Renderer {
 			'found' => $found,
 			'pages' => $pages,
 		);
+	}
+
+	/**
+	 * The empty result of the new designs: what was searched for, and what to do next. Classic and Modern keep "No results found."
+	 *
+	 * @param array $state Normalized state.
+	 * @return string HTML, escaped.
+	 */
+	private static function empty_message( $state ) {
+		if ( '' !== $state['s'] ) {
+			/* translators: %s: the visitor's search text. */
+			$title = sprintf( __( 'No results for “%s”.', 'ajax-filter-search' ), $state['s'] );
+		} elseif ( self::has_active_filters( $state ) ) {
+			$title = __( 'No results match these filters.', 'ajax-filter-search' );
+		} else {
+			$title = __( 'No results found.', 'ajax-filter-search' );
+		}
+		$hint = self::has_active_filters( $state ) ? ' <span class="afs-none__hint">' . esc_html__( 'Try a different word or clear the filters.', 'ajax-filter-search' ) . '</span>' : '';
+		return '<p class="afs-none"><span class="afs-none__title">' . esc_html( $title ) . '</span>' . $hint . '</p>';
 	}
 
 	/** Labels for the sort choices. */
@@ -624,7 +710,7 @@ class AFS_Renderer {
 	 * Active filters as removable chips, plus Clear all. Each chip is a plain link, so it works without JavaScript;
 	 * the script turns a click into a fetch.
 	 */
-	private static function chips( $config, $state, $base, $instance ) {
+	private static function chips( $config, $state, $base, $instance, $with_clear = true ) {
 		if ( ! self::has_active_filters( $state ) ) {
 			return '';
 		}
@@ -671,6 +757,9 @@ class AFS_Renderer {
 				esc_attr( sprintf( __( 'Remove filter: %s', 'ajax-filter-search' ), $label ) ),
 				esc_html( $label )
 			);
+		}
+		if ( ! $with_clear ) {
+			return $out . '</div>';
 		}
 		$out .= sprintf(
 			'<a class="afs-chip-clear" href="%1$s" data-afs-clear="all">%2$s</a></div>',

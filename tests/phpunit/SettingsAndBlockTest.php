@@ -219,4 +219,81 @@ class SettingsAndBlockTest extends AFS_Test_Case {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertStringContainsString( 'afs-row__main', $response->get_data()['rendered'] );
 	}
+
+	// --- Progressive disclosure in the Cards settings ---
+
+	public function test_a_dependent_row_is_hidden_when_its_parent_is_off_but_its_value_is_kept_and_submitted() {
+		$this->save( array( 'afs_cards_show_image' => 0, 'afs_cards_image_ratio' => '3:2', 'afs_cards_show_excerpt' => 0, 'afs_cards_excerpt_length' => 33, 'afs_cards_show_date' => 0 ) );
+		$html = $this->settings_html();
+		foreach ( array( 'afs_cards_show_image', 'afs_cards_show_excerpt', 'afs_cards_show_date' ) as $parent ) {
+			$this->assertMatchesRegularExpression( '/<div class="afs-row" data-afs-needs="afs_settings\[' . $parent . '\]" hidden>/', $html, $parent . ' dependents are hidden' );
+		}
+		// Hidden is not removed or disabled: the controls are still in the form with their saved values.
+		$this->assertStringContainsString( 'name="afs_settings[afs_cards_image_ratio]"', $html );
+		$this->assertMatchesRegularExpression( '/<option value="3:2" selected=\'selected\'>/', $html );
+		$this->assertStringContainsString( 'value="33"', $html );
+		$this->assertDoesNotMatchRegularExpression( '/data-afs-needs[^>]*disabled/', $html );
+		$out = AFSAdmin::sanitize( array( 'afs_cards_show_image' => '0', 'afs_cards_image_ratio' => '3:2', 'afs_cards_show_excerpt' => '0', 'afs_cards_excerpt_length' => '33', 'afs_cards_show_date' => '0' ) );
+		$this->assertSame( '3:2', $out['afs_cards_image_ratio'], 'The value survives a save while hidden' );
+		$this->assertSame( 33, $out['afs_cards_excerpt_length'] );
+	}
+
+	public function test_a_dependent_row_shows_when_its_parent_is_on() {
+		$this->save( array() );
+		$html = $this->settings_html();
+		$this->assertDoesNotMatchRegularExpression( '/data-afs-needs="afs_settings\[afs_cards_show_[a-z]+\]" hidden/', $html );
+		$this->assertSame( 3, substr_count( $html, 'data-afs-needs=' ), 'Image shape, excerpt length and time' );
+	}
+
+	public function test_the_cards_card_is_open_for_a_site_on_a_new_design_and_folded_with_a_note_otherwise() {
+		$this->save( array( 'afs_appearance_design' => 'editorial' ) );
+		$this->assertMatchesRegularExpression( '/<details class="afs-fold" open><summary>Card settings<\/summary>/', $this->settings_html() );
+
+		$this->save( array( 'afs_appearance_design' => 'modern' ) );
+		$html = $this->settings_html();
+		$this->assertMatchesRegularExpression( '/<details class="afs-fold"><summary>Card settings <small>Used by feeds that choose Editorial Grid or Resource Library\.<\/small>/', $html );
+		foreach ( array( 'show_image', 'image_ratio', 'columns', 'show_excerpt', 'excerpt_length', 'show_date', 'show_time', 'show_category' ) as $key ) {
+			$this->assertStringContainsString( 'name="afs_settings[afs_cards_' . $key . ']"', $html, 'Folded, but ' . $key . ' is still in the form' );
+		}
+	}
+
+	public function test_the_cards_card_explains_defaults_and_overrides() {
+		$html = $this->settings_html();
+		$this->assertStringContainsString( 'class="afs-callout"', $html );
+		$this->assertStringContainsString( 'Defaults, and how a feed overrides them.', $html );
+		$this->assertStringContainsString( 'Use plugin setting', $html );
+		$this->assertStringContainsString( 'Include the time', $html );
+		$this->assertStringNotContainsString( 'Publication time', $html );
+	}
+
+	public function test_the_time_is_part_of_the_date() {
+		$this->assertTrue( AFS_Renderer::normalize_config( array( 'design' => 'editorial', 'show_time' => 'true' ) )['show_time'] );
+		$c = AFS_Renderer::normalize_config( array( 'design' => 'editorial', 'show_date' => 'false', 'show_time' => 'true' ) );
+		$this->assertFalse( $c['show_date'] );
+		$this->assertFalse( $c['show_time'], 'No date, no time' );
+
+		$this->save( array( 'afs_cards_show_date' => 0, 'afs_cards_show_time' => 1 ) );
+		$this->assertFalse( AFS_Renderer::normalize_config( array( 'design' => 'library' ) )['show_time'], 'The saved time is kept but not used without the date' );
+		$this->assertSame( 1, AFSAdmin::afs_get_option( 'afs_cards_show_time' ), 'and it is still saved' );
+
+		$html = $this->rest( array( 'design' => 'editorial', 'show_date' => '0', 'show_time' => '1', 'afs_year' => 2024, 'afs_month' => 1 ) )->get_data()['html'];
+		$this->assertStringNotContainsString( 'afs-time', $html );
+		$this->assertStringNotContainsString( 'afs-date', $html );
+	}
+
+	public function test_the_editor_is_told_the_current_card_defaults() {
+		$this->save( array( 'afs_cards_show_image' => 0, 'afs_cards_columns' => 2, 'afs_cards_excerpt_length' => 40, 'afs_cards_image_ratio' => '1:1' ) );
+		$handle = generate_block_asset_handle( 'ajax-filter-search/feed', 'editorScript' );
+		wp_scripts()->add_data( $handle, 'before', array() );
+		AFS_Frontend::editor_assets();
+		$before = wp_scripts()->get_data( $handle, 'before' );
+		$js     = is_array( $before ) ? implode( '', $before ) : '';
+		$data   = json_decode( substr( $js, strlen( 'window.afsEditor = ' ), -1 ), true );
+		$this->assertFalse( $data['cards']['showImage'] );
+		$this->assertSame( 2, $data['cards']['columns'] );
+		$this->assertSame( 40, $data['cards']['excerptLength'] );
+		$this->assertSame( '1:1', $data['cards']['imageRatio'] );
+		$this->assertTrue( $data['cards']['showDate'] );
+		$this->assertFalse( $data['cards']['showTime'] );
+	}
 }

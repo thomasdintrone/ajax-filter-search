@@ -1,0 +1,95 @@
+{
+	"_note": "Free photographs from Unsplash (https://unsplash.com/license: free for commercial use, no permission or attribution needed). They are used only in the demo site behind the WordPress.org screenshots and are never shipped in the plugin. The files are not stored in this repository: node docs/screenshots/fetch-photos.mjs downloads them into docs/screenshots/photos/ (git-ignored). Each entry is the article it illustrates, the photo's Unsplash id (page: https://unsplash.com/photos/<id>), the image path on the Unsplash CDN, and the photographer as shown on the photo page.",
+	"photos": [
+		{
+			"title": "Riverside library extends weekend hours",
+			"id": "6iZC50eJ7MI",
+			"cdn": "photo-1758885698366-47d44c6ec6ba",
+			"by": "Jim Petkiewicz"
+		},
+		{
+			"title": "Example Newsroom announces 2026 community grants",
+			"id": "3Z2Z7yMlOpQ",
+			"cdn": "photo-1759716705272-8d1697eccf7a",
+			"by": "Leonie Clough"
+		},
+		{
+			"title": "Harbor Light Festival returns to the waterfront",
+			"id": "Gpl090VI918",
+			"cdn": "photo-1786043536940-310dfae33bdf",
+			"by": "Arlind Photography"
+		},
+		{
+			"title": "Quarterly results: membership grows 12 percent",
+			"id": "GWe0dlVD9e0",
+			"cdn": "photo-1431540015161-0bf868a2d407",
+			"by": "Benjamin Child"
+		},
+		{
+			"title": "Open house at the community workshop",
+			"id": "t5YUoHW6zRo",
+			"cdn": "photo-1426927308491-6380b6a9936f",
+			"by": "Barn Images"
+		},
+		{
+			"title": "Statement on the proposed harbor development",
+			"id": "gsBjNlPrOkg",
+			"cdn": "photo-1717940716846-5c061c2e66b1",
+			"by": "Dennis Zhang"
+		},
+		{
+			"title": "Appointment of a new director of programs",
+			"id": "cpDBPCwTs2s",
+			"cdn": "photo-1653463174225-fb1c604b8812",
+			"by": "Annie Spratt"
+		},
+		{
+			"title": "Annual report now available online",
+			"id": "Ok76F6yW2iA",
+			"cdn": "photo-1544377193-33dcf4d68fb5",
+			"by": "NORTHFOLK"
+		},
+		{
+			"title": "Spring book fair at the central library",
+			"id": "Bbh43CDCTwA",
+			"cdn": "photo-1759255258996-c944b8c23c5b",
+			"by": "𝕡𝕒𝕨𝕤 𝕒𝕟𝕕 𝕡𝕣𝕚𝕟𝕥𝕤 (name as shown on the photo page)"
+		},
+		{
+			"title": "Seed swap and planting day",
+			"id": "SpbdvpOqVlE",
+			"cdn": "photo-1622383564921-7efafd1f5ebe",
+			"by": "Jonathan Kemper"
+		},
+		{
+			"title": "Public art trail opens along the waterfront",
+			"id": "KsOWP1sH6W4",
+			"cdn": "photo-1601913463731-cfba9fd31ed3",
+			"by": "Mateo Krossler"
+		},
+		{
+			"title": "Ferry service adds evening crossings this summer",
+			"id": "egitJcsKTOw",
+			"cdn": "photo-1678666701965-51d6fd32695b",
+			"by": "Raymond Wong"
+		},
+		{
+			"title": "Community solar project reaches full subscription",
+			"id": "IwY-27ceRCA",
+			"cdn": "photo-1629726797843-618688139f5a",
+			"by": "Raphael Cruz"
+		},
+		{
+			"title": "Local bakery wins regional sustainability award",
+			"id": "go3DT3PpIw4",
+			"cdn": "photo-1568254183919-78a4f43a2877",
+			"by": "Yeh Xintong"
+		},
+		{
+			"title": "New partnership brings free Wi-Fi to public parks",
+			"id": "OBP_KLYsXbc",
+			"cdn": "photo-1690253525298-d35a3afb0f40",
+			"by": "Elliott Blair"
+		}
+	]
+}

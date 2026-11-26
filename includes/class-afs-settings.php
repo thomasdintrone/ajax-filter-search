@@ -109,6 +109,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'label'   => __( 'Image shape', 'ajax-filter-search' ),
 					'help'    => __( 'The proportions of the Editorial Grid images. Resource Library thumbnails are always square.', 'ajax-filter-search' ),
 					'default' => '16:10',
+					'needs'   => 'afs_cards_show_image',
 				),
 				'afs_cards_columns'            => array(
 					'section' => self::SECTION_CARDS,
@@ -130,6 +131,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'label'   => __( 'Excerpt length', 'ajax-filter-search' ),
 					'help'    => __( 'How many words of the excerpt to show (10 to 80).', 'ajax-filter-search' ),
 					'default' => 25,
+					'needs'   => 'afs_cards_show_excerpt',
 				),
 				'afs_cards_show_date'          => array(
 					'section' => self::SECTION_CARDS,
@@ -141,9 +143,10 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 				'afs_cards_show_time'          => array(
 					'section' => self::SECTION_CARDS,
 					'type'    => 'yesno',
-					'label'   => __( 'Publication time', 'ajax-filter-search' ),
-					'help'    => __( 'Show the time of day next to the date.', 'ajax-filter-search' ),
+					'label'   => __( 'Include the time', 'ajax-filter-search' ),
+					'help'    => __( 'Show the time of day next to the date. It needs the publication date to be shown.', 'ajax-filter-search' ),
 					'default' => 0,
+					'needs'   => 'afs_cards_show_date',
 				),
 				'afs_cards_show_category'      => array(
 					'section' => self::SECTION_CARDS,
@@ -478,9 +481,14 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'fields' => array( 'afs_appearance_design', 'afs_appearance_accent' ),
 				),
 				'cards'      => array(
-					'title'  => __( 'Cards', 'ajax-filter-search' ),
-					'intro'  => __( 'What each result shows in the Editorial Grid and Resource Library designs. Classic and Modern are not affected, and any feed can override these with shortcode attributes or the block settings.', 'ajax-filter-search' ),
-					'fields' => array( 'afs_cards_show_image', 'afs_cards_image_ratio', 'afs_cards_columns', 'afs_cards_show_excerpt', 'afs_cards_excerpt_length', 'afs_cards_show_date', 'afs_cards_show_time', 'afs_cards_show_category' ),
+					'title'   => __( 'Cards', 'ajax-filter-search' ),
+					'intro'   => __( 'What each result shows in the Editorial Grid and Resource Library designs.', 'ajax-filter-search' ),
+					'callout' => array(
+						__( 'Defaults, and how a feed overrides them.', 'ajax-filter-search' ),
+						__( 'These settings apply to every feed that uses one of these designs. A single feed can override any of them with a shortcode attribute (for example columns="2") or in the block\'s Cards panel, where "Use plugin setting" shows the value from this page. Classic and Modern ignore them.', 'ajax-filter-search' ),
+					),
+					'fold'    => true,
+					'fields'  => array( 'afs_cards_show_image', 'afs_cards_image_ratio', 'afs_cards_columns', 'afs_cards_show_excerpt', 'afs_cards_excerpt_length', 'afs_cards_show_date', 'afs_cards_show_time', 'afs_cards_show_category' ),
 				),
 			);
 		}
@@ -510,11 +518,16 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 				<header class="afs-admin__header">
 					<img class="afs-admin__icon" src="<?php echo esc_url( $icon ); ?>" alt="" width="52" height="52">
 					<div class="afs-admin__title">
-						<h1><?php echo esc_html( AFS_PAGE_TITLE ); ?></h1>
+						<h1 id="afs-admin-title" tabindex="-1"><?php echo esc_html( AFS_PAGE_TITLE ); ?></h1>
 						<p><?php esc_html_e( 'Filterable, searchable posts with no page reload.', 'ajax-filter-search' ); ?></p>
 					</div>
+					<?php if ( ! AFS_Announcement::should_show() ) : ?>
+						<a class="afs-admin__whatsnew" href="<?php echo esc_url( AFS_Announcement::reopen_url() ); ?>"><?php esc_html_e( 'What\'s new', 'ajax-filter-search' ); ?></a>
+					<?php endif; ?>
 					<span class="afs-admin__version"><?php echo esc_html( 'v' . AFS_VERSION ); ?></span>
 				</header>
+
+				<?php AFS_Announcement::render(); ?>
 
 				<form id="afs-form" class="afs-admin__form" action="options.php" method="post">
 					<?php settings_fields( 'afs_settings_group' ); ?>
@@ -553,14 +566,32 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 								<section class="afs-card" id="afs-sec-<?php echo esc_attr( $group ); ?>" aria-labelledby="afs-h-<?php echo esc_attr( $group ); ?>">
 									<h2 id="afs-h-<?php echo esc_attr( $group ); ?>"><?php echo esc_html( $info['title'] ); ?></h2>
 									<p class="afs-card__intro"><?php echo esc_html( $info['intro'] ); ?></p>
+									<?php if ( ! empty( $info['callout'] ) ) : ?>
+										<p class="afs-callout"><strong><?php echo esc_html( $info['callout'][0] ); ?></strong> <?php echo esc_html( $info['callout'][1] ); ?></p>
+									<?php endif; ?>
 									<?php
+									$fold = ! empty( $info['fold'] );
+									if ( $fold ) {
+										// Open when the site's own design uses these settings; otherwise folded, because only feeds that choose
+										// one of the two designs use them (the options are still there, and still saved).
+										$fold_open = AFS_Design::has_own_markup( AFS_Design::resolve( '' ) );
+										echo '<details class="afs-fold"' . ( $fold_open ? ' open' : '' ) . '><summary>' . esc_html__( 'Card settings', 'ajax-filter-search' );
+										if ( ! $fold_open ) {
+											echo ' <small>' . esc_html__( 'Used by feeds that choose Editorial Grid or Resource Library.', 'ajax-filter-search' ) . '</small>';
+										}
+										echo '</summary>';
+									}
 									foreach ( $info['fields'] as $key ) {
 										if ( ! isset( $fields[ $key ] ) ) {
 											continue;
 										}
 										$field = $fields[ $key ];
+										// A control that depends on another (for example the image shape on the featured image) is hidden, never
+										// disabled or removed, while its parent is off, so its saved value is kept and submitted.
+										$needs       = ! empty( $field['needs'] ) ? $field['needs'] : '';
+										$needs_attrs = $needs ? ' data-afs-needs="' . esc_attr( AFS_SETTINGS . '[' . $needs . ']' ) . '"' . ( (int) self::afs_get_option( $needs ) ? '' : ' hidden' ) : '';
 										?>
-										<div class="afs-row">
+										<div class="afs-row"<?php echo $needs_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>>
 											<div class="afs-row__label">
 												<?php if ( in_array( $field['type'], array( 'yesno', 'design' ), true ) ) : ?>
 													<?php // A fieldset is named by its legend; a label's "for" cannot point at it. ?>
@@ -587,6 +618,9 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 											</div>
 										</div>
 										<?php
+									}
+									if ( $fold ) {
+										echo '<p class="afs-kept" hidden>' . esc_html__( 'Hidden options keep their saved values and apply again if you turn the option back on.', 'ajax-filter-search' ) . '</p></details>';
 									}
 									?>
 								</section>
@@ -631,6 +665,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'none'       => __( 'None', 'ajax-filter-search' ),
 					'copied'     => __( 'Copied', 'ajax-filter-search' ),
 					'unsaved'    => __( 'You have unsaved changes.', 'ajax-filter-search' ),
+					'dismissed'  => __( 'Announcement dismissed.', 'ajax-filter-search' ),
 				)
 			);
 		}

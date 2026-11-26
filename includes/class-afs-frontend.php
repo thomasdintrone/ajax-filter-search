@@ -82,6 +82,17 @@ class AFS_Frontend {
 					'designs'      => $items,
 					'siteDesign'   => AFS_Design::resolve( '' ),
 					'siteTaxonomy' => $taxonomy,
+					// The Cards defaults, so "Use plugin setting" can say what that setting currently is.
+					'cards'        => array(
+						'showImage'     => 1 === (int) AFSAdmin::afs_retrieve( '_cards_show_image' ),
+						'imageRatio'    => (string) AFSAdmin::afs_retrieve( '_cards_image_ratio' ),
+						'columns'       => (int) AFSAdmin::afs_retrieve( '_cards_columns' ),
+						'showExcerpt'   => 1 === (int) AFSAdmin::afs_retrieve( '_cards_show_excerpt' ),
+						'excerptLength' => (int) AFSAdmin::afs_retrieve( '_cards_excerpt_length' ),
+						'showDate'      => 1 === (int) AFSAdmin::afs_retrieve( '_cards_show_date' ),
+						'showTime'      => 1 === (int) AFSAdmin::afs_retrieve( '_cards_show_time' ),
+						'showCategory'  => 1 === (int) AFSAdmin::afs_retrieve( '_cards_show_category' ),
+					),
 				)
 			) . ';',
 			'before'

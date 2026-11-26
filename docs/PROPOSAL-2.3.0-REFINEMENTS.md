@@ -1,6 +1,8 @@
 # 2.3.0 visual review: assessment and proposed refinements
 
-Status: **proposal for approval. Nothing in the plugin, the release package, the SVN copy or the listing has been changed.** 2.3.0 is merged to `master` and staged in SVN, but not published. Every picture referred to below is a mockup or a capture of the current build, in `design/prototypes/refinements/`.
+Status update: the owner approved including the recommended refinements and the announcement in 2.3.0. They are implemented on the 2.3.0 refinements branch, with tests (section 3 items 1 to 6, 9 and 10 and the hover and focus rings; section 5; section 6). Item 8 (excerpt ellipsis) was reviewed and needs no change. Done since: the photography (free Unsplash photos, decision 1), the ten listing screenshots retaken in the new order, and the two announcement thumbnails cropped from them. The collapsible mobile panel stays deferred.
+
+Original status: **proposal for approval. Nothing in the plugin, the release package, the SVN copy or the listing has been changed.** 2.3.0 is merged to `master` and staged in SVN, but not published. Every picture referred to below is a mockup or a capture of the current build, in `design/prototypes/refinements/`.
 
 How to read this: each item is marked **screenshot only** (no plugin change), **plugin change** (and whether it touches only the two new designs), or **deferred**. A plugin change needs new tests and new baselines, so it is cheaper to do before the independent QA audit than after.
 

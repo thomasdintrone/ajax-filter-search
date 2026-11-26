@@ -131,6 +131,19 @@
 		};
 	};
 
+	/**
+	 * Mark the feed root when a filter is active (a search, a category, a month or a year; the sort is not a filter).
+	 * Only the Editorial Grid and Resource Library use it (their stylesheet shows Reset only when it is needed), so a
+	 * Classic or Modern feed's markup is never touched. The server renders the same class on first load.
+	 */
+	Widget.prototype.markFiltered = function () {
+		if ( ! this.root.classList.contains( 'afs-discovery' ) ) {
+			return;
+		}
+		var state = this.state();
+		this.root.classList.toggle( 'afs-is-filtered', '' !== state.s || '' !== state.term || '' !== state.month || '' !== state.year );
+	};
+
 	/** The sort the feed starts with (the select's own default), or '' when the control is not shown. */
 	Widget.prototype.defaultSort = function () {
 		var select = this.form.elements.afs_sort;
@@ -346,6 +359,7 @@
 			this.searchTimer.cancel();
 		}
 		var state = this.state();
+		this.markFiltered();
 
 		var url = new URL( settings.restUrl, window.location.href );
 		Object.keys( this.config ).forEach( function ( key ) {

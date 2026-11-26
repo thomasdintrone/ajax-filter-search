@@ -59,6 +59,8 @@ class AFS_Card {
 		}
 		$length = min( 80, max( 10, $length ? $length : 25 ) );
 
+		$show_date = $bool( 'show_date', 1 === (int) $saved( 'show_date' ) );
+
 		return array(
 			// Images belong to the designs with their own markup; Classic and Modern never show them.
 			'show_image'     => $bool( 'show_image', $own && 1 === (int) $saved( 'show_image' ) ),
@@ -66,8 +68,9 @@ class AFS_Card {
 			'columns'        => $columns,
 			'show_excerpt'   => $bool( 'show_excerpt', 1 === (int) $saved( 'show_excerpt' ) ),
 			'excerpt_length' => $length,
-			'show_date'      => $bool( 'show_date', 1 === (int) $saved( 'show_date' ) ),
-			'show_time'      => $bool( 'show_time', 1 === (int) $saved( 'show_time' ) ),
+			'show_date'      => $show_date,
+			// The time is part of the date: with the date hidden there is nothing to put it next to.
+			'show_time'      => $show_date && $bool( 'show_time', 1 === (int) $saved( 'show_time' ) ),
 			'show_category'  => $bool( 'show_category', 1 === (int) $saved( 'show_category' ) ),
 		);
 	}
@@ -141,16 +144,16 @@ class AFS_Card {
 	}
 
 	/**
-	 * Classes for a result item. The row design drops its thumbnail column for a post with no image.
+	 * Classes for a result item. The row design drops its thumbnail column only when images are turned off; a post with no
+	 * image still gets a small tile, so every title in the list starts at the same place.
 	 *
 	 * @param string $design  Design slug.
 	 * @param array  $options Template options.
-	 * @param mixed  $post    Post, ID or null for the current post.
 	 * @return string[]
 	 */
-	public static function item_classes( $design, $options, $post = null ) {
+	public static function item_classes( $design, $options ) {
 		$classes = array( 'afs-item', AFS_Design::item_class( $design ) );
-		if ( AFS_Design::LIBRARY === $design && ( empty( $options['show_image'] ) || ! self::has_image( $post ) ) ) {
+		if ( AFS_Design::LIBRARY === $design && empty( $options['show_image'] ) ) {
 			$classes[] = 'afs-row--nothumb';
 		}
 		return $classes;
@@ -194,7 +197,7 @@ class AFS_Card {
 		}
 		$text   = '' !== $fallback ? $fallback : get_the_title( $post );
 		$letter = '' !== $text ? mb_strtoupper( mb_substr( wp_strip_all_tags( $text ), 0, 1 ) ) : '';
-		return '<span class="afs-img afs-img--none" aria-hidden="true">' . esc_html( $letter ) . '</span>';
+		return '<span class="afs-img afs-img--none" aria-hidden="true"><span class="afs-img__mono">' . esc_html( $letter ) . '</span></span>';
 	}
 
 	/**

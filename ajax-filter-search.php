@@ -37,6 +37,7 @@ define( 'AFS_PLUGIN_URL', untrailingslashit( plugins_url( '', __FILE__ ) ) );
 require_once AFS_PLUGIN_PATH . 'includes/functions.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-settings.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-design.php';
+require_once AFS_PLUGIN_PATH . 'includes/class-afs-announcement.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-registry.php';
 require_once AFS_PLUGIN_PATH . 'includes/api.php';
 require_once AFS_PLUGIN_PATH . 'includes/class-afs-card.php';
@@ -53,6 +54,7 @@ require_once AFS_PLUGIN_PATH . 'includes/compat.php';
 register_activation_hook( __FILE__, array( 'AFS_Design', 'activate' ) );
 
 AFSAdmin::init();
+AFS_Announcement::init();
 AFS_Frontend::init();
 AFS_Patterns::init();
 AFS_REST::init();

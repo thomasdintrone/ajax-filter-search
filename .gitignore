@@ -27,3 +27,6 @@ docs-private/
 
 # Rendered prototype screenshots (regenerate with design/prototypes/render.mjs)
 design/prototypes/*.png
+
+# Demo photographs for the listing screenshots (downloaded by docs/screenshots/fetch-photos.mjs; see CREDITS.md)
+docs/screenshots/photos/

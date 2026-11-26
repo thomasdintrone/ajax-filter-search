@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { feed, settled } from './helpers.mjs';
 
 // Admin-side journeys (2.3.0): choosing a design in the settings screen and using the block's term picker with the keyboard.
@@ -68,12 +69,20 @@ test.describe( 'onboarding', () => {
 		expect( look.radius ).not.toBe( '0px' );
 	} );
 
-	test( 'a feed that names its design is not changed by the site design', async ( { page } ) => {
+	test( 'a feed that names its design is not changed by the site design, on first load or after an update', async ( { page } ) => {
 		await chooseDesign( page, 'editorial' );
 		await page.goto( '/afs-classic/' );
 		await settled( page );
 		await expect( feed( page ) ).not.toHaveClass( /afs-design-editorial/ );
 		await expect( feed( page ).locator( '.afs-card' ) ).toHaveCount( 0 );
+		// The same through AJAX: the results must keep this feed's own markup, not the site design's cards.
+		await feed( page ).locator( 'input[name="afs_s"]' ).fill( 'Announcement' );
+		await settled( page );
+		await expect( feed( page ).locator( '.afs-TableRowItem' ).first() ).toBeVisible();
+		await expect( feed( page ).locator( '.afs-card, .afs-card__body, .afs-img' ) ).toHaveCount( 0 );
+		await feed( page ).locator( '.afs-Tabs a[data-afs-term="news"]' ).click();
+		await settled( page );
+		await expect( feed( page ).locator( '.afs-card, .afs-card__body, .afs-img' ) ).toHaveCount( 0 );
 	} );
 } );
 
@@ -120,5 +129,164 @@ test.describe( 'block editor', () => {
 		// Backspace in the empty field removes the last term.
 		await page.keyboard.press( 'Backspace' );
 		await expect.poll( terms ).toBe( '' );
+	} );
+} );
+
+const SETTINGS = '/wp-admin/options-general.php?page=ajax-filter-search';
+const row = ( page, name ) => page.locator( `[data-afs-needs="afs_settings[${ name }]"]` );
+
+test.describe( 'Cards settings', () => {
+	test.beforeEach( async ( { page } ) => {
+		await login( page );
+	} );
+
+	// The settings are shared with every other spec: put the Cards defaults and the design back.
+	test.afterEach( async ( { page } ) => {
+		await page.goto( SETTINGS );
+		await page.locator( '.afs-fold' ).evaluate( ( el ) => { el.open = true; } );
+		for ( const name of [ 'afs_cards_show_image', 'afs_cards_show_excerpt', 'afs_cards_show_date' ] ) {
+			await page.locator( `input[name="afs_settings[${ name }]"][value="1"]` ).check( { force: true } );
+		}
+		await page.locator( 'input[name="afs_settings[afs_cards_show_time]"][value="0"]' ).check( { force: true } );
+		await page.locator( 'select[name="afs_settings[afs_cards_image_ratio]"]' ).selectOption( '16:10' );
+		await page.locator( 'input[name="afs_settings[afs_cards_excerpt_length]"]' ).fill( '25' );
+		await page.locator( `${ DESIGN }[value="modern"]` ).check( { force: true } );
+		await Promise.all( [ page.waitForURL( /options-general\.php/ ), page.locator( '#submit' ).click() ] );
+	} );
+
+	test( 'the card is folded, with a note, while the site design is not one of the new ones, and opens from the navigation', async ( { page } ) => {
+		await page.goto( SETTINGS );
+		const fold = page.locator( '.afs-fold' );
+		await expect( fold ).not.toHaveAttribute( 'open', '' );
+		await expect( fold.locator( 'summary small' ) ).toContainText( 'Used by feeds that choose Editorial Grid or Resource Library' );
+		await expect( page.locator( '.afs-callout' ) ).toContainText( 'how a feed overrides them' );
+		await page.locator( '.afs-admin__nav a[href="#afs-sec-cards"]' ).click();
+		await expect( fold ).toHaveAttribute( 'open', '' );
+	} );
+
+	test( 'the card is open when the site design is the Editorial Grid', async ( { page } ) => {
+		await chooseDesign( page, 'editorial' );
+		await page.goto( SETTINGS );
+		await expect( page.locator( '.afs-fold' ) ).toHaveAttribute( 'open', '' );
+		await expect( page.locator( '.afs-fold summary small' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'dependent controls hide with their parent, and their saved values are kept', async ( { page } ) => {
+		await page.goto( SETTINGS );
+		await page.locator( '.afs-fold summary' ).click();
+		const shape = page.locator( 'select[name="afs_settings[afs_cards_image_ratio]"]' );
+		const length = page.locator( 'input[name="afs_settings[afs_cards_excerpt_length]"]' );
+		await shape.selectOption( '3:2' );
+		await length.fill( '33' );
+		await expect( row( page, 'afs_cards_show_image' ) ).toBeVisible();
+
+		await page.locator( 'input[name="afs_settings[afs_cards_show_image]"][value="0"]' ).check( { force: true } );
+		await page.locator( 'input[name="afs_settings[afs_cards_show_excerpt]"][value="0"]' ).check( { force: true } );
+		await page.locator( 'input[name="afs_settings[afs_cards_show_date]"][value="0"]' ).check( { force: true } );
+		for ( const parent of [ 'afs_cards_show_image', 'afs_cards_show_excerpt', 'afs_cards_show_date' ] ) {
+			await expect( row( page, parent ) ).toBeHidden();
+		}
+		await expect( page.locator( '.afs-kept' ) ).toBeVisible();
+
+		await Promise.all( [ page.waitForURL( /options-general\.php/ ), page.locator( '#submit' ).click() ] );
+		await page.locator( '.afs-fold summary' ).click();
+		await expect( row( page, 'afs_cards_show_image' ) ).toBeHidden(); // Still hidden after a reload: the parent is still No.
+
+		await page.locator( 'input[name="afs_settings[afs_cards_show_image]"][value="1"]' ).check( { force: true } );
+		await page.locator( 'input[name="afs_settings[afs_cards_show_excerpt]"][value="1"]' ).check( { force: true } );
+		await expect( shape ).toBeVisible();
+		await expect( shape ).toHaveValue( '3:2' ); // Kept while hidden, and through a save.
+		await expect( length ).toHaveValue( '33' );
+		await expect( page.locator( '.afs-kept' ) ).toBeVisible(); // The date is still off, so the time is still hidden.
+		await page.locator( 'input[name="afs_settings[afs_cards_show_date]"][value="1"]' ).check( { force: true } );
+		await expect( page.locator( '.afs-kept' ) ).toBeHidden();
+	} );
+} );
+
+test.describe( "What's new", () => {
+	const REOPEN = `${ SETTINGS }&afs_whatsnew=1`;
+
+	test.beforeEach( async ( { page } ) => {
+		await login( page );
+	} );
+
+	test( 'a fresh install does not see it, but can ask for it from the header', async ( { page } ) => {
+		await page.goto( SETTINGS );
+		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
+		await page.getByRole( 'link', { name: "What's new" } ).click();
+		await expect( page.locator( '#afs-news' ) ).toBeVisible();
+		await expect( page.getByRole( 'region', { name: 'Meet the next generation of Ajax Filter Search.' } ) ).toBeVisible();
+	} );
+
+	test( 'has no accessibility violations and adds no outside request', async ( { page } ) => {
+		// WordPress itself loads a few outside things on any admin screen (the avatar, for example). The card must add none:
+		// the same screen without the card requests exactly the same addresses.
+		const outsideOf = async ( context, url ) => {
+			const seen = new Set();
+			const tab = await context.newPage();
+			tab.on( 'request', ( request ) => {
+				const u = new URL( request.url() );
+				if ( [ 'http:', 'https:' ].includes( u.protocol ) && u.hostname !== 'wordpress' ) seen.add( u.origin + u.pathname.replace( /[0-9a-f]{20,}/g, 'H' ) );
+			} );
+			await tab.goto( url );
+			await tab.waitForLoadState( 'networkidle' );
+			return [ ...seen ].sort();
+		};
+		const without = await outsideOf( page.context(), SETTINGS );
+		const withCard = await outsideOf( page.context(), REOPEN );
+		expect( withCard ).toEqual( without );
+
+		await page.goto( REOPEN );
+		await expect( page.locator( '#afs-news' ) ).toBeVisible();
+		const { violations } = await new AxeBuilder( { page } ).include( '.afs-news' ).withTags( [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ] ).analyze();
+		expect( violations.map( ( v ) => `${ v.id }: ${ v.help }` ) ).toEqual( [] );
+	} );
+
+	test( 'fits a phone without sideways scrolling', async ( { page } ) => {
+		await page.setViewportSize( { width: 390, height: 844 } );
+		await page.goto( REOPEN );
+		await expect( page.locator( '#afs-news' ) ).toBeVisible();
+		expect( await page.evaluate( () => document.documentElement.scrollWidth <= innerWidth ) ).toBe( true );
+		const box = await page.locator( '#afs-news' ).boundingBox();
+		expect( box.x + box.width ).toBeLessThanOrEqual( 390 );
+	} );
+
+	test( 'the buttons are at least 44px tall and the dismiss button has a name', async ( { page } ) => {
+		await page.goto( REOPEN );
+		for ( const target of [ page.locator( '.afs-news__btn' ), page.locator( '.afs-news__later' ), page.locator( '.afs-news__x' ) ] ) {
+			expect( ( await target.boundingBox() ).height ).toBeGreaterThanOrEqual( 43.5 );
+		}
+		await expect( page.getByRole( 'button', { name: 'Dismiss this announcement' } ) ).toBeVisible();
+	} );
+
+	test( 'Explore the new designs goes to the design picker', async ( { page } ) => {
+		await page.goto( REOPEN );
+		await page.getByRole( 'link', { name: 'Explore the new designs' } ).click();
+		await expect( page ).toHaveURL( /#afs-sec-appearance$/ );
+		await expect( page.locator( '.afs-design-option--editorial' ) ).toBeInViewport();
+	} );
+
+	test( 'dismissing removes it, tells a screen reader, keeps focus on the page heading and stays dismissed', async ( { page } ) => {
+		await page.goto( REOPEN );
+		await page.getByRole( 'button', { name: 'Dismiss this announcement' } ).click();
+		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
+		await expect( page.locator( '#afs-news-status' ) ).toHaveText( 'Announcement dismissed.' );
+		await expect( page.locator( '#afs-admin-title' ) ).toBeFocused();
+		await page.goto( SETTINGS );
+		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
+		await page.reload();
+		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
+		await expect( page.getByRole( 'link', { name: "What's new" } ) ).toBeVisible();
+	} );
+
+	test( 'Maybe later works without JavaScript: an ordinary form submit that comes back to the settings screen', async ( { browser } ) => {
+		const context = await browser.newContext( { javaScriptEnabled: false } );
+		const page = await context.newPage();
+		await login( page );
+		await page.goto( REOPEN );
+		await expect( page.locator( '#afs-news' ) ).toBeVisible();
+		await Promise.all( [ page.waitForURL( /options-general\.php\?page=ajax-filter-search$/ ), page.getByRole( 'button', { name: 'Maybe later' } ).click() ] );
+		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
+		await context.close();
 	} );
 } );

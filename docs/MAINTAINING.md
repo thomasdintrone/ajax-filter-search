@@ -43,7 +43,12 @@ The e2e stack uses the seeded content from `bin/seed-test-content.php` (the defa
 Test the minimum stack (a git-ignored `.wp-env.override.json` with PHP 7.4 and WordPress 6.0) and the latest stack when changing anything version-sensitive.
 
 ## Screenshots
-`docs/screenshots/seed-demo.php` builds a small fictional demo newsroom and `docs/screenshots/capture.mjs` takes the ten WordPress.org screenshots from it (needs Google Chrome, `npm ci --ignore-scripts`, and a stack on `http://localhost:8892`). Copy the results from `.cache/screenshots/` to `.wordpress-org/`, look at every image, and update the `== Screenshots ==` list in `readme.txt` to match.
+`docs/screenshots/seed-demo.php` builds a small fictional demo newsroom and `docs/screenshots/capture.mjs` takes the ten WordPress.org screenshots from it (needs Google Chrome, `npm ci --ignore-scripts`, and a stack on `http://localhost:8892`).
+
+1. `node docs/screenshots/fetch-photos.mjs` downloads the free Unsplash photos the demo articles use (listed in `photos.json`, credited in `CREDITS.md`) into `docs/screenshots/photos/`, which is git-ignored: the photos are never stored in the repository or shipped in the plugin.
+2. Start the stack, install WordPress with the throwaway `admin` / `password` account, activate the plugin and run `seed-demo.php` (`wp eval-file`). The demo pages put their heading inside a wide group and use the theme's "Page (No Title)" template, so the title lines up with the feed (a demo-site setting, not plugin CSS).
+3. `node docs/screenshots/capture.mjs` writes the ten images to `.cache/screenshots/`, framed from the page heading down to the bottom of the feed. It waits for each feed to finish loading (not for `networkidle`), refuses to save the filtered shot if the results do not match the filters, and refuses the two-feed shot unless the feeds show different states.
+4. Copy the images to `.wordpress-org/`, look at every one, and keep the `== Screenshots ==` list in `readme.txt` in the same order (it is documented at the top of `capture.mjs`). Re-crop the two "What's new" thumbnails (`admin/images/whatsnew-*.webp`) from screenshots 1 and 2 (`cwebp`).
 
 ## Release checklist
 1. Bump the version in `ajax-filter-search.php` (header and `AFS_VERSION`) and in `readme.txt` (Stable tag, Tested up to, changelog, Upgrade Notice).
