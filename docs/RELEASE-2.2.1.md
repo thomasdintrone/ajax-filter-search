@@ -1,6 +1,6 @@
 # Release 2.2.1: checklist
 
-Status: **prepared, not published**. Follows the steps in `RELEASE-2.2.0.md`; publishing to WordPress.org is a separate, approved step.
+Status: **published** to WordPress.org as SVN r3827748 (trunk, `tags/2.2.1` and the two re-rendered banners in `assets/`) on 2026-11-26; Git tag `v2.2.1`. Follows the steps in `RELEASE-2.2.0.md`, kept as the record and the template for the next release.
 
 ## What changes
 
