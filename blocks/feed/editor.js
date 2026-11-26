@@ -90,7 +90,8 @@
 			return found || token;
 		};
 
-		return el( FormTokenField, {
+		// The token field has no bottom margin of its own; the other controls in the panel have 24px.
+		return el( 'div', { style: { marginBottom: '24px' } }, el( FormTokenField, {
 			label: __( 'Limit to these terms', 'ajax-filter-search' ),
 			value: selected.map( label ),
 			suggestions: list
@@ -120,7 +121,7 @@
 					return names.current[ slug ] === token;
 				} );
 			},
-		} );
+		} ) );
 	}
 
 	var showHide = [
