@@ -323,7 +323,8 @@ class AFS_Renderer {
 		$root_extra = '';
 		if ( $discovery ) {
 			$root_extra .= $config['show_chips'] ? ' afs-has-chips' : '';
-			$root_extra .= $config['show_views'] ? ' afs-has-switch' : '';
+			// The Resource Library is always a list, so its switch is hidden and the feed has no switch to make room for.
+			$root_extra .= $config['show_views'] && AFS_Design::LIBRARY !== $config['design'] ? ' afs-has-switch' : '';
 			$root_extra .= self::has_active_filters( $state ) ? ' afs-is-filtered' : '';
 		}
 
