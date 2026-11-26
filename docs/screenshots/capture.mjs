@@ -144,7 +144,7 @@ await admin.addStyleTag( { content: '.afs-savebar{position:static!important;box-
 	// From the Appearance card (the design picker) to the end of the Cards card.
 	const top = await admin.locator( '#afs-sec-appearance' ).boundingBox();
 	const bottom = await admin.locator( '#afs-sec-cards' ).boundingBox();
-	const left = ( await admin.locator( '.afs-admin__nav' ).boundingBox() ).x;
+	const left = ( await admin.locator( '.afs-admin__main' ).boundingBox() ).x; // Without the section list: it would show only its last links.
 	await blur( admin );
 	await admin.screenshot( { path: path.join( OUT, 'screenshot-6.png' ), fullPage: true, clip: { x: left - 16, y: top.y - 16, width: 1280 - left, height: bottom.y + bottom.height - top.y + 32 } } );
 }
