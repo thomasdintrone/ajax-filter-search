@@ -24,3 +24,6 @@ docs-private/
 # Test caches and per-run worktrees
 .cache/
 docs-private/
+
+# Rendered prototype screenshots (regenerate with design/prototypes/render.mjs)
+design/prototypes/*.png
