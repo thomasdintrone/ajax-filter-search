@@ -145,6 +145,15 @@ class AFS_Frontend {
 			'show_sort'      => '',
 			'show_chips'     => '',
 			'design'         => '',
+			// Card options of the designs that have their own item markup (ignored by Classic and Modern).
+			'show_image'     => '',
+			'image_ratio'    => '',
+			'columns'        => '',
+			'show_excerpt'   => '',
+			'excerpt_length' => '',
+			'show_date'      => '',
+			'show_time'      => '',
+			'show_category'  => '',
 		);
 	}
 
@@ -167,21 +176,29 @@ class AFS_Frontend {
 	 */
 	public static function render_block( $attributes ) {
 		$map  = array(
-			'postType'   => 'post_type',
-			'taxonomy'   => 'post_tax',
-			'perPage'    => 'posts_per_page',
-			'terms'      => 'terms',
-			'layout'     => 'layout',
-			'orderby'    => 'orderby',
-			'order'      => 'order',
-			'showTabs'   => 'show_tabs',
-			'showViews'  => 'show_views',
-			'showSearch' => 'show_search',
-			'showMonths' => 'show_months',
-			'showYears'  => 'show_years',
-			'showSort'   => 'show_sort',
-			'showChips'  => 'show_chips',
-			'design'     => 'design',
+			'postType'      => 'post_type',
+			'taxonomy'      => 'post_tax',
+			'perPage'       => 'posts_per_page',
+			'terms'         => 'terms',
+			'layout'        => 'layout',
+			'orderby'       => 'orderby',
+			'order'         => 'order',
+			'showTabs'      => 'show_tabs',
+			'showViews'     => 'show_views',
+			'showSearch'    => 'show_search',
+			'showMonths'    => 'show_months',
+			'showYears'     => 'show_years',
+			'showSort'      => 'show_sort',
+			'showChips'     => 'show_chips',
+			'design'        => 'design',
+			'showImage'     => 'show_image',
+			'imageRatio'    => 'image_ratio',
+			'columns'       => 'columns',
+			'showExcerpt'   => 'show_excerpt',
+			'excerptLength' => 'excerpt_length',
+			'showDate'      => 'show_date',
+			'showTime'      => 'show_time',
+			'showCategory'  => 'show_category',
 		);
 		$atts = array();
 		foreach ( $map as $from => $to ) {
@@ -225,6 +242,6 @@ class AFS_Frontend {
 		$result = AFS_Renderer::render_results( $config, $state, AFS_Renderer::current_url() );
 		++self::$rendered;
 
-		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . ( AFS_Design::MODERN === $config['design'] ? ' afs-design-modern' : '' ) . '"><div class="afs-results">' . $result['html'] . '</div></div>';
+		return '<div class="afs afs-wrapper afs-layout-' . esc_attr( $state['layout'] ) . esc_attr( AFS_Design::root_class( $config['design'] ) ) . '"><div class="afs-results">' . $result['html'] . '</div></div>';
 	}
 }
