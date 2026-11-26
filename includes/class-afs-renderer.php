@@ -323,6 +323,7 @@ class AFS_Renderer {
 		$root_extra = '';
 		if ( $discovery ) {
 			$root_extra .= $config['show_chips'] ? ' afs-has-chips' : '';
+			$root_extra .= $config['show_views'] ? ' afs-has-switch' : '';
 			$root_extra .= self::has_active_filters( $state ) ? ' afs-is-filtered' : '';
 		}
 
@@ -417,7 +418,7 @@ class AFS_Renderer {
 					</nav>
 				<?php endif; ?>
 
-				<?php echo $discovery ? self::layout_switch( $config, $state, $legacy, $n ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch(). Nothing is printed for Classic and Modern, so their markup is unchanged. ?><div class="afs-Filters">
+				<div class="afs-Filters">
 					<?php if ( $config['show_search'] ) : ?>
 						<div class="afs-field afs-field-search">
 							<label for="<?php echo esc_attr( $id ); ?>-s"><?php esc_html_e( 'Search', 'ajax-filter-search' ); ?></label>
@@ -467,7 +468,10 @@ class AFS_Renderer {
 					</div>
 				</div>
 
-				<?php if ( ! $discovery && $config['show_views'] ) : ?>
+				<?php
+				echo $discovery ? self::layout_switch( $config, $state, $legacy, $n ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in layout_switch(). Nothing is printed for Classic and Modern, so their markup is unchanged.
+				if ( ! $discovery && $config['show_views'] ) :
+					?>
 					<div<?php echo $legacy ? ' id="newsViewOptionsPanel"' : ''; ?> class="afs-Switch" role="group" aria-label="<?php echo esc_attr( self::label( __( 'Layout', 'ajax-filter-search' ), $n ) ); ?>">
 						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="list" aria-pressed="<?php echo 'list' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'List View', 'ajax-filter-search' ); ?></button>
 						<button type="button" class="afs-btn afs-switch-btn" data-afs-layout="grid" aria-pressed="<?php echo 'grid' === $state['layout'] ? 'true' : 'false'; ?>"><?php esc_html_e( 'Grid View', 'ajax-filter-search' ); ?></button>

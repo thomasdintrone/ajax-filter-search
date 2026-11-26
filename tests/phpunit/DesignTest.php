@@ -150,7 +150,10 @@ class DesignTest extends AFS_Test_Case {
 		}
 		$this->assertSame( 4, substr_count( $html, 'name="afs_settings[afs_appearance_design]"' ), 'One radio per design' );
 		$this->assertStringContainsString( 'Save Settings', $html );
-		$this->assertSame( 5, substr_count( $html, 'data-afs-copy=' ), 'Five copyable example shortcodes' );
+		$this->assertSame( 5, substr_count( $html, 'data-afs-copy=' ), 'One shortcode shown and four more inside the disclosure' );
+		$this->assertSame( 1, substr_count( $html, 'class="afs-more"' ) );
+		$this->assertLessThan( strpos( $html, 'class="afs-more"' ), strpos( $html, 'data-afs-copy="[ajax_filter_search]"' ), 'The plain shortcode comes first, outside the disclosure' );
+		$this->assertLessThan( strpos( $html, 'id="afs-sec-feed"' ), strpos( $html, 'id="afs-sec-appearance"' ), 'The design picker comes before the feed settings' );
 	}
 
 	public function test_labels_only_point_at_things_a_label_can_name() {

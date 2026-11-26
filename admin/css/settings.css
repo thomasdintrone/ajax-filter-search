@@ -652,6 +652,23 @@
 	box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--afs-a-blue);
 }
 
+/* More examples: a disclosure under the one shortcode that is always shown. */
+
+.afs-more > summary {
+	display: inline-block;
+	margin: 0 0 12px;
+	padding: 4px 2px;
+	color: var(--afs-a-blue-dark);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.afs-more > summary:focus-visible {
+	outline: 2px solid var(--afs-a-blue);
+	outline-offset: 2px;
+}
+
 /* Copyable shortcodes --------------------------------------------------------------------- */
 
 .afs-copy {
