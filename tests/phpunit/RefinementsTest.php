@@ -38,6 +38,7 @@ class RefinementsTest extends AFS_Test_Case {
 			$this->assertMatchesRegularExpression( '/data-afs-layout="list"[^>]*>List View<\/button>/', $html );
 			$this->assertStringNotContainsString( 'afs-is-filtered', $html );
 			$this->assertStringNotContainsString( 'afs-has-chips', $html );
+			$this->assertStringNotContainsString( 'afs-has-switch', $html );
 		}
 	}
 
@@ -50,8 +51,10 @@ class RefinementsTest extends AFS_Test_Case {
 
 	public function test_the_layout_switch_follows_the_tabs_in_the_new_designs_and_the_filters_in_the_old_ones() {
 		$new = $this->feed( '[ajax_filter_search design="editorial"]' );
-		$this->assertLessThan( strpos( $new, 'class="afs-Filters"' ), strpos( $new, 'class="afs-Switch"' ), 'Source order matches the visual order' );
+		// Tab order is tabs, switch, search, as in 2.3.0; on a phone the switch is only moved on screen (see the stylesheet).
+		$this->assertLessThan( strpos( $new, 'class="afs-Filters"' ), strpos( $new, 'class="afs-Switch"' ) );
 		$this->assertGreaterThan( strpos( $new, 'class="afs-Tabs"' ), strpos( $new, 'class="afs-Switch"' ) );
+		$this->assertStringContainsString( ' afs-has-switch', $new );
 		$old = $this->feed( '[ajax_filter_search design="modern"]' );
 		$this->assertGreaterThan( strpos( $old, 'class="afs-Filters"' ), strpos( $old, 'class="afs-Switch"' ) );
 	}
@@ -63,7 +66,7 @@ class RefinementsTest extends AFS_Test_Case {
 
 		$_GET['afs_s'] = 'alpha';
 		$active = $this->feed( '[ajax_filter_search design="editorial" show_chips="true"]' );
-		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper afs-layout-grid afs-design-editorial afs-discovery afs-has-chips afs-is-filtered"/', $active );
+		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper afs-layout-grid afs-design-editorial afs-discovery afs-has-chips afs-has-switch afs-is-filtered"/', $active );
 
 		$_GET = array( 'afs_term' => 'news' );
 		$this->assertStringContainsString( 'afs-is-filtered', $this->feed( '[ajax_filter_search design="library"]' ) );
@@ -176,6 +179,6 @@ class RefinementsTest extends AFS_Test_Case {
 		$_GET = array();
 		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper [^"]*afs-is-filtered"/', $off );
 		$this->assertDoesNotMatchRegularExpression( '/class="afs afs-wrapper [^"]*afs-has-chips/', $off, 'No chips, so Reset is the way out' );
-		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper [^"]*afs-has-chips afs-is-filtered"/', $on, 'Chips on, so Reset stays hidden' );
+		$this->assertMatchesRegularExpression( '/class="afs afs-wrapper [^"]*afs-has-chips[^"]* afs-is-filtered"/', $on, 'Chips on, so Reset stays hidden' );
 	}
 }

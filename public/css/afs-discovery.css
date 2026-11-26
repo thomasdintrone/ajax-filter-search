@@ -450,7 +450,7 @@
 	}
 
 	/* The layout switch leaves the tab row: it sits at the right of the line that holds the result count (and any chips),
-	   so the pills get the full width. It stays after the filters in the page order, which is also its order on screen. */
+	   so the pills get the full width. Only its place on screen changes; in the page and tab order it still follows the tabs. */
 	.afs-discovery.afs-js.afs-has-switch .afs-Switch {
 		grid-column: 1 / -1;
 		grid-row: 3;
