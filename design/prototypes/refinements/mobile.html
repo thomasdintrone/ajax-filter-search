@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mobile, compact filters</title><link rel="stylesheet" href="refine.css">
+<style>
+body{padding:28px 30px 36px;width:1400px}
+.sheet{display:flex;gap:34px;align-items:flex-start}
+.col{width:390px}.col h2{margin:0 0 .15rem;font-size:1rem}.col .sub{margin:0 0 .8rem;color:var(--muted);font-size:.82rem;min-height:2.6em}
+.phone{position:relative;width:390px;height:844px;overflow:hidden;background:#fff;border:1px solid #cfd5e0;border-radius:26px;box-shadow:0 20px 40px -24px rgba(15,23,42,.4)}
+.phone img.real{display:block;width:390px}
+.site{display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 20px;font-weight:700;font-size:.95rem}
+.mpage{padding:0 20px 20px}.mh{margin:.2rem 0 .8rem;font-size:1.6rem;font-weight:600;letter-spacing:-.02em}
+.m-search{position:relative;margin-bottom:.6rem}
+.m-search input{width:100%;height:3rem;border:1px solid var(--line);border-radius:12px;padding:0 1rem 0 2.6rem;font:inherit;font-size:1rem}
+.m-search:before{content:"";position:absolute;left:1rem;top:1rem;width:.8rem;height:.8rem;border:2px solid #7a8496;border-radius:50%}
+.m-search:after{content:"";position:absolute;left:1.66rem;top:1.62rem;width:.4rem;height:2px;border-radius:1px;background:#7a8496;transform:rotate(45deg);transform-origin:0 50%}
+.m-ctl{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.7rem}
+.m-ctl .btn,.m-ctl .sel{height:2.75rem;border:1px solid var(--line);border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 .85rem;font-weight:600;font-size:.95rem}
+.m-ctl .btn{gap:.5rem;justify-content:flex-start}.m-ctl .btn .n{margin-left:auto;display:grid;place-items:center;min-width:1.4rem;height:1.4rem;border-radius:999px;background:var(--accent);color:#fff;font-size:.75rem}
+.m-ctl .btn.open{border-color:var(--ink)}
+.m-ctl .sel{font-weight:500}
+.m-row{display:flex;align-items:center;justify-content:space-between;margin:.55rem 0 .8rem;font-size:.88rem;color:var(--muted)}
+.m-row .seg button{width:2.1rem;height:2.1rem}
+.chips{margin-top:.1rem}
+.panel{margin:0 0 .8rem;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 14px 30px -20px rgba(15,23,42,.4)}
+.panel h5{margin:0 0 .45rem;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.panel .tabs{margin-bottom:.9rem;gap:.4rem}.panel .tabs a{padding:.4rem .85rem;font-size:.86rem}
+.panel .two{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.9rem}
+.panel .sel{height:2.6rem;border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:space-between;padding:0 .8rem;font-size:.95rem}
+.panel .sel:after{content:"";width:.45rem;height:.45rem;border-right:2px solid #5b6678;border-bottom:2px solid #5b6678;transform:rotate(45deg) translateY(-2px)}
+.panel .acts{display:flex;align-items:center;justify-content:space-between}
+.panel .go{height:2.75rem;padding:0 1.2rem;border-radius:10px;background:var(--accent);color:#fff;font-weight:650;display:grid;place-items:center}
+.marker{position:absolute;left:0;right:0;border-top:2px dashed #e11d48;z-index:5}
+.marker span{position:absolute;right:8px;top:-1.55rem;padding:.12rem .5rem;border-radius:6px;background:#e11d48;color:#fff;font-size:.72rem;font-weight:700}
+.card .ph{aspect-ratio:16/9}
+.fold{position:absolute;left:0;right:0;bottom:0;height:1px}
+.summary{margin:26px 0 0;padding:16px 20px;border:1px dashed #b8c0cf;border-radius:12px;background:#f8f9fc;font-size:.88rem;line-height:1.6;max-width:1230px}
+</style></head><body>
+<span class="tag">Revised reference · not implemented</span>
+<div class="sheet">
+<section class="col"><h2>Today (2.3.0 as built)</h2><p class="sub">Real capture of the demo site. Tabs clip at the right edge, filters take a full screen section.</p>
+<div class="phone"><img class="real" src="real/mobile-today.png" alt=""><div class="marker" style="top:566px"><span>first result · 566px</span></div></div></section>
+
+<section class="col"><h2>Proposed: panel closed</h2><p class="sub">Search first, one row for Filters and Sort, active filters visible, count and layout switch on one line.</p>
+<div class="phone" id="b"><div class="site"><span>Example Newsroom</span><span>☰</span></div><div class="mpage">
+<h1 class="mh">Newsroom</h1>
+<div class="m-search"><input placeholder="Search Posts" aria-label="Search"></div>
+<div class="m-ctl"><div class="btn"><svg viewBox="0 0 20 20" aria-hidden="true" style="width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>Filters <span class="n">2</span></div><div class="sel">Oldest</div></div>
+<div class="chips"><span class="chip">Press Releases <b>×</b></span><span class="chip">2025 <b>×</b></span><a class="clear" href="#">Clear all</a></div>
+<div class="m-row"><span>3 results</span><div class="seg" role="group" aria-label="Layout"><button type="button" aria-pressed="true" aria-label="Grid view"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="3" y="11.5" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="11.5" width="5.5" height="5.5" rx="1.2"/></svg></button><button type="button" aria-pressed="false" aria-label="List view"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10"/><circle cx="3.6" cy="5" r=".6"/><circle cx="3.6" cy="10" r=".6"/><circle cx="3.6" cy="15" r=".6"/></svg></button></div></div>
+<div id="firstcard"><article class="card"><div class="ph p6" data-photo="PHOTO: harbor from above"></div><div class="body"><span class="badge">Press Releases</span><h3>Statement on the proposed harbor development</h3><p>Our position on the waterfront plan and how to take part.</p><time>March 28, 2025</time></div></article></div><div style="height:16px"></div><article class="card"><div class="ph p5" data-photo="PHOTO: printed report on a desk"></div><div class="body"><span class="badge">Press Releases</span><h3>Annual report now available online</h3><p>Read the year in numbers and stories.</p><time>November 5, 2025</time></div></article>
+</div><div class="marker" id="mk"><span id="mkl">first result</span></div></div></section>
+
+<section class="col"><h2>Proposed: panel open</h2><p class="sub">Category, month and year live in one disclosure panel (a button with aria-expanded; no drawer, no focus trap). With JavaScript off everything is simply visible.</p>
+<div class="phone"><div class="site"><span>Example Newsroom</span><span>☰</span></div><div class="mpage">
+<h1 class="mh">Newsroom</h1>
+<div class="m-search"><input placeholder="Search Posts" aria-label="Search"></div>
+<div class="m-ctl"><div class="btn open"><svg viewBox="0 0 20 20" aria-hidden="true" style="width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round"><path d="M3 5h14M6 10h8M8.5 15h3"/></svg>Filters <span class="n">2</span></div><div class="sel">Oldest</div></div>
+<div class="panel"><h5>Category</h5><ul class="tabs"><li><a href="#">All</a></li><li><a href="#">News</a></li><li class="on"><a href="#">Press Releases</a></li><li><a href="#">Events</a></li></ul>
+<div class="two"><div><h5>Month</h5><div class="sel">All months</div></div><div><h5>Year</h5><div class="sel">2025</div></div></div>
+<div class="acts"><a class="clear" href="#" style="font-size:.9rem">Clear all</a><span class="go">Show 3 results</span></div></div>
+<div class="chips"><span class="chip">Press Releases <b>×</b></span><span class="chip">2025 <b>×</b></span></div>
+<div class="m-row"><span>3 results</span><div class="seg" role="group" aria-label="Layout"><button type="button" aria-pressed="true" aria-label="Grid view"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="3" y="11.5" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="11.5" width="5.5" height="5.5" rx="1.2"/></svg></button><button type="button" aria-pressed="false" aria-label="List view"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10"/><circle cx="3.6" cy="5" r=".6"/><circle cx="3.6" cy="10" r=".6"/><circle cx="3.6" cy="15" r=".6"/></svg></button></div></div>
+</div></div></section>
+</div>
+<div class="summary"><b>How it compares.</b> Today the plugin's own controls take <b>457px</b> of an 844px phone screen before the first result (measured on the demo site: tabs 47, filters 274, layout switch 42, result bar 22, plus spacing). The proposal brings the first result up from 566px to <b id="num"></b>, with the same functions all reachable: search is always visible, the category tabs become wrapped pills (nothing clipped) inside the panel, and the active filters stay visible whether the panel is open or closed. New designs only; Classic and Modern are untouched. This needs new markup (a wrapper and a toggle button for the new designs), a small amount of JavaScript for the disclosure and the active count, and new tests, so it is proposed as a follow-up milestone, not as part of the current release.</div>
+<script>
+const b=document.getElementById('b'),fc=document.getElementById('firstcard');
+const y=fc.getBoundingClientRect().top-b.getBoundingClientRect().top;
+document.getElementById('mk').style.top=y+'px';document.getElementById('mkl').textContent='first result · '+Math.round(y)+'px';
+document.getElementById('num').textContent=Math.round(y)+'px (about '+Math.round((566-y)/566*100)+'% earlier)';
+</script></body></html>

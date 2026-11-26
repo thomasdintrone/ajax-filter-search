@@ -1,0 +1,70 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cards settings, progressive disclosure</title>
+<link rel="stylesheet" href="../../../admin/css/settings.css">
+<style>
+html{background:#f0f0f1}body{margin:0;padding:16px 24px 40px;font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1d2327}
+.tag{display:inline-block;margin:0 0 10px;padding:.15rem .6rem;border-radius:999px;background:#fff3cd;color:#6b4e00;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.lab{display:flex;gap:18px;align-items:center;margin:0 0 14px;padding:10px 14px;border:1px dashed #b8c0cf;border-radius:10px;background:#f8f9fc;font-size:13px}
+.lab label{display:flex;gap:6px;align-items:center}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.afs-admin{max-width:none}
+.help{margin:0 0 18px;padding:12px 14px;border-radius:12px;background:var(--afs-a-tint);color:#1e3a8a;font-size:13.5px;line-height:1.55}
+.help b{color:#0f172a}
+details.afs-fold{border:1px solid var(--afs-a-line);border-radius:14px;background:#fff}
+details.afs-fold>summary{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;list-style:none;font-weight:700;font-size:16px}
+details.afs-fold>summary::-webkit-details-marker{display:none}
+details.afs-fold>summary small{font-weight:400;color:var(--afs-a-sub);font-size:13px}
+details.afs-fold>summary:after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid #64748b;border-bottom:2px solid #64748b;transform:rotate(45deg)}
+details.afs-fold[open]>summary:after{transform:rotate(-135deg)}
+details.afs-fold .afs-card{border:0;box-shadow:none;margin:0}
+[hidden]{display:none!important}
+.screen-reader-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.kept{margin:14px 0 0;color:var(--afs-a-sub);font-size:12.5px}
+.blk{border:1px solid #dcdcde;background:#fff;padding:16px;font-size:12px}
+.blk h4{margin:0 0 12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#1e1e1e}
+.blk .f{margin:0 0 14px}.blk .f label{display:block;margin:0 0 4px;font-size:11px;font-weight:500;text-transform:uppercase}
+.blk .s{height:32px;border:1px solid #8c8f94;border-radius:2px;padding:0 8px;display:flex;align-items:center;justify-content:space-between;font-size:13px;background:#fff}
+.blk .s:after{content:"";width:6px;height:6px;border-right:1.5px solid #1e1e1e;border-bottom:1.5px solid #1e1e1e;transform:rotate(45deg) translateY(-2px)}
+.blk .why{margin:2px 0 0;color:#757575;font-size:11.5px}
+</style></head><body>
+<span class="tag">Revised reference · interactive prototype · not implemented</span>
+<div class="lab"><strong>Try it:</strong><span>Site design</span><label><input type="radio" name="sd" value="modern"> Modern</label><label><input type="radio" name="sd" value="editorial" checked> Editorial Grid</label><span style="color:#64748b">then switch the Yes/No controls below</span></div>
+<div class="grid2">
+<div class="wrap afs-admin">
+<details class="afs-fold" id="fold" open><summary><span>Cards</span><small id="foldnote"></small></summary>
+<section class="afs-card" aria-label="Cards">
+<p class="afs-card__intro">What each result shows in the Editorial Grid and Resource Library designs.</p>
+<p class="help"><b>Defaults, and how a feed overrides them.</b> These settings apply to every feed that uses one of these designs. A single feed can override any of them with a shortcode attribute (for example <code>columns="2"</code>) or in the block's Cards panel, where "Use plugin setting" shows the value from this page. Classic and Modern ignore them.</p>
+
+<div class="afs-row"><div class="afs-row__label"><span class="afs-row__title">Featured image</span><p class="description">Show each post's featured image.</p></div><div class="afs-row__control"><fieldset class="afs-seg"><legend class="screen-reader-text">Featured image</legend><label class="afs-seg__opt"><input type="radio" name="image" value="1" checked><span>Yes</span></label><label class="afs-seg__opt"><input type="radio" name="image" value="0"><span>No</span></label></fieldset></div></div>
+<div class="afs-row" data-needs="image"><div class="afs-row__label"><span class="afs-row__title">Image shape</span><p class="description">Editorial Grid images only. Resource Library thumbnails are always square.</p></div><div class="afs-row__control"><select><option>16:10</option><option>3:2</option><option>4:3</option><option>1:1</option><option>16:9</option></select></div></div>
+<div class="afs-row"><div class="afs-row__label"><span class="afs-row__title">Columns</span><p class="description">The most columns the Editorial Grid uses. It shows fewer on narrow screens.</p></div><div class="afs-row__control"><select><option>3</option><option>1</option><option>2</option><option>4</option></select></div></div>
+<div class="afs-row"><div class="afs-row__label"><span class="afs-row__title">Excerpt</span><p class="description">Show a short excerpt under each title.</p></div><div class="afs-row__control"><fieldset class="afs-seg"><legend class="screen-reader-text">Excerpt</legend><label class="afs-seg__opt"><input type="radio" name="excerpt" value="1" checked><span>Yes</span></label><label class="afs-seg__opt"><input type="radio" name="excerpt" value="0"><span>No</span></label></fieldset></div></div>
+<div class="afs-row" data-needs="excerpt"><div class="afs-row__label"><span class="afs-row__title">Excerpt length</span><p class="description">How many words of the excerpt to show (10 to 80).</p></div><div class="afs-row__control"><input type="number" class="small-text" value="25" min="10" max="80"></div></div>
+<div class="afs-row"><div class="afs-row__label"><span class="afs-row__title">Publication date</span><p class="description">Show the date each post was published.</p></div><div class="afs-row__control"><fieldset class="afs-seg"><legend class="screen-reader-text">Publication date</legend><label class="afs-seg__opt"><input type="radio" name="date" value="1" checked><span>Yes</span></label><label class="afs-seg__opt"><input type="radio" name="date" value="0"><span>No</span></label></fieldset></div></div>
+<div class="afs-row" data-needs="date"><div class="afs-row__label"><span class="afs-row__title">Include the time</span><p class="description">Show the time of day next to the date.</p></div><div class="afs-row__control"><fieldset class="afs-seg"><legend class="screen-reader-text">Include the time</legend><label class="afs-seg__opt"><input type="radio" name="time" value="1"><span>Yes</span></label><label class="afs-seg__opt"><input type="radio" name="time" value="0" checked><span>No</span></label></fieldset></div></div>
+<div class="afs-row"><div class="afs-row__label"><span class="afs-row__title">Category badge</span><p class="description">Show the post's category as a badge.</p></div><div class="afs-row__control"><fieldset class="afs-seg"><legend class="screen-reader-text">Category badge</legend><label class="afs-seg__opt"><input type="radio" name="cat" value="1" checked><span>Yes</span></label><label class="afs-seg__opt"><input type="radio" name="cat" value="0"><span>No</span></label></fieldset></div></div>
+<p class="kept" id="kept" hidden>Hidden options keep their saved values and apply again if you turn the option back on.</p>
+</section></details>
+</div>
+
+<aside class="blk" aria-label="Block sidebar preview"><h4>Block sidebar · Cards</h4>
+<div class="f"><label>Featured image</label><div class="s" id="b-image">Use plugin setting (Show)</div></div>
+<div class="f" id="b-shape"><label>Image shape</label><div class="s">Use plugin setting (16:10)</div></div>
+<div class="f"><label>Excerpt</label><div class="s" id="b-excerpt">Use plugin setting (Show)</div></div>
+<div class="f" id="b-len"><label>Excerpt length (words)</label><div class="s">Use plugin setting (25)</div></div>
+<p class="why">Each "Use plugin setting" label shows the current default, so a block never needs a trip back to Settings to see it. Dependent controls hide the same way as on the settings screen.</p></aside>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+function val(n){const r=$('input[name="'+n+'"]:checked');return !!r&&r.value==='1'}
+function sync(){
+ const ed=$('input[name="sd"]:checked').value==='editorial';
+ const fold=$('#fold');fold.open=ed;$('#foldnote').textContent=ed?'':'Used by feeds that choose Editorial Grid or Resource Library';
+ let hid=false;
+ $$('[data-needs]').forEach(function(r){const on=val(r.dataset.needs);r.hidden=!on;if(!on)hid=true});
+ $('#kept').hidden=!hid;
+ $('#b-shape').hidden=!val('image');$('#b-len').hidden=!val('excerpt');
+ $('#b-image').textContent='Use plugin setting ('+(val('image')?'Show':'Hide')+')';$('#b-excerpt').textContent='Use plugin setting ('+(val('excerpt')?'Show':'Hide')+')';
+}
+$$('input[type=radio]').forEach(function(i){i.addEventListener('change',sync)});sync();
+</script></body></html>
