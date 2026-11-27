@@ -1,6 +1,6 @@
 # Release 2.3.1: checklist
 
-Status: **prepared, not published.** Version 2.3.1 follows the independent audit of the published 2.3.0 (SVN r3828281, tag `v2.3.0`). Codex re-reviewed the remediation and signed off on commit `b927575`; the version bump, changelog, upgrade notice and listing assets are in this release commit. Publishing to WordPress.org is done by the owner (SVN steps in `RELEASE-2.2.0.md`). The Git tag `v2.3.1` is made after SVN is published, on the merged `master` commit.
+Status: **published** to WordPress.org as SVN r3828499 (trunk, `tags/2.3.1` and the 14 listing images in `assets/`) on 2026-11-26; Git tag `v2.3.1` (commit `4cd6521`). The live check after the roughly 6-hour hold (`bin/verify-live-release.sh 2.3.1 2.3.0`) is still to run, and the 2.3.0 update offer was not yet confirmed when 2.3.1 was committed. Earlier wording follows: prepared, not published. Version 2.3.1 follows the independent audit of the published 2.3.0 (SVN r3828281, tag `v2.3.0`). Codex re-reviewed the remediation and signed off on commit `b927575`; the version bump, changelog, upgrade notice and listing assets are in this release commit. Publishing to WordPress.org is done by the owner (SVN steps in `RELEASE-2.2.0.md`). The Git tag `v2.3.1` was made after SVN was published, on the merged `master` commit.
 
 Package: `build/ajax-filter-search-2.3.1.zip` (from `bin/build-zip.sh`; `bin/check-package.sh` passes).
 
