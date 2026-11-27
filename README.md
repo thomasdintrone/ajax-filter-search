@@ -14,7 +14,7 @@ WordPress plugin: a filterable, searchable, paginated list of posts or custom po
 | `blocks/feed/` | Gutenberg block (no build step; `editor.js` uses the `wp.*` globals) |
 | `public/` | Front-end CSS and JS (no dependencies) |
 | `admin/js/` | Settings-screen script |
-| `.wordpress-org/` | Store assets (banner, screenshots). Synced to SVN `/assets`, never shipped in the zip |
+| `.wordpress-org/` | Store assets (banner, icon, screenshots). The banner and icon are exported from the approved artwork in `design/approved-artwork/` by `design/export-approved-artwork.sh`. Synced to SVN `/assets`, never shipped in the zip |
 | `bin/` | Dev scripts (tests, snapshot generator, guards, seed content, smoke test, zip build and package check) |
 | `tests/` | PHPUnit suite (`tests/phpunit`), 2.0.0 snapshots, fixtures |
 | `.github/workflows/ci.yml` | CI: lint, guards, PHPUnit matrix, frozen-snapshot check, package build |

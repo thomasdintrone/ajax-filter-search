@@ -195,3 +195,46 @@ test.describe( 'phone', () => {
 		expect( first - rootTop ).toBeLessThan( 430 ); // Was 457px before the 2.3.0 refinements.
 	} );
 } );
+
+// On a phone the layout switch sits on the line of the result count. In both text directions it must not cover the count,
+// the chips, an empty-result message or the first result.
+test.describe( 'phone toolbar: the switch never overlaps', () => {
+	const urls = {
+		'a count and chips': '/afs-editorial/?afs_term=events&afs_s=Announcement',
+		'chips that wrap': '/afs-editorial/?afs_term=press-releases&afs_s=Quarterly+results+membership+grows&afs_year=2026&afs_month=6',
+		'an empty result': '/afs-editorial/?afs_s=zebra+submarine',
+		'no filters': '/afs-editorial/',
+	};
+	for ( const dir of [ 'ltr', 'rtl' ] ) {
+		for ( const [ name, url ] of Object.entries( urls ) ) {
+			test( `${ dir }: ${ name }`, async ( { browser } ) => {
+				const context = await browser.newContext( { viewport: { width: 390, height: 844 }, locale: 'en-US' } );
+				const page = await context.newPage();
+				await page.goto( url );
+				await settled( page );
+				if ( 'rtl' === dir ) {
+					await page.evaluate( () => { document.documentElement.dir = 'rtl'; } );
+					await page.waitForTimeout( 200 );
+				}
+				const rects = await page.evaluate( () => {
+					const root = document.querySelector( '.afs[data-afs-instance="1"]' );
+					const r = ( el ) => { const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height, label: el.className || el.tagName }; };
+					const sw = root.querySelector( '.afs-Switch' );
+					const others = [ ...root.querySelectorAll( '.afs-resultbar > *, .afs-chip, .afs-count, .afs-none, .afs-none__title, .afs-recover, .afs-item, .afs-card, .afs-Filters .afs-field, .afs-Tabs a' ) ];
+					return { sw: r( sw ), others: others.map( r ), vw: document.documentElement.clientWidth, sx: document.documentElement.scrollWidth };
+				} );
+				const hit = ( a, b ) => a.x < b.x + b.w - 0.5 && b.x < a.x + a.w - 0.5 && a.y < b.y + b.h - 0.5 && b.y < a.y + a.h - 0.5;
+				for ( const other of rects.others ) {
+					expect( hit( rects.sw, other ), `the switch covers ${ other.label }` ).toBe( false );
+				}
+				expect( rects.sx, 'no sideways scrolling' ).toBeLessThanOrEqual( rects.vw );
+				expect( rects.sw.x ).toBeGreaterThanOrEqual( 0 );
+				expect( rects.sw.x + rects.sw.w ).toBeLessThanOrEqual( rects.vw );
+				// The switch is on the end side: right in left-to-right text, left in right-to-left.
+				const middle = rects.sw.x + rects.sw.w / 2;
+				expect( 'rtl' === dir ? middle < rects.vw / 2 : middle > rects.vw / 2 ).toBe( true );
+				await context.close();
+			} );
+		}
+	}
+} );

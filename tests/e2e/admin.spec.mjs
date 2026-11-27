@@ -132,6 +132,198 @@ test.describe( 'block editor', () => {
 	} );
 } );
 
+test.describe( 'block editor, terms that share a name', () => {
+	test( 'the picker keeps each term apart by its slug', async ( { page, request } ) => {
+		const pages = await ( await request.get( '/wp-json/wp/v2/pages?slug=afs-block&_fields=id' ) ).json();
+		await login( page );
+		await page.goto( `/wp-admin/post.php?post=${ pages[ 0 ].id }&action=edit` );
+		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
+		// Two categories with one name, under different parents. They are created for this test and removed at the end.
+		const ids = await page.evaluate( async () => {
+			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
+			const a = await make( { name: 'Dup Parent A', slug: 'dup-parent-a' } );
+			const b = await make( { name: 'Dup Parent B', slug: 'dup-parent-b' } );
+			const x = await make( { name: 'Twin', slug: 'twin-a', parent: a.id } );
+			const y = await make( { name: 'Twin', slug: 'twin-b', parent: b.id } );
+			return [ a.id, b.id, x.id, y.id ];
+		} );
+		try {
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'welcomeGuide', false );
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { design: 'editorial', terms: 'news' } );
+				wp.data.dispatch( 'core/block-editor' ).selectBlock( block.clientId );
+				wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			} );
+			const terms = () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ].attributes.terms );
+			const input = page.locator( '.components-form-token-field__input' );
+			await input.waitFor( { timeout: 30000 } );
+			await page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( '.afs-card' ).first().waitFor( { timeout: 30000 } );
+			await input.focus();
+			await page.keyboard.type( 'Twin' );
+			const options = page.locator( '.components-form-token-field__suggestion' );
+			await expect( options ).toHaveCount( 2 );
+			await expect( options.nth( 0 ) ).toHaveText( 'Twin (twin-a)' );
+			await expect( options.nth( 1 ) ).toHaveText( 'Twin (twin-b)' );
+			// Choosing the second one stores the second slug, and keeps the term that was already chosen.
+			await options.nth( 1 ).click();
+			await expect.poll( terms ).toBe( 'news,twin-b' );
+			// Adding the first as well, then removing the second, leaves the first and the original.
+			await page.keyboard.type( 'Twin' );
+			await expect( options ).toHaveCount( 1 );
+			await options.first().click();
+			await expect.poll( terms ).toBe( 'news,twin-b,twin-a' );
+			await page.locator( '.components-form-token-field__token' ).filter( { hasText: 'twin-b' } ).locator( 'button' ).click();
+			await expect.poll( terms ).toBe( 'news,twin-a' );
+		} finally {
+			await page.evaluate( async ( list ) => {
+				for ( const id of list.slice().reverse() ) {
+					await wp.apiFetch( { path: `/wp/v2/categories/${ id }?force=true`, method: 'DELETE' } );
+				}
+			}, ids );
+		}
+	} );
+} );
+
+test.describe( 'block editor, labels that could collide', () => {
+	test( 'a term whose name looks like another term\'s label keeps its own slug, and a taxonomy switch drops old labels', async ( { page, request } ) => {
+		const pages = await ( await request.get( '/wp-json/wp/v2/pages?slug=afs-block&_fields=id' ) ).json();
+		await login( page );
+		await page.goto( `/wp-admin/post.php?post=${ pages[ 0 ].id }&action=edit` );
+		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
+		// Two "News" categories under different parents, and a third whose NAME is the label the first would get.
+		const ids = await page.evaluate( async () => {
+			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
+			const a = await make( { name: 'Clash Parent A', slug: 'clash-parent-a' } );
+			const b = await make( { name: 'Clash Parent B', slug: 'clash-parent-b' } );
+			const x = await make( { name: 'Clashnews', slug: 'clashnews-a', parent: a.id } );
+			const y = await make( { name: 'Clashnews', slug: 'clashnews-b', parent: b.id } );
+			const z = await make( { name: 'Clashnews (clashnews-a)', slug: 'special-clashnews' } );
+			return [ a.id, b.id, x.id, y.id, z.id ];
+		} );
+		try {
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'welcomeGuide', false );
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { design: 'editorial', taxonomy: 'category', terms: '' } );
+				wp.data.dispatch( 'core/block-editor' ).selectBlock( block.clientId );
+				wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			} );
+			const attrs = () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ].attributes );
+			const input = page.locator( '.components-form-token-field__input' );
+			await input.waitFor( { timeout: 30000 } );
+			await page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( '.afs-card' ).first().waitFor( { timeout: 30000 } );
+			await input.focus();
+			await page.keyboard.type( 'Clashnews' );
+			const options = page.locator( '.components-form-token-field__suggestion' );
+			await expect( options ).toHaveCount( 3 );
+			const texts = await options.allTextContents();
+			expect( new Set( texts ).size ).toBe( 3 ); // Every label is different.
+			// Choose the one whose slug is special-clashnews, by its label.
+			const special = texts.findIndex( ( t ) => t.includes( 'special-clashnews' ) );
+			expect( special ).toBeGreaterThan( -1 );
+			await options.nth( special ).click();
+			await expect.poll( async () => ( await attrs() ).terms ).toBe( 'special-clashnews' );
+			// Then the first of the pair: both are kept, in order.
+			await page.keyboard.type( 'Clashnews' );
+			const rest = await options.allTextContents();
+			expect( new Set( rest ).size ).toBe( rest.length );
+			const first = rest.findIndex( ( t ) => /clashnews-a\)$/.test( t ) && ! t.includes( 'special' ) );
+			expect( first ).toBeGreaterThan( -1 );
+			await options.nth( first ).click();
+			await expect.poll( async () => ( await attrs() ).terms ).toBe( 'special-clashnews,clashnews-a' );
+
+			// Another taxonomy shows none of the categories' labels.
+			await page.evaluate( () => {
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { taxonomy: 'post_tag', terms: '' } );
+			} );
+			await page.locator( '.components-form-token-field__input' ).focus();
+			await page.keyboard.type( 'Clashnews' );
+			await expect( page.locator( '.components-form-token-field__suggestion' ).filter( { hasText: 'Clashnews' } ) ).toHaveCount( 0 );
+			// Back to categories: the labels are the same as before, with nothing left over.
+			await page.evaluate( () => {
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { taxonomy: 'category', terms: '' } );
+			} );
+			await page.locator( '.components-form-token-field__input' ).focus();
+			await page.keyboard.press( 'Control+a' );
+			await page.keyboard.type( 'Clashnews' );
+			await expect( options ).toHaveCount( 3 );
+			expect( new Set( await options.allTextContents() ).size ).toBe( 3 );
+		} finally {
+			await page.evaluate( async ( list ) => {
+				for ( const id of list.slice().reverse() ) {
+					await wp.apiFetch( { path: `/wp/v2/categories/${ id }?force=true`, method: 'DELETE' } );
+				}
+			}, ids );
+		}
+	} );
+} );
+
+test.describe( 'block editor, names that are also JavaScript property names', () => {
+	test( 'terms called constructor, toString and __proto__ can be listed and chosen', async ( { page, request } ) => {
+		const pages = await ( await request.get( '/wp-json/wp/v2/pages?slug=afs-block&_fields=id' ) ).json();
+		await login( page );
+		await page.goto( `/wp-admin/post.php?post=${ pages[ 0 ].id }&action=edit` );
+		await page.waitForFunction( () => window.wp && wp.data && wp.data.select( 'core/block-editor' ) && window.afsEditor && wp.data.select( 'core/block-editor' ).getBlocks().length > 0, null, { timeout: 60000 } );
+		const errors = [];
+		page.on( 'pageerror', ( e ) => errors.push( e.message ) );
+		// Remove anything an interrupted earlier run left behind, so the test can be run again.
+		await page.evaluate( async () => {
+			const old = await wp.apiFetch( { path: '/wp/v2/categories?per_page=100&slug=proto-parent,construction,constructor-child,tostring-cat,proto-cat' } );
+			for ( const term of old.reverse() ) {
+				await wp.apiFetch( { path: `/wp/v2/categories/${ term.id }?force=true`, method: 'DELETE' } );
+			}
+		} );
+		// Two terms with one such name (different parents) also go through the duplicate-label path.
+		const ids = await page.evaluate( async () => {
+			const make = ( body ) => wp.apiFetch( { path: '/wp/v2/categories', method: 'POST', data: body } );
+			const p = await make( { name: 'Proto Parent', slug: 'proto-parent' } );
+			const out = [ p.id ];
+			out.push( ( await make( { name: 'constructor', slug: 'construction' } ) ).id );
+			out.push( ( await make( { name: 'constructor', slug: 'constructor-child', parent: p.id } ) ).id );
+			out.push( ( await make( { name: 'toString', slug: 'tostring-cat' } ) ).id );
+			out.push( ( await make( { name: '__proto__', slug: 'proto-cat' } ) ).id );
+			return out;
+		} );
+		try {
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/preferences' ).set( 'core/edit-post', 'welcomeGuide', false );
+				const block = wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ];
+				wp.data.dispatch( 'core/block-editor' ).updateBlockAttributes( block.clientId, { design: 'editorial', taxonomy: 'category', terms: '' } );
+				wp.data.dispatch( 'core/block-editor' ).selectBlock( block.clientId );
+				wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+			} );
+			const terms = () => page.evaluate( () => wp.data.select( 'core/block-editor' ).getBlocks()[ 0 ].attributes.terms );
+			const input = page.locator( '.components-form-token-field__input' );
+			await input.waitFor( { timeout: 30000 } );
+			await page.frameLocator( 'iframe[name="editor-canvas"]' ).locator( '.afs-card' ).first().waitFor( { timeout: 30000 } );
+			const options = page.locator( '.components-form-token-field__suggestion' );
+			await input.focus();
+			await page.keyboard.type( 'constructor' );
+			await expect( options ).toHaveCount( 2 ); // Two terms with that name, told apart by their slugs.
+			const labels = await options.allTextContents();
+			expect( new Set( labels ).size ).toBe( 2 );
+			await options.nth( labels.findIndex( ( t ) => t.includes( 'constructor-child' ) ) ).click();
+			await expect.poll( terms ).toBe( 'constructor-child' );
+			await page.keyboard.type( 'toString' );
+			await options.first().click();
+			await expect.poll( terms ).toBe( 'constructor-child,tostring-cat' );
+			await page.keyboard.type( '__proto__' );
+			await options.first().click();
+			await expect.poll( terms ).toBe( 'constructor-child,tostring-cat,proto-cat' );
+			expect( errors ).toEqual( [] );
+		} finally {
+			await page.evaluate( async ( list ) => {
+				for ( const id of list.slice().reverse() ) {
+					await wp.apiFetch( { path: `/wp/v2/categories/${ id }?force=true`, method: 'DELETE' } );
+				}
+			}, ids );
+		}
+	} );
+} );
+
 const SETTINGS = '/wp-admin/options-general.php?page=ajax-filter-search';
 const row = ( page, name ) => page.locator( `[data-afs-needs="afs_settings[${ name }]"]` );
 
@@ -288,5 +480,40 @@ test.describe( "What's new", () => {
 		await Promise.all( [ page.waitForURL( /options-general\.php\?page=ajax-filter-search$/ ), page.getByRole( 'button', { name: 'Maybe later' } ).click() ] );
 		await expect( page.locator( '#afs-news' ) ).toHaveCount( 0 );
 		await context.close();
+	} );
+} );
+
+test.describe( 'a feed with chips off, on a site with chips on', () => {
+	const CHIPS = 'input[name="afs_settings[afs_general_show_chips]"]';
+
+	test.beforeEach( async ( { page } ) => {
+		await login( page );
+		await page.goto( SETTINGS );
+		await page.locator( `${ CHIPS }[value="1"]` ).check( { force: true } );
+		await Promise.all( [ page.waitForURL( /options-general\.php/ ), page.locator( '#submit' ).click() ] );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.goto( SETTINGS );
+		await page.locator( `${ CHIPS }[value="0"]` ).check( { force: true } );
+		await Promise.all( [ page.waitForURL( /options-general\.php/ ), page.locator( '#submit' ).click() ] );
+	} );
+
+	test( 'keeps the chips off after an update, so Reset stays the way out', async ( { page } ) => {
+		// The second feed on the Editorial page says show_chips="false"; the first one follows the site setting (on).
+		await page.goto( '/afs-editorial/' );
+		await settled( page, 2 );
+		const plain = feed( page, 2 );
+		await expect( plain.locator( '.afs-chips' ) ).toHaveCount( 0 );
+		await plain.locator( 'input[name="afs_s"]' ).fill( 'Announcement' );
+		await settled( page, 2 );
+		await expect( plain.locator( '.afs-chips' ) ).toHaveCount( 0 );
+		await expect( plain.locator( '.afs-chip' ) ).toHaveCount( 0 );
+		await expect( plain.locator( '.afs-reset' ) ).toBeVisible();
+		// And the feed that follows the setting does show them.
+		await feed( page, 1 ).locator( '.afs-Tabs a[data-afs-term="news"]' ).click();
+		await settled( page, 1 );
+		await expect( feed( page, 1 ).locator( '.afs-chip' ).first() ).toBeVisible();
+		await expect( feed( page, 1 ).locator( '.afs-reset' ) ).toBeHidden();
 	} );
 } );

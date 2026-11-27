@@ -65,10 +65,44 @@ $items = array(
 	),
 );
 
+// One excerpt per article, written for it, so the screenshots show believable cards (not the same sentence repeated).
 $excerpts = array(
-	'A short summary of what happened and what comes next, with the key dates and where to find more details.',
-	'Read the full story for the background, who is involved and how residents can take part.',
-	'Details, schedule and contact information are available on the page, along with related coverage.',
+	'Riverside library extends weekend hours' => 'Starting this month the branch opens at nine on Saturdays and stays open until six, with quiet study rooms and a children\'s story hour.',
+	'City council approves new bike lanes on Harbor Street' => 'Protected lanes will run the length of Harbor Street by autumn, with new crossings near the ferry terminal and the market.',
+	'Local bakery wins regional sustainability award' => 'The family-run bakery was recognised for composting its waste, buying flour from nearby farms and delivering by cargo bike.',
+	'School garden program expands to six more campuses' => 'Students will grow vegetables and herbs this spring, and the harvest will supply the school kitchens and a weekly neighbourhood stand.',
+	'Ferry service adds evening crossings this summer' => 'Two extra sailings leave the harbour after seven on Thursdays through Sundays, timed to match the festival and the concert series.',
+	'Community solar project reaches full subscription' => 'More than three hundred households have signed up for shared panels on the old depot roof, cutting their bills from next month.',
+	'Public art trail opens along the waterfront' => 'Eleven new murals and sculptures line the mile-long walk, each with a short audio note from the artist about its story.',
+	'Neighborhood clean-up draws record volunteers' => 'Nearly five hundred residents filled two hundred bags along the river path on Saturday, and local shops donated lunch for everyone.',
+	'Transit agency introduces contactless fares' => 'Riders can now tap a card or phone on buses and trains, with daily and weekly caps so frequent travellers never overpay.',
+	'Winter shelter network opens early this year' => 'Four churches and a community hall will offer beds from the first cold night, with hot meals and help finding permanent housing.',
+	'Farmers market launches weekly recipe series' => 'Each Saturday a local cook turns the week\'s produce into a simple dish, with printed recipes at the information stall.',
+	'Harbor dredging project completes ahead of schedule' => 'Crews finished clearing the main channel three weeks early, reopening the deep berths to the fishing fleet and visiting ships.',
+	'Example Newsroom announces 2026 community grants' => 'Fifteen grants of up to five thousand dollars will fund local journalism, archives and youth media projects across the region.',
+	'Quarterly results: membership grows 12 percent' => 'Paid membership reached its highest level yet, driven by a new student rate and the success of the autumn reader drive.',
+	'New partnership brings free Wi-Fi to public parks' => 'Eight parks will have free, password-free internet by spring thanks to an agreement with the city and a regional provider.',
+	'Annual report now available online' => 'The report covers programs, finances and audience growth for the year, with a plain-language summary and downloadable data tables.',
+	'Appointment of a new director of programs' => 'The board has named a longtime community organiser to lead programs, beginning with a listening tour of neighbourhood groups.',
+	'Statement on the proposed harbor development' => 'We support public access to the shoreline and ask the developer to publish its traffic and flood studies before the hearing.',
+	'Call for proposals: neighborhood storytelling fund' => 'Residents and small groups can apply for support to record oral histories, photograph local life or publish a neighbourhood zine.',
+	'Launch of the open data portal' => 'Budgets, meeting records and service statistics are now searchable in one place, with every dataset free to download and reuse.',
+	'Update to our privacy and accessibility commitments' => 'We have shortened our privacy notice, removed third-party trackers and completed an independent accessibility review of the site.',
+	'Winter schedule and holiday closures' => 'Offices close on public holidays and run shorter hours in December, while the online services stay available at all times.',
+	'Volunteer of the year announced' => 'A retired teacher who has hosted the reading circle for twelve years received the award at the annual members\' evening.',
+	'Joint statement with regional libraries' => 'Together with nine library systems we call for fair e-book licensing so every reader can borrow the books they want.',
+	'Harbor Light Festival returns to the waterfront' => 'Three evenings of lanterns, food stalls and live music light up the quay, with a lantern-making workshop for families on Friday.',
+	'Open house at the community workshop' => 'Come and try woodworking, bike repair and 3D printing, and meet the volunteers who run the free weekend classes.',
+	'Spring book fair at the central library' => 'Hundreds of donated books go on sale for a dollar each, with author readings in the main hall and a swap table for children.',
+	'Town hall: transit improvements' => 'Planners will present three route options and answer questions, and residents can share their daily trips before the plan is finalised.',
+	'Seed swap and planting day' => 'Bring spare seeds, take new ones and help plant the new community beds, with tea and advice from the master gardeners.',
+	'Evening concert series opens in the park' => 'Free Thursday concerts begin at six with a brass band, followed by folk, jazz and a closing night of local school choirs.',
+	'Resume and career help drop-in' => 'Volunteers from local employers review resumes, practise interviews and explain training programs in friendly twenty-minute sessions.',
+	'Photography walk along the river' => 'A guided two-hour walk at sunrise, suitable for phones and cameras, ending with a small exhibition of the morning\'s pictures.',
+	'Winter lights parade' => 'Decorated bikes, boats-on-wheels and school bands lead the parade through the old town, finishing with hot chocolate in the square.',
+	'Youth coding day' => 'Young people aged ten to sixteen build a small game in a single afternoon, with mentors on hand and laptops provided.',
+	'Neighborhood potluck and games' => 'Bring a dish to share and join lawn games, a music corner and a table where neighbours swap stories and recipes.',
+	'Annual membership meeting' => 'Members review the year, vote on the budget and elect two board seats, with childcare and live captioning available.',
 );
 
 // Cover photos for the designs that show images: free Unsplash photographs, matched to articles by title (see photos.json and
@@ -102,8 +136,8 @@ for ( $row = 0; $row < 12; $row++ ) {
 				'post_status'   => 'publish',
 				'post_date'     => $date,
 				'post_date_gmt' => $date,
-				'post_excerpt'  => $excerpts[ $i % 3 ],
-				'post_content'  => $excerpts[ $i % 3 ],
+				'post_excerpt'  => $excerpts[ $titles[ $row ] ],
+				'post_content'  => $excerpts[ $titles[ $row ] ],
 				'post_category' => array( $cats[ $slug ] ),
 			)
 		);

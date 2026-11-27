@@ -1,3 +1,8 @@
+// SUPERSEDED (2.3.1 remediation): the banner and icon are now the owner-approved artwork in design/approved-artwork/, exported by
+// design/export-approved-artwork.sh. Running this script would overwrite them with the older HTML/SVG drawings, so it stops here.
+process.stderr.write( 'render-assets.mjs is superseded; use design/export-approved-artwork.sh\n' );
+process.exit( 1 );
+
 // Renders the WordPress.org icon and banner from their sources.
 //   node design/render-assets.mjs          (needs Google Chrome and `npm ci --ignore-scripts`)
 // Sources: design/icon.svg (the icon, exact vector geometry) and design/banner.html (the banner, which uses the icon).

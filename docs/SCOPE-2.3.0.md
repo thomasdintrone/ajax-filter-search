@@ -1,6 +1,6 @@
 # Scope: 2.3.0, "Beautiful content discovery"
 
-Status: **scoped, not started.** Approved direction: two new opt-in designs (Editorial Grid and Resource Library, working names), card options, a searchable term picker, dark-theme support for the new designs, block patterns and honest screenshots. Prototypes: `design/prototypes/` (`editorial.html`, `library.html`). Publishing to WordPress.org is a separate approved step (see `RELEASE-2.2.0.md` for the SVN steps).
+Status: **shipped as 2.3.0 (SVN r3828281, tag v2.3.0); audit fixes follow in 2.3.1 (see RELEASE-2.3.0.md).** Approved direction: two new opt-in designs (Editorial Grid and Resource Library, working names), card options, a searchable term picker, dark-theme support for the new designs, block patterns and honest screenshots. Prototypes: `design/prototypes/` (`editorial.html`, `library.html`). Publishing to WordPress.org is a separate approved step (see `RELEASE-2.2.0.md` for the SVN steps).
 
 ## Goals and non-goals
 

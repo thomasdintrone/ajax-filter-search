@@ -100,14 +100,14 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'section' => self::SECTION_CARDS,
 					'type'    => 'yesno',
 					'label'   => __( 'Featured image', 'ajax-filter-search' ),
-					'help'    => __( 'Show each post\'s featured image. Posts without one get a tinted tile in the Editorial Grid and no thumbnail in the Resource Library.', 'ajax-filter-search' ),
+					'help'    => __( 'Show each post\'s featured image. A post without one gets a tinted tile with a letter.', 'ajax-filter-search' ),
 					'default' => 1,
 				),
 				'afs_cards_image_ratio'        => array(
 					'section' => self::SECTION_CARDS,
 					'type'    => 'ratio',
 					'label'   => __( 'Image shape', 'ajax-filter-search' ),
-					'help'    => __( 'The proportions of the Editorial Grid images. Resource Library thumbnails are always square.', 'ajax-filter-search' ),
+					'help'    => __( 'Editorial Grid images only. Resource Library thumbnails are always square.', 'ajax-filter-search' ),
 					'default' => '16:10',
 					'needs'   => 'afs_cards_show_image',
 				),
@@ -115,7 +115,7 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'section' => self::SECTION_CARDS,
 					'type'    => 'columns',
 					'label'   => __( 'Columns', 'ajax-filter-search' ),
-					'help'    => __( 'The most columns the Editorial Grid uses. It shows fewer on narrow screens.', 'ajax-filter-search' ),
+					'help'    => __( 'The most columns the Editorial Grid uses. Fewer on narrow screens.', 'ajax-filter-search' ),
 					'default' => 3,
 				),
 				'afs_cards_show_excerpt'       => array(
@@ -460,6 +460,21 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 		/** Which fields belong to which card, in order. */
 		private static function groups() {
 			return array(
+				'appearance' => array(
+					'title'  => __( 'Appearance', 'ajax-filter-search' ),
+					'intro'  => __( 'How feeds look on your site.', 'ajax-filter-search' ),
+					'fields' => array( 'afs_appearance_design', 'afs_appearance_accent' ),
+				),
+				'cards'      => array(
+					'title'   => __( 'Cards', 'ajax-filter-search' ),
+					'intro'   => __( 'What each result shows in Editorial Grid and Resource Library.', 'ajax-filter-search' ),
+					'callout' => array(
+						__( 'Defaults, and how a feed overrides them.', 'ajax-filter-search' ),
+						__( 'These apply to every feed that uses one of these designs. One feed can override any of them with a shortcode attribute (for example columns="2") or in the block\'s Cards panel ("Use plugin setting"). Classic and Modern ignore them.', 'ajax-filter-search' ),
+					),
+					'fold'    => true,
+					'fields'  => array( 'afs_cards_show_image', 'afs_cards_image_ratio', 'afs_cards_columns', 'afs_cards_show_excerpt', 'afs_cards_excerpt_length', 'afs_cards_show_date', 'afs_cards_show_time', 'afs_cards_show_category' ),
+				),
 				'feed'       => array(
 					'title'  => __( 'Feed', 'ajax-filter-search' ),
 					'intro'  => __( 'What a feed lists by default. Every feed can override these with shortcode attributes or the block settings.', 'ajax-filter-search' ),
@@ -474,21 +489,6 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 					'title'  => __( 'Search engines', 'ajax-filter-search' ),
 					'intro'  => __( 'Keep filtered views out of search results so only your main page is indexed.', 'ajax-filter-search' ),
 					'fields' => array( 'afs_general_noindex_filtered' ),
-				),
-				'appearance' => array(
-					'title'  => __( 'Appearance', 'ajax-filter-search' ),
-					'intro'  => __( 'How feeds look on your site.', 'ajax-filter-search' ),
-					'fields' => array( 'afs_appearance_design', 'afs_appearance_accent' ),
-				),
-				'cards'      => array(
-					'title'   => __( 'Cards', 'ajax-filter-search' ),
-					'intro'   => __( 'What each result shows in the Editorial Grid and Resource Library designs.', 'ajax-filter-search' ),
-					'callout' => array(
-						__( 'Defaults, and how a feed overrides them.', 'ajax-filter-search' ),
-						__( 'These settings apply to every feed that uses one of these designs. A single feed can override any of them with a shortcode attribute (for example columns="2") or in the block\'s Cards panel, where "Use plugin setting" shows the value from this page. Classic and Modern ignore them.', 'ajax-filter-search' ),
-					),
-					'fold'    => true,
-					'fields'  => array( 'afs_cards_show_image', 'afs_cards_image_ratio', 'afs_cards_columns', 'afs_cards_show_excerpt', 'afs_cards_excerpt_length', 'afs_cards_show_date', 'afs_cards_show_time', 'afs_cards_show_category' ),
 				),
 			);
 		}
@@ -546,20 +546,28 @@ if ( ! class_exists( 'AFSAdmin' ) ) :
 								<h2 id="afs-h-start"><?php esc_html_e( 'Add to a page', 'ajax-filter-search' ); ?></h2>
 								<p class="afs-card__intro"><?php esc_html_e( 'Paste a shortcode into any page, or add the Ajax Filter Search block in the editor.', 'ajax-filter-search' ); ?></p>
 								<?php
-								foreach ( array(
-									'[ajax_filter_search]',
-									'[ajax_filter_search terms="news,events" posts_per_page="12" layout="grid"]',
-									'[ajax_filter_search show_sort="true" show_chips="true" design="classic"]',
-									'[ajax_filter_search design="editorial" columns="3" image_ratio="16:10" excerpt_length="25"]',
-									'[ajax_filter_search design="library" show_sort="true" show_chips="true"]',
-								) as $example ) {
+								$copy = static function ( $example ) {
 									printf(
 										'<div class="afs-copy"><code>%1$s</code><button type="button" class="afs-copy__btn" data-afs-copy="%1$s">%2$s</button></div>',
 										esc_attr( $example ),
 										esc_html__( 'Copy', 'ajax-filter-search' )
 									);
-								}
-								?>
+								};
+								$copy( '[ajax_filter_search]' );
+			?>
+								<details class="afs-more">
+									<summary><?php esc_html_e( 'More examples', 'ajax-filter-search' ); ?></summary>
+									<?php
+									foreach ( array(
+										'[ajax_filter_search terms="news,events" posts_per_page="12" layout="grid"]',
+										'[ajax_filter_search show_sort="true" show_chips="true" design="classic"]',
+										'[ajax_filter_search design="editorial" columns="3" image_ratio="16:10" excerpt_length="25"]',
+										'[ajax_filter_search design="library" show_sort="true" show_chips="true"]',
+									) as $example ) {
+										$copy( $example );
+									}
+									?>
+								</details>
 							</section>
 
 							<?php foreach ( self::groups() as $group => $info ) : ?>

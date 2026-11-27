@@ -15,6 +15,9 @@ class AFS_Cache {
 
 	const OPTION = 'afs_cache_version';
 
+	/** Raise when cached output must be thrown away on update, whatever else has or has not changed. */
+	const EPOCH = 2;
+
 	/** @var bool */
 	private static $dirty = false;
 
@@ -28,7 +31,7 @@ class AFS_Cache {
 			add_action( $hook, array( __CLASS__, 'mark' ) );
 		}
 		foreach ( array( 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ) as $hook ) {
-			add_action( $hook, array( __CLASS__, 'mark_thumbnail' ), 10, 3 );
+			add_action( $hook, array( __CLASS__, 'mark_image_meta' ), 10, 3 );
 		}
 		add_action( 'update_option_' . AFS_SETTINGS, array( __CLASS__, 'mark' ) );
 		add_action( 'switched_theme', array( __CLASS__, 'mark' ) );
@@ -40,15 +43,19 @@ class AFS_Cache {
 		self::$dirty = true;
 	}
 
+	/** The post meta keys behind what a card shows of an image: which one is featured, where the file is, and its sizes. */
+	const IMAGE_META = array( '_thumbnail_id', '_wp_attached_file', '_wp_attachment_metadata' );
+
 	/**
-	 * Mark a change when the post meta that holds a featured image changes.
+	 * Mark a change when the meta behind a featured image changes: choosing or removing the featured image, replacing the
+	 * file, or regenerating or cropping its sizes (which rewrites the attachment metadata without touching any post).
 	 *
 	 * @param int    $meta_id    Meta ID (unused).
 	 * @param int    $object_id  Post ID (unused).
 	 * @param string $meta_key   Meta key.
 	 */
-	public static function mark_thumbnail( $meta_id, $object_id, $meta_key ) {
-		if ( '_thumbnail_id' === $meta_key ) {
+	public static function mark_image_meta( $meta_id, $object_id, $meta_key ) {
+		if ( in_array( $meta_key, self::IMAGE_META, true ) ) {
 			self::mark();
 		}
 	}
@@ -66,7 +73,11 @@ class AFS_Cache {
 	 * @return string
 	 */
 	public static function version() {
-		$version = get_option( self::OPTION, '0' );
+		// The epoch changes when what is cached changes meaning (for example when protected content stopped depending on a
+		// visitor's cookie), so an update purges output cached by an earlier version: the object cache is keyed by this
+		// string and so are the validators browsers and caches send back. Shared caches in front of the site keep an old
+		// response for at most the response's own max-age (60 seconds by default) plus its stale window (5 minutes).
+		$version = self::EPOCH . '.' . get_option( self::OPTION, '0' );
 		/**
 		 * Filters the cache version used in result validators and cached results. Change it to invalidate everything.
 		 *

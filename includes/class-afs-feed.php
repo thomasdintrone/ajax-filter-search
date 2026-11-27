@@ -120,6 +120,17 @@ class AFS_Feed {
 	}
 
 	/**
+	 * Treat every password-protected post as locked while the feed is built.
+	 *
+	 * @param bool         $required Whether the visitor still needs the password.
+	 * @param WP_Post|null $post     The post.
+	 * @return bool
+	 */
+	public static function lock_protected( $required, $post = null ) {
+		return $required || AFS_Card::is_password_locked( $post );
+	}
+
+	/**
 	 * RSS 2.0 XML for a config and state.
 	 *
 	 * @param array $config Normalized config.
@@ -136,13 +147,18 @@ class AFS_Feed {
 		$query->is_feed = true;
 		$wp_query       = $query; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- The core feed template reads the main query; restored below.
 
+		// Core's feed template decides what to print for a protected post from the visitor's password cookie. The feed is
+		// shared (cached) output, so a protected post is always treated as locked here, whoever asks.
+		add_filter( 'post_password_required', array( __CLASS__, 'lock_protected' ), 10, 2 );
+
 		ob_start();
 		try {
 			// Core's template sends a Content-Type header itself; the REST server sets the final one, and when output
 			// has already started (command-line tests) PHP would warn, so that single warning is silenced.
 			@load_template( ABSPATH . WPINC . '/feed-rss2.php', false ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		} finally {
-			$xml      = (string) ob_get_clean();
+			$xml = (string) ob_get_clean();
+			remove_filter( 'post_password_required', array( __CLASS__, 'lock_protected' ), 10 );
 			$wp_query = $saved_query; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 			$post     = $saved_post;  // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}

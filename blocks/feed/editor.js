@@ -66,19 +66,27 @@
 	 * Searchable term picker. The block stores slugs (comma separated, as the shortcode does); the picker shows names.
 	 * A slug that is not in the loaded terms stays in the list as it is, so nothing is lost when the list is long.
 	 */
+	/**
+	 * A lookup table with no inherited keys. Term names and slugs come from the site, so a term called "constructor",
+	 * "toString" or "__proto__" must be an ordinary key, not a property of Object.prototype.
+	 */
+	function dictionary() {
+		return Object.create( null );
+	}
+
 	function TermPicker( props ) {
 		var taxonomy = props.taxonomy;
 		var searchState = useState( '' );
 		var search = searchState[ 0 ];
 		var setSearch = searchState[ 1 ];
-		var names = useRef( {} ); // slug => name, for every term seen so far.
+		var seen = useRef( { taxonomy: taxonomy, terms: dictionary() } ); // slug => { name, parent }, for every term seen in this taxonomy.
 
 		var terms = useSelect(
 			function ( select ) {
 				if ( ! taxonomy || taxonomy === 'none' ) {
 					return null;
 				}
-				var query = { per_page: 100, orderby: 'name', order: 'asc', _fields: 'id,slug,name' };
+				var query = { per_page: 100, orderby: 'name', order: 'asc', _fields: 'id,slug,name,parent' };
 				if ( search ) {
 					query.search = search;
 				}
@@ -94,8 +102,15 @@
 		}
 		var list = terms || last.current;
 
+		// Terms of another taxonomy are never offered or labelled here: start again when the taxonomy changes.
+		if ( seen.current.taxonomy !== taxonomy ) {
+			seen.current = { taxonomy: taxonomy, terms: dictionary() };
+			last.current = [];
+			list = [];
+		}
+		var names = { current: seen.current.terms };
 		list.forEach( function ( term ) {
-			names.current[ term.slug ] = term.name;
+			names.current[ term.slug ] = { name: term.name, parent: term.parent || 0 };
 		} );
 
 		var selected = ( props.value || '' )
@@ -104,12 +119,48 @@
 				return slug.trim();
 			} )
 			.filter( Boolean );
+		// A term is identified by its slug, never by its name. Each term gets one label that no other term has: its name when
+		// that is unique, otherwise the name with its slug, and if that still matches another label (a term whose name
+		// looks like one of those labels) its slug is added again, until every label is different.
+		var labels = dictionary();
+		var entries = dictionary();
+		Object.keys( names.current ).forEach( function ( slug ) {
+			entries[ slug ] = names.current[ slug ].name;
+		} );
+		selected.forEach( function ( slug ) {
+			if ( ! entries[ slug ] ) {
+				entries[ slug ] = slug; // Not loaded yet: shown by its slug.
+			}
+		} );
+		Object.keys( entries ).forEach( function ( slug ) {
+			labels[ slug ] = entries[ slug ];
+		} );
+		var groups = function () {
+			var byLabel = dictionary();
+			Object.keys( labels ).forEach( function ( slug ) {
+				( byLabel[ labels[ slug ] ] = byLabel[ labels[ slug ] ] || [] ).push( slug );
+			} );
+			return Object.keys( byLabel )
+				.map( function ( key ) {
+					return byLabel[ key ];
+				} )
+				.filter( function ( group ) {
+					return group.length > 1;
+				} );
+		};
+		for ( var round = 0, clash = groups(); clash.length && round < 10; round++, clash = groups() ) {
+			clash.forEach( function ( group ) {
+				group.forEach( function ( slug ) {
+					labels[ slug ] = labels[ slug ] + ' (' + slug + ')';
+				} );
+			} );
+		}
 		var label = function ( slug ) {
-			return names.current[ slug ] || slug;
+			return labels[ slug ] || slug;
 		};
 		var slugFor = function ( token ) {
-			var found = Object.keys( names.current ).filter( function ( slug ) {
-				return names.current[ slug ] === token;
+			var found = Object.keys( labels ).filter( function ( slug ) {
+				return labels[ slug ] === token;
 			} )[ 0 ];
 			return found || token;
 		};
@@ -123,7 +174,7 @@
 					return selected.indexOf( term.slug ) === -1;
 				} )
 				.map( function ( term ) {
-					return term.name;
+					return label( term.slug );
 				} ),
 			onChange: function ( tokens ) {
 				props.onChange(
@@ -141,8 +192,8 @@
 			__experimentalShowHowTo: false,
 			// Only terms that exist can be added; a typed name that matches none is dropped.
 			__experimentalValidateInput: function ( token ) {
-				return Object.keys( names.current ).some( function ( slug ) {
-					return names.current[ slug ] === token;
+				return Object.keys( labels ).some( function ( slug ) {
+					return names.current[ slug ] && labels[ slug ] === token;
 				} );
 			},
 		} ) );

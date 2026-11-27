@@ -126,10 +126,26 @@ class AFS_Card {
 		return array_intersect_key( $config, array_flip( $keys ) );
 	}
 
+	/**
+	 * Whether a post is password protected, read from the post itself.
+	 *
+	 * This is deliberately not post_password_required(): that answers "does this visitor still need to enter the password?"
+	 * and changes with the visitor's cookie. What the plugin shows (and what its public, cacheable responses contain) must
+	 * not depend on who is asking, so a protected post never exposes an image or an excerpt, even to someone who has entered
+	 * the password. Its title stays listed, as in any WordPress archive.
+	 *
+	 * @param mixed $post Post, ID or null for the current post.
+	 * @return bool
+	 */
+	public static function is_password_locked( $post = null ) {
+		$post = get_post( $post );
+		return $post instanceof WP_Post && '' !== (string) $post->post_password;
+	}
+
 	/** True when the post's image can be shown: a featured image exists and the post is not password protected. */
 	public static function has_image( $post = null ) {
 		$post = get_post( $post );
-		return $post && ! post_password_required( $post ) && has_post_thumbnail( $post );
+		return $post && ! self::is_password_locked( $post ) && has_post_thumbnail( $post );
 	}
 
 	/**
@@ -208,7 +224,7 @@ class AFS_Card {
 	 */
 	public static function excerpt( $words = 25 ) {
 		$post = get_post();
-		if ( ! $post || post_password_required( $post ) ) {
+		if ( ! $post || self::is_password_locked( $post ) ) {
 			return '';
 		}
 		$text = has_excerpt( $post ) ? $post->post_excerpt : $post->post_content;

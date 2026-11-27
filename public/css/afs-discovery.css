@@ -310,7 +310,8 @@
 }
 
 .afs-discovery .afs-resultbar .afs-count {
-	margin: 0 0 0 auto;
+	margin: 0;
+	margin-inline-start: auto;
 	color: var(--afs-muted);
 	font-size: 0.875em;
 }
@@ -446,7 +447,30 @@
 	}
 
 	.afs-discovery .afs-resultbar .afs-count {
-		margin-left: 0;
+		margin-inline-start: 0;
+	}
+
+	/* The layout switch leaves the tab row: it sits at the right of the line that holds the result count (and any chips),
+	   so the pills get the full width. Only its place on screen changes; in the page and tab order it still follows the tabs. */
+	.afs-discovery.afs-js.afs-has-switch .afs-Switch {
+		grid-column: 1 / -1;
+		grid-row: 3;
+		position: relative;
+		z-index: 1;
+	}
+
+	.afs-discovery.afs-js.afs-has-switch .afs-results {
+		margin-top: -2.9rem;
+	}
+
+	.afs-discovery.afs-js.afs-has-switch .afs-resultbar {
+		min-height: 2.9rem;
+		padding-inline-end: 6.5rem; /* Logical, so the room is on the switch side in right-to-left text too. */
+	}
+
+	/* Nothing to share the line with (an empty result with no chips): start below the switch. */
+	.afs-discovery.afs-js.afs-has-switch .afs-results > :first-child:not(.afs-resultbar) {
+		margin-top: 3.2rem;
 	}
 
 	.afs-discovery .afs-pagination ul {
