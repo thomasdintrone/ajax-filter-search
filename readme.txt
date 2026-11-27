@@ -5,7 +5,7 @@ Tags: ajax filter, filter posts, live search, category filter, custom post type
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -171,6 +171,16 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 
 == Changelog ==
 
+= 2.3.1 =
+* Fixed: A password-protected post no longer shows its featured image or excerpt in the Editorial Grid, the Resource Library, the results route or the RSS feed, whether or not the visitor has entered the password.
+* Fixed: Cached results now also refresh when a featured image file or its details are replaced or edited.
+* Fixed: A feed with `show_chips="false"` on a site where chips are on keeps its chips off after an Ajax update.
+* Fixed: In the block's term picker, terms that share a name (for example in different parent categories) can each be chosen; they are told apart by their slug.
+* Improved: On phones the layout switch sits beside the result count, and the category tabs use the full width. It works in right-to-left languages too.
+* Improved: The settings screen shows one shortcode with a "More examples" list, puts the design choice first and has shorter Cards text.
+* Improved: New plugin banner and icon, and retaken screenshots.
+* Classic and Modern feeds, shortcodes, saved settings, bookmarked links and theme template overrides are unchanged.
+
 = 2.3.0 =
 * New: Editorial Grid design (image cards with category badges, excerpts and dates) and Resource Library design (compact searchable rows with optional thumbnails). Choose them under Settings > Appearance, with `design="editorial"` or `design="library"`, or in the block. Existing sites keep their current design.
 * New: Cards settings for what each result shows: featured image, image shape, columns, excerpt and its length, date, time and category badge. Set them site wide under Settings > Cards or for one feed with shortcode attributes or the block.
@@ -250,6 +260,9 @@ The plugin's single settings option is removed when you delete the plugin. Your 
 * Ajax Filter Search
 
 == Upgrade Notice ==
+
+= 2.3.1 =
+Fixes password-protected posts appearing with an image or excerpt in the new designs, and a few smaller problems. Existing feeds look exactly as before. Recommended.
 
 = 2.3.0 =
 Adds two optional designs (Editorial Grid and Resource Library) with featured images, excerpts, card settings, block patterns and dark-theme support. Existing feeds look exactly as before until you choose a new design. Recommended.

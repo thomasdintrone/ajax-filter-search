@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ajax Filter Search: Filter Posts by Category, Date & Keyword 2.3.0\n"
+"Project-Id-Version: Ajax Filter Search: Filter Posts by Category, Date & Keyword 2.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ajax-filter-search\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-26T22:58:37+00:00\n"
+"POT-Creation-Date: 2026-11-27T00:10:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: ajax-filter-search\n"
@@ -313,7 +313,7 @@ msgid "Next page"
 msgstr ""
 
 #: includes/class-afs-settings.php:32
-#: blocks/feed/editor.js:216
+#: blocks/feed/editor.js:258
 msgid "Post type"
 msgstr ""
 
@@ -330,7 +330,7 @@ msgid "Select a taxonomy for the tabbed filters."
 msgstr ""
 
 #: includes/class-afs-settings.php:46
-#: blocks/feed/editor.js:241
+#: blocks/feed/editor.js:283
 msgid "Posts per page"
 msgstr ""
 
@@ -339,7 +339,7 @@ msgid "How many posts to display per page (1 to 100)."
 msgstr ""
 
 #: includes/class-afs-settings.php:53
-#: blocks/feed/editor.js:292
+#: blocks/feed/editor.js:334
 msgid "Category tabs"
 msgstr ""
 
@@ -348,7 +348,7 @@ msgid "Display tabbed filters."
 msgstr ""
 
 #: includes/class-afs-settings.php:60
-#: blocks/feed/editor.js:312
+#: blocks/feed/editor.js:354
 msgid "Layout switcher"
 msgstr ""
 
@@ -365,7 +365,7 @@ msgid "The layout used when a page first loads."
 msgstr ""
 
 #: includes/class-afs-settings.php:74
-#: blocks/feed/editor.js:320
+#: blocks/feed/editor.js:362
 msgid "Sort control"
 msgstr ""
 
@@ -374,7 +374,7 @@ msgid "Let visitors sort by newest, oldest, A to Z, recently updated or most com
 msgstr ""
 
 #: includes/class-afs-settings.php:81
-#: blocks/feed/editor.js:328
+#: blocks/feed/editor.js:370
 msgid "Active filter chips"
 msgstr ""
 
@@ -391,7 +391,7 @@ msgid "Adds noindex to a page when it is shown with a filter, search or page num
 msgstr ""
 
 #: includes/class-afs-settings.php:95
-#: blocks/feed/editor.js:300
+#: blocks/feed/editor.js:342
 msgid "Design"
 msgstr ""
 
@@ -400,7 +400,7 @@ msgid "How feeds look. Editorial Grid and Resource Library show image cards or c
 msgstr ""
 
 #: includes/class-afs-settings.php:102
-#: blocks/feed/editor.js:362
+#: blocks/feed/editor.js:404
 msgid "Featured image"
 msgstr ""
 
@@ -409,7 +409,7 @@ msgid "Show each post's featured image. A post without one gets a tinted tile wi
 msgstr ""
 
 #: includes/class-afs-settings.php:109
-#: blocks/feed/editor.js:372
+#: blocks/feed/editor.js:414
 msgid "Image shape"
 msgstr ""
 
@@ -418,7 +418,7 @@ msgid "Editorial Grid images only. Resource Library thumbnails are always square
 msgstr ""
 
 #: includes/class-afs-settings.php:117
-#: blocks/feed/editor.js:385
+#: blocks/feed/editor.js:427
 msgid "Columns"
 msgstr ""
 
@@ -427,7 +427,7 @@ msgid "The most columns the Editorial Grid uses. Fewer on narrow screens."
 msgstr ""
 
 #: includes/class-afs-settings.php:124
-#: blocks/feed/editor.js:395
+#: blocks/feed/editor.js:437
 msgid "Excerpt"
 msgstr ""
 
@@ -444,7 +444,7 @@ msgid "How many words of the excerpt to show (10 to 80)."
 msgstr ""
 
 #: includes/class-afs-settings.php:139
-#: blocks/feed/editor.js:416
+#: blocks/feed/editor.js:458
 msgid "Publication date"
 msgstr ""
 
@@ -453,7 +453,7 @@ msgid "Show the date each post was published."
 msgstr ""
 
 #: includes/class-afs-settings.php:146
-#: blocks/feed/editor.js:426
+#: blocks/feed/editor.js:468
 msgid "Include the time"
 msgstr ""
 
@@ -462,7 +462,7 @@ msgid "Show the time of day next to the date. It needs the publication date to b
 msgstr ""
 
 #: includes/class-afs-settings.php:154
-#: blocks/feed/editor.js:435
+#: blocks/feed/editor.js:477
 msgid "Category badge"
 msgstr ""
 
@@ -493,7 +493,7 @@ msgstr ""
 
 #: includes/class-afs-settings.php:244
 #: includes/class-afs-settings.php:469
-#: blocks/feed/editor.js:360
+#: blocks/feed/editor.js:402
 msgid "Cards"
 msgstr ""
 
@@ -503,7 +503,7 @@ msgstr ""
 
 #: includes/class-afs-settings.php:374
 #: includes/class-afs-settings.php:673
-#: blocks/feed/editor.js:192
+#: blocks/feed/editor.js:234
 msgid "None"
 msgstr ""
 
@@ -516,12 +516,12 @@ msgid "No"
 msgstr ""
 
 #: includes/class-afs-settings.php:439
-#: blocks/feed/editor.js:284
+#: blocks/feed/editor.js:326
 msgid "List"
 msgstr ""
 
 #: includes/class-afs-settings.php:440
-#: blocks/feed/editor.js:285
+#: blocks/feed/editor.js:327
 msgid "Grid"
 msgstr ""
 
@@ -633,99 +633,99 @@ msgstr ""
 #. translators: %s: the current value of the setting, "Show" or "Hide".
 #. translators: %s: the current value of the setting, for example 16:10.
 #: blocks/feed/editor.js:39
-#: blocks/feed/editor.js:374
+#: blocks/feed/editor.js:416
 #, js-format
 msgid "Use plugin setting (%s)"
 msgstr ""
 
 #: blocks/feed/editor.js:39
 #: blocks/feed/editor.js:42
-#: blocks/feed/editor.js:162
+#: blocks/feed/editor.js:204
 msgid "Show"
 msgstr ""
 
 #: blocks/feed/editor.js:39
 #: blocks/feed/editor.js:43
-#: blocks/feed/editor.js:163
+#: blocks/feed/editor.js:205
 msgid "Hide"
 msgstr ""
 
-#: blocks/feed/editor.js:128
+#: blocks/feed/editor.js:170
 msgid "Limit to these terms"
 msgstr ""
 
-#: blocks/feed/editor.js:214
+#: blocks/feed/editor.js:256
 msgid "Content"
 msgstr ""
 
-#: blocks/feed/editor.js:224
+#: blocks/feed/editor.js:266
 msgid "Taxonomy for tabs"
 msgstr ""
 
-#: blocks/feed/editor.js:242
+#: blocks/feed/editor.js:284
 msgid "0 uses the plugin setting."
 msgstr ""
 
-#: blocks/feed/editor.js:251
+#: blocks/feed/editor.js:293
 msgid "Order by"
 msgstr ""
 
-#: blocks/feed/editor.js:255
+#: blocks/feed/editor.js:297
 msgid "Date published"
 msgstr ""
 
-#: blocks/feed/editor.js:256
+#: blocks/feed/editor.js:298
 msgid "Title"
 msgstr ""
 
-#: blocks/feed/editor.js:257
+#: blocks/feed/editor.js:299
 msgid "Date modified"
 msgstr ""
 
-#: blocks/feed/editor.js:264
+#: blocks/feed/editor.js:306
 msgid "Order"
 msgstr ""
 
-#: blocks/feed/editor.js:268
+#: blocks/feed/editor.js:310
 msgid "Newest / Z to A first"
 msgstr ""
 
-#: blocks/feed/editor.js:269
+#: blocks/feed/editor.js:311
 msgid "Oldest / A to Z first"
 msgstr ""
 
-#: blocks/feed/editor.js:278
+#: blocks/feed/editor.js:320
 msgid "Display"
 msgstr ""
 
-#: blocks/feed/editor.js:280
+#: blocks/feed/editor.js:322
 msgid "Starting layout"
 msgstr ""
 
-#: blocks/feed/editor.js:336
+#: blocks/feed/editor.js:378
 msgid "Search box"
 msgstr ""
 
-#: blocks/feed/editor.js:343
+#: blocks/feed/editor.js:385
 msgid "Month filter"
 msgstr ""
 
-#: blocks/feed/editor.js:350
+#: blocks/feed/editor.js:392
 msgid "Year filter"
 msgstr ""
 
 #. translators: %d: the current default number of columns.
-#: blocks/feed/editor.js:386
+#: blocks/feed/editor.js:428
 #, js-format
 msgid "The most columns used. 0 uses the plugin setting (%d)."
 msgstr ""
 
-#: blocks/feed/editor.js:405
+#: blocks/feed/editor.js:447
 msgid "Excerpt length (words)"
 msgstr ""
 
 #. translators: %d: the current default excerpt length in words.
-#: blocks/feed/editor.js:406
+#: blocks/feed/editor.js:448
 #, js-format
 msgid "0 uses the plugin setting (%d)."
 msgstr ""
