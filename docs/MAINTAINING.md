@@ -5,11 +5,10 @@ GitHub is the source of truth for development. WordPress.org SVN is a release ta
 ## Current state
 | Item | Value |
 |---|---|
-| Production version | **2.3.0** (WordPress.org SVN r3828281, published 2026-11-26; Git tag `v2.3.0` = `3e2bc45`). Whether WordPress.org is offering the update to sites is checked with `bin/verify-live-release.sh 2.3.0 2.2.2`; do not assume it |
-| Release history | 2.3.0 r3828281; 2.2.2 r3827794; 2.2.1 r3827748 (all three 2026-11-26); 2.2.0 r3809958 (2026-11-18); 2.1.0 r3803994; 2.0.0 r3775464 (2026-10-30, `36c8469`); 1.0.4 security release r3774078; 1.0.3 original. Each has a Git tag `v<version>`. Per-release notes: `docs/RELEASE-*.md` |
-| In progress | 2.3.1 (audit fixes, `fix/2.3.0-audit-remediation`, PR 31): prepared, not published; see `docs/RELEASE-2.3.1.md` |
+| Production version | **2.3.1** (SVN r3828499, 2026-11-26; Git tag `v2.3.1` = `4cd6521`). Whether WordPress.org is offering updates to sites is checked with `bin/verify-live-release.sh 2.3.1 2.3.0` after the roughly 6-hour hold; do not assume it |
+| Release history | 2.3.1 r3828499; 2.3.0 r3828281; 2.2.2 r3827794; 2.2.1 r3827748 (all three 2026-11-26); 2.2.0 r3809958 (2026-11-18); 2.1.0 r3803994; 2.0.0 r3775464 (2026-10-30, `36c8469`); 1.0.4 security release r3774078; 1.0.3 original. Each has a Git tag `v<version>`. Per-release notes: `docs/RELEASE-*.md` |
 | Supported | WordPress 6.0 and up (tested to 7.1.4), PHP 7.4 and up (tested on 7.4 and 8.4) |
-| Git | `master` is the integration branch (2.3.0 and its docs, `d679789`, when this was written). Historical: until the 2.0.0 release `master` equalled the 2.0.0 source (merge commit `40e44bd`) |
+| Git | `master` is the integration branch (2.3.1, `4cd6521`, when this was written). Historical: until the 2.0.0 release `master` equalled the 2.0.0 source (merge commit `40e44bd`) |
 | Source layout | see `README.md` |
 
 ## Build and package
